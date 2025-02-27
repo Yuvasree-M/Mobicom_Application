@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobi.Comm - Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+        html {
+            scroll-padding-top: 80px;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Navbar Styling - Fixed Position */
+        .navbar {
+            background: linear-gradient(90deg, #00796B, #009688);
+            padding: 10px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #FFD700 !important;
+            margin-right: 30px;
+        }
+
+        .navbar-nav {
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-item {
+            margin: 0 5px;
+        }
+
+        .nav-link {
+            color: white !important;
+            font-size: 1.1rem;
+            padding: 8px 15px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: #FFD700 !important;
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-link.active {
+            color: #FFD700 !important;
+            font-weight: bold;
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 15%;
+            width: 70%;
+            height: 2px;
+            background-color: #FFD700;
+            transition: width 0.3s;
+        }
+
+        .avatar-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgb(254, 254, 254);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            margin-left: 15px;
+        }
+
+        .avatar-icon:hover {
+            background-color: #FFD700;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            transform: scale(1.1);
+        }
+
+        .dropdown-menu {
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: none;
+            margin-top: 10px;
+        }
+
+        .dropdown-item {
+            padding: 8px 20px;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background-color: #E0F2F1;
+        }
+
+
+
+        /* Hero Section - Adjusted for fixed navbar */
+        .hero-section {
+            text-align: center;
+            padding: 100px 0 60px;
+            background: #E0F2F1;
+            margin-top: 70px;
+        }
+
+        .hero-section h2 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #0e0f0f;
+        }
+
+        /* Carousel Section */
+        .carousel-section {
+            padding: 40px 0;
+            background: #f8f9fa;
+        }
+
+        .carousel-inner img {
+            height: 350px;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+
+        .carousel-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+            padding: 0 20px;
+        }
+
+        .carousel-text h3 {
+            color: #00796B;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .carousel-text p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .carousel-text .btn {
+            align-self: flex-start;
+            background: #FFA000;
+            color: white;
+            border-radius: 25px;
+            padding: 10px 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .carousel-text .btn:hover {
+            background: #FF8F00;
+            transform: scale(1.05);
+        }
+
+        /* Quick Recharge Section */
+        .quick-recharge {
+            background: #E0F2F1;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 30px auto;
+            width: 60%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .recharge-input {
+            width: 80%;
+            padding: 15px;
+            border-radius: 25px;
+            border: 2px solid #009688;
+            font-size: 1.2rem;
+            text-align: center;
+            margin-bottom: 15px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .recharge-input:focus {
+            outline: none;
+            border-color: #00796B;
+            box-shadow: 0 0 0 3px rgba(0, 150, 136, 0.25);
+        }
+
+        #rechargeButton {
+            padding: 10px 30px;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        #rechargeButton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Popular Plans Section */
+        .popular-plans {
+            padding: 40px;
+            background: linear-gradient(90deg, #00796B, #009688);
+            color: white;
+            text-align: center;
+        }
+
+        /* Plan Wrapper - Uses Grid for Better Responsiveness */
+        .plan-wrapper {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Individual Plan Card */
+        .plan-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Top Accent Line */
+        .plan-card::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 5px;
+            top: 0;
+            left: 0;
+            background: linear-gradient(90deg, #FFA000, #FFD700);
+        }
+
+        /* Hover Effects */
+        .plan-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Plan Title */
+        .plan-card h4 {
+            font-size: 1.6rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #00796B;
+        }
+
+        /* Plan Details */
+        .plan-card p {
+            font-size: 1.1rem;
+            color: #444;
+        }
+
+        /* Recharge Button */
+        .plan-card .btn-plan {
+            background: #FFA000;
+            color: white;
+            border-radius: 20px;
+            font-weight: bold;
+            transition: background 0.3s ease, transform 0.2s;
+            padding: 10px 20px;
+            margin-top: 15px;
+            display: inline-block;
+        }
+
+        /* Hover Effect for Button */
+        .plan-card .btn-plan:hover {
+            background: #FF8F00;
+            transform: translateY(-2px);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+
+            /* Tablets */
+            .plan-wrapper {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            }
+        }
+
+        @media (max-width: 480px) {
+
+            /* Mobile */
+            .plan-card {
+                padding: 20px;
+            }
+
+            .plan-card h4 {
+                font-size: 1.4rem;
+            }
+
+            .plan-card p {
+                font-size: 1rem;
+            }
+
+            .plan-card .btn-plan {
+                font-size: 1rem;
+                padding: 8px 15px;
+            }
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            padding: 50px 20px;
+            background: #fbfbfb;
+            text-align: center;
+        }
+
+        .faq-section h3 {
+            color: #020202;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .accordion {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .accordion-item {
+            border: none;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .accordion-button {
+            background-color: #f8f9fa;
+            color: #37474F;
+            font-weight: 600;
+            padding: 15px;
+            border: none;
+            box-shadow: none;
+            border-radius: 8px;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .accordion-button:hover {
+            background-color: #72cbc8;
+            color: rgb(0, 0, 0);
+        }
+
+
+        .accordion-button:focus {
+            box-shadow: none;
+            border-color: rgba(150, 235, 225, 0.577);
+        }
+
+        .accordion-body {
+            background-color: #E0F2F1;
+            padding: 15px 20px;
+            color: #141d22;
+            border-radius: 0 0 8px 8px;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(90deg, #00796B, #009688);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .footer a {
+            color: #FFD700;
+            /* Gold */
+            margin: 0 15px;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer a:hover {
+            color: #FFA000;
+            /* Amber */
+            text-decoration: underline;
+        }
+
+        .footer-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-columns {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            text-align: left;
+            padding-bottom: 20px;
+        }
+
+        .footer-column {
+            width: 48%;
+        }
+
+        .footer-column h3 {
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .footer-column p,
+        .footer-column address {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .footer-column a {
+            color: #FFD700;
+            /* Gold */
+        }
+
+        .footer-column a:hover {
+            color: #FFA000;
+            /* Amber */
+        }
+
+        .social-icons {
+            margin-top: 15px;
+        }
+
+        .social-icons a {
+            color: #FFD700;
+            font-size: 1.5rem;
+            margin: 0 10px;
+            transition: transform 0.3s, color 0.3s;
+        }
+
+        .social-icons a:hover {
+            color: white;
+            /* Gold */
+            transform: translateY(-3px);
+        }
+
+        .footer-copyright {
+            border-top: 1px solid #555;
+            padding-top: 10px;
+            font-size: 14px;
+        }
+
+
+        /* Back to Top Button */
+        #homeButton {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: none;
+            background: #FFA000;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 50%;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+            width: 50px;
+            height: 50px;
+        }
+
+        #homeButton:hover {
+            background: #FF8F00;
+            transform: scale(1.1);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 80px 0 40px;
+            }
+
+            .hero-section h2 {
+                font-size: 1.8rem;
+            }
+
+            .carousel-inner img {
+                height: 250px;
+            }
+
+            .quick-recharge {
+                width: 90%;
+                padding: 30px 20px;
+            }
+
+            .recharge-input {
+                width: 100%;
+            }
+
+            .plan-card {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .footer-columns {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .footer-column {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .navbar-nav {
+                margin: 10px 0;
+            }
+
+            .nav-item {
+                margin: 5px 0;
+            }
+
+            .nav-link {
+                padding: 10px;
+                border-radius: 0;
+            }
+
+            .nav-link.active::after {
+                width: 30%;
+                left: 35%;
+            }
+
+            .navbar-collapse {
+                max-height: calc(100vh - 70px);
+                overflow-y: auto;
+                background-color: #00796B;
+                border-radius: 0 0 10px 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!--  Navbar with Menu and Avatar Dropdown -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#home">Mobi.Comm</a>
+
+
+            <!-- Navbar content -->
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#offers">Offers</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#quick-recharge">Quick Recharge</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#plans">Plans</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#faq">FAQ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Avatar dropdown -->
+            <div class="dropdown">
+                <div class="avatar-icon" data-bs-toggle="dropdown">
+                    <i class="fas fa-user"></i>
+                </div>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="login.html">Login</a></li>
+                    <li><a class="dropdown-item" href="signup.html">Register</a></li>
+                </ul>
+            </div>
+            <!-- Toggle button for mobile -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+        </div>
+
+
+    </nav>
+
+    <!--  Hero Section -->
+    <div class="hero-section" id="home">
+        <h2>Welcome to <span style="color: #00796B;">Mobi.Comm</span> Service</h2>
+        <p>Recharge your mobile in just a few clicks.</p>
+    </div>
+
+    <!--  Updated Carousel Section with Text -->
+    <div class="carousel-section" id="offers">
+        <div class="container">
+            <div class="row align-items-center">
+                <!-- Left side: Carousel (50% width) -->
+                <div class="col-md-6">
+                    <div id="offerCarousel" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <img src="Images/image1.avif" class="d-block w-100" alt="Special Offer">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="Images/image3.avif" class="d-block w-100" alt="Promotional Deal">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="Images/image3.jpeg" class="d-block w-100" alt="Promotional Deal">
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#offerCarousel"
+                            data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#offerCarousel"
+                            data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right side: Text content (50% width) -->
+                <div class="col-md-6">
+                    <div class="carousel-text">
+                        <h3>Exclusive Offers Just For You</h3>
+                        <p>Discover our latest promotional plans with unbeatable data packages and unlimited calling.
+                            Our special offers provide you with the best value for your money, ensuring you stay
+                            connected without worrying about overcharges.</p>
+                        <p>Switch to Mobi.Comm today and experience lightning-fast 5G speeds, seamless connectivity, and
+                            customer support that truly cares about your needs.</p>
+                        <a class="btn" href="offers.html">View Offers</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--  Quick Recharge Section -->
+    <div class="quick-recharge" id="quick-recharge">
+        <h3>Quick Recharge</h3>
+        <input type="text" id="mobileNumber" class="recharge-input" placeholder="+91 Enter Mobile Number">
+        <div id="error-message" style="color: red; margin-top: 10px;"></div>
+        <button class="btn btn-success" id="rechargeButton">Recharge Now</button>
+    </div>
+
+    <!-- Popular plan -->
+    <div class="popular-plans" id="plans">
+        <div class="container">
+            <h3 style="text-align: center; padding-bottom: 20px;">Popular Plans</h3>
+            <div id="plans-container" class="row justify-content-center">
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="faq-section" id="faq">
+        <h3 style="text-align: center; padding-bottom: 20px;">Frequently Asked Questions</h3>
+        <div class="accordion accordion-flush" id="faqAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#faq1">What is
+                        Mobi.Comm?</button>
+                </h2>
+                <div id="faq1" class="accordion-collapse collapse">
+                    <div class="accordion-body">Mobi.Comm is a leading mobile service provider offering affordable
+                        prepaid recharge plans with high-speed data, unlimited calls, and seamless network coverage
+                        across India.</div>
+                </div>
+                <h2 class="accordion-header">
+                    <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#faq2">How to
+                        recharge?</button>
+                </h2>
+                <div id="faq2" class="accordion-collapse collapse">
+                    <div class="accordion-body">Enter your mobile number, select a plan, and proceed to payment.</div>
+                </div>
+                <h2 class="accordion-header">
+                    <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#faq3">How do I create an
+                        account?</button>
+                </h2>
+                <div id="faq3" class="accordion-collapse collapse">
+                    <div class="accordion-body"> You can sign up using your mobile number and verify it via OTP. For
+                        admin access, use your email and password.</div>
+                </div>
+                <h2 class="accordion-header">
+                    <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#faq4">What payment
+                        methods are accepted?</button>
+                </h2>
+                <div id="faq4" class="accordion-collapse collapse">
+                    <div class="accordion-body"> We accept UPI, Net Banking and Credit/Debit Cards.</div>
+                </div>
+                <h2 class="accordion-header">
+                    <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#faq5"> I didn't receive
+                        my recharge confirmation. What should I do?</button>
+                </h2>
+                <div id="faq5" class="accordion-collapse collapse">
+                    <div class="accordion-body">Check your email and SMS notifications. If you still haven't received
+                        confirmation, contact our support team.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button id="homeButton"><i class="fas fa-arrow-up"></i></button>
+
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+        <div class="container py-5">
+            <div class="row">
+                <div class="col-md-6 footer-column mb-4 mb-md-0">
+                    <h5>About Mobi.Comm</h5>
+                    <p>We provide quick and secure mobile recharges for prepaid users. Our goal is to make recharge
+                        services simple, efficient, and accessible.</p>
+                </div>
+                <div class="col-md-6 footer-column">
+                    <h5>Contact</h5>
+                    <p>Email: <a href="mailto:support@mobi.comm">support@mobi.comm</a></p>
+                    <p>Phone: +1 234 567 890</p>
+                    <div class="social-icons">
+                        <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom text-center mt-4">
+                <p>&copy; 2025 Mobi.Comm - All Rights Reserved</p>
+            </div>
+        </div>
+    </footer>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const navbarHeight = document.querySelector('.navbar').offsetHeight;
+            document.documentElement.style.setProperty('--scroll-padding', navbarHeight + 'px');
+
+            document.getElementById('rechargeButton').addEventListener('click', function () {
+                var mobileNumber = document.getElementById('mobileNumber').value;
+                var errorMessage = document.getElementById('error-message');
+
+                errorMessage.innerHTML = '';
+                if (!mobileNumber) {
+                    errorMessage.innerHTML = 'Please enter your mobile number.';
+                    return;
+                }
+                var phoneRegex = /^\+91\s\d{5}\s\d{5}$/;
+                if (!phoneRegex.test(mobileNumber)) {
+                    errorMessage.innerHTML = 'Please enter a valid phone number (e.g., +91 XXXXX XXXXX).';
+                    return;
+                }
+
+                window.location.href = 'plans.html';
+            });
+
+
+            const rechargeButtons = document.querySelectorAll(".recharge-btn");
+            rechargeButtons.forEach(btn => {
+                btn.addEventListener("click", function () {
+                    let planCard = this.closest(".plan-card");
+                    let planData = {
+                        price: planCard.dataset.price,
+                        validity: planCard.dataset.validity,
+                        data: planCard.dataset.data
+                    };
+
+
+                    window.location.href = `payment_simulation.html?price=${planData.price}&validity=${planData.validity}&data=${planData.data}`;
+                });
+            });
+
+            // Handle smooth scrolling for nav links with fixed navbar
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    navLinks.forEach(navLink => navLink.classList.remove('active'));
+                    this.classList.add('active');
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetElement = document.getElementById(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+
+        // Show/hide home button based on scroll position
+        window.addEventListener("scroll", function () {
+            let homeButton = document.getElementById("homeButton");
+            if (window.scrollY > 200) {
+                homeButton.style.display = "block";
+            } else {
+                homeButton.style.display = "none";
+            }
+            updateActiveNavItem();
+        });
+
+        document.getElementById("homeButton").addEventListener("click", function () {
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        });
+
+        // Function to update active nav item based on scroll position
+        function updateActiveNavItem() {
+            const navbarHeight = document.querySelector('.navbar').offsetHeight;
+            const sections = ['home', 'offers', 'quick-recharge', 'plans', 'faq', 'contact'];
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            let currentSection = '';
+
+            sections.forEach(section => {
+                const element = document.getElementById(section);
+                if (element) {
+                    const rect = element.getBoundingClientRect();
+                    if (rect.top <= navbarHeight + 20 && rect.bottom >= navbarHeight + 20) {
+                        currentSection = section;
+                    }
+                }
+            });
+
+            if (currentSection) {
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${currentSection}`) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const plans = [
+                { name: "Basic Plan", price: 299, validity: "28 Days", calls: "500 minutes", sms: "100", data: "1GB/day" },
+                { name: "Unlimited Plan", price: 999, validity: "90 Days", calls: "Unlimited", sms: "100/day", data: "5GB/day" },
+                { name: "Data Booster Plan", price: 599, validity: "28 Days", calls: "N/A", sms: "N/A", data: "2GB Total" },
+                { name: "Basic Plan", price: 349, validity: "30 Days", calls: "600 minutes", sms: "150", data: "1.5GB/day" },
+                { name: "Unlimited Plan", price: 1099, validity: "100 Days", calls: "Unlimited", sms: "120/day", data: "4GB/day" },
+                { name: "Data Booster Plan", price: 699, validity: "35 Days", calls: "N/A", sms: "N/A", data: "3GB Total" },
+                { name: "Basic Plan", price: 199, validity: "21 Days", calls: "400 minutes", sms: "80", data: "1GB/day" },
+                { name: "Unlimited Plan", price: 1299, validity: "120 Days", calls: "Unlimited", sms: "150/day", data: "6GB/day" },
+                { name: "Data Booster Plan", price: 799, validity: "42 Days", calls: "N/A", sms: "N/A", data: "5GB Total" }
+            ];
+
+            const plansContainer = document.getElementById("plans-container");
+            let selectedPlan = {};
+
+            plans.forEach(plan => {
+                const planCard = document.createElement("div");
+                planCard.classList.add("col-md-4", "mb-4");
+
+                planCard.innerHTML = `
+                    <div class="plan-card">
+                        <h4>${plan.name} | ₹${plan.price}</h4>
+                        <p>Validity: <strong> ${plan.validity} </strong></p>
+                        <p>Calls: <strong> ${plan.calls}</strong></p>
+                        <p>SMS: <strong> ${plan.sms}</strong></p>
+                        <p>Data: <strong> ${plan.data}</strong></p>
+                        <a class="btn btn-plan recharge-btn" href="login.html">
+                            Recharge
+                        </a>
+                    </div>
+                `;
+
+                plansContainer.appendChild(planCard);
+            });
+
+        });
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,152 @@
+{
+    "totalSubscribers": 1500,
+    "activePlans": 120,
+    "expiringSubscribers": [
+        {
+            "name": "Yuvas",
+            "phone": "+91 98765 43210",
+            "plan": "Basic Plan",
+            "price": "₹999",
+            "validity": 30,
+            "rechargeDate": "01-02-2020",
+            "expiryDate": "03-03-2025"
+        },
+        {
+            "name": "Yuvasree",
+            "phone": "+91 98735 43210",
+            "plan": "Unlimited Plan",
+            "price": "₹999",
+            "validity": 30,
+           "rechargeDate": "01-02-2020",
+            "expiryDate": "03-03-2025"
+        },
+        {
+            "name": "SreeYuva",
+            "phone": "+91 98765 23210",
+            "plan": "Data Booster Plan",
+            "price": "₹999",
+            "validity": 30,
+            "rechargeDate": "01-02-2020",
+            "expiryDate": "03-03-2025"
+        },
+        {
+            "name": "Vaish",
+            "phone": "+91 98765 13210",
+            "plan": "Unlimited",
+            "price": "₹999",
+            "validity": 30,
+           "rechargeDate": "01-02-2020",
+            "expiryDate": "03-03-2025"
+        }
+    ],
+    "totalRevenue": 50000,
+    "totalRecharge": 8500,
+    "newSubscribers": 8,
+    "revenueOverview": {
+        "dates": ["Feb 1", "Feb 5", "Feb 10", "Feb 15", "Feb 20"],
+        "values": [2000, 2500, 3000, 2800, 3200]
+    },
+    "dailyRecharge": {
+        "dates": ["Feb 1", "Feb 2", "Feb 3", "Feb 4", "Feb 5"],
+        "values": [500, 600, 700, 800, 900]
+    },
+    "rechargePlanPopularity": {
+        "plans": ["Baisc Plan", "Unlimited Plan", "Data Booster Plan"],
+        "values": [30, 40, 20]
+    },
+    "paymentModeUsage": {
+        "modes": ["Credit/Debit Card","Net Banking","UPI"],
+        "values": [40, 30, 20]
+    },
+    "subscribers": [
+        { "name": "Yuvasree", "mobile": "+91 98765 43210", "email": "yuvasree@example.com", "status": "Pending" },
+        { "name": "Yuva", "mobile": "+91 98765 43211", "email": "yuva@example.com", "status": "Pending" },
+        { "name": "Subscriber 1", "mobile": "+91 98765 43212", "email": "subscriber1@example.com", "status": "Pending" },
+        { "name": "Subscriber 2", "mobile": "+91 98765 43213", "email": "subscriber2@example.com", "status": "Pending" },
+        { "name": "Subscriber 3", "mobile": "+91 98765 43214", "email": "subscriber3@example.com", "status": "Pending" },
+        { "name": "Vaishiya", "mobile": "+91 98765 43215", "email": "vaishiya@example.com", "status": "Pending" },
+        { "name": "Subscriber 4", "mobile": "+91 98765 43216", "email": "subscriber4l@example.com", "status": "Pending" }
+    ],
+    "plans": [
+        { "name": "Basic Plan", "price": 199, "validity": "30 Days", "dataLimit": "Nil", "smsLimit": "100 SMS", "callLimit": "Unlimited", "status": "Active" },
+        { "name": "Unlimited Plan", "price": 399, "validity": "60 Days", "dataLimit": "2GB/Day", "smsLimit": "200 SMS", "callLimit": "Unlimited", "status": "Active" },
+        { "name": "Data Booster Plan", "price": 599, "validity": "90 Days", "dataLimit": "50GB Total", "smsLimit": "Nil", "callLimit": "Nil", "status": "Inactive" },
+        { "name": "Basic Plan", "price": 199, "validity": "30 Days", "dataLimit": "Nil", "smsLimit": "100 SMS", "callLimit": "Unlimited", "status": "Inactive" },
+        { "name": "Unlimited Plan", "price": 399, "validity": "60 Days", "dataLimit": "2GB/Day", "smsLimit": "200 SMS", "callLimit": "Unlimited", "status": "Inactive" },
+        { "name": "Data Booster Plan", "price": 599, "validity": "90 Days", "dataLimit": "50GB Total", "smsLimit": "Nil", "callLimit": "Nil", "status": "Active" },
+        { "name": "Basic Plan", "price": 199, "validity": "30 Days", "dataLimit": "Nil", "smsLimit": "100 SMS", "callLimit": "Unlimited", "status": "Active" },
+        { "name": "Unlimited Plan", "price": 399, "validity": "60 Days", "dataLimit": "2GB/Day", "smsLimit": "200 SMS", "callLimit": "Unlimited", "status": "Active" },
+        { "name": "Data Booster Plan", "price": 599, "validity": "90 Days", "dataLimit": "50GB Total", "smsLimit": "Nil", "callLimit": "Nil", "status": "Inactive" },
+        { "name": "Basic Plan", "price": 199, "validity": "30 Days", "dataLimit": "Nil", "smsLimit": "100 SMS", "callLimit": "Unlimited", "status": "Active" }
+    ],
+
+    "transactionHistory": [
+        {
+            "transactionID": "TXN001",
+            "rechargeDate": "20-02-2025",
+            "username": "Yuvasree",
+            "mobileNumber": "+91 98765 43210",
+            "planName": "Unlimited Plan",
+            "planPrice": "₹399",
+            "validity": "60 Days",
+            "paymentMode": "UPI",
+            "status": "Successful"
+        },
+        {
+            "transactionID": "TXN002",
+            "rechargeDate": "20-02-2025",
+            "username": "Yuva",
+            "mobileNumber": "+91 87654 32109",
+            "planName": "Basic Plan",
+            "planPrice": "₹199",
+            "validity": "30 Days",
+            "paymentMode": "Credit Card",
+            "status": "Failed"
+        },
+        {
+            "transactionID": "TXN003",
+            "rechargeDate": "20-02-2025",
+            "username": "Subcriber 1",
+            "mobileNumber": "+91 98765 43210",
+            "planName": "Unlimited Plan",
+            "planPrice": "₹399",
+            "validity": "60 Days",
+            "paymentMode": "UPI",
+            "status": "Successful"
+        },
+        {
+            "transactionID": "TXN004",
+            "rechargeDate": "21-02-2025",
+            "username": "Subscriber 2",
+            "mobileNumber": "+91 87654 32109",
+            "planName": "Basic Plan",
+            "planPrice": "₹199",
+            "validity": "30 Days",
+            "paymentMode": "Credit Card",
+            "status": "Failed"
+        },
+        {
+            "transactionID": "TXN005",
+            "rechargeDate": "23-02-2025",
+            "username": "Vaishiya",
+            "mobileNumber": "+91 98765 43210",
+            "planName": "Unlimited Plan",
+            "planPrice": "₹399",
+            "validity": "60 Days",
+            "paymentMode": "UPI",
+            "status": "Successful"
+        },
+        {
+            "transactionID": "TXN006",
+            "rechargeDate": "20-02-2025",
+            "username": "Subscriber 5",
+            "mobileNumber": "+91 98765 43210",
+            "planName": "Unlimited Plan",
+            "planPrice": "₹399",
+            "validity": "60 Days",
+            "paymentMode": "UPI",
+            "status": "Successful"
+        }
+       
+    ]
+}

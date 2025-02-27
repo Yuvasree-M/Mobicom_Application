@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">;
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobi.Comm - Mobile Recharge</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #009688;
+            --primary-dark: #00796B;
+            --accent-color: #FFD700;
+            --error-color: #d32f2f;
+            --success-color: #388e3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .navbar {
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            position: fixed;
+            top: 0%;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--accent-color) !important;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-link {
+            color: white !important;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            transform: translateY(-2px);
+        }
+
+        .avatar-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .avatar-icon:hover {
+            background-color: var(--accent-color);
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            transform: scale(1.1);
+        }
+
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            border: none;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.9rem;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(0, 150, 136, 0.25);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        .invoice {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .success-icon {
+            font-size: 60px;
+            color: var(--success-color);
+            margin-bottom: 20px;
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: var(--primary-color);
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .payment-form-container {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+        }
+
+        .page-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 0;
+        }
+
+        footer {
+            background-color: var(--primary-dark);
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            margin-top: auto;
+        }
+
+        .custom-breadcrumb {
+            --bs-breadcrumb-divider: '>';
+        }
+
+        .breadcrumb-container {
+            margin-top: 70px;
+        }
+
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .card {
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-container">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container">
+                <a class="navbar-brand" href="index.html">Mobi.Comm</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+
+                        <li class="nav-item">
+                            <a class="nav-link" style="cole:--accent-color" href="plans.html">Plans</a>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Breadcrumb Navigation
+
+        <div class="container breadcrumb-container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb custom-breadcrumb">
+                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                    <li class="breadcrumb-item"><a href="plans.html">Plans</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Recharge</li>
+                </ol>
+            </nav>
+        </div> -->
+
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <!-- Recharge Section -->
+                        <div id="recharge-section" class="card p-4 bg-white">
+                            <h3 class="text-center mb-3">Complete Your Recharge</h3>
+                            <div class="alert alert-info">
+                                <p class="text-center mb-0"><strong>Plan Selected:</strong> <span id="planDetails"
+                                        class="fw-bold"></span></p>
+                            </div>
+                            <div class="mb-3">
+                                <label for="paymentMethod" class="form-label"><i class="fas fa-credit-card me-1"></i>
+                                    Select Payment Method:</label>
+                                <select id="paymentMethod" class="form-control">
+                                    <option value="" disabled selected>--Select Payment Method--</option>
+                                    <option value="credit">Credit Card</option>
+                                    <option value="upi">UPI</option>
+                                    <option value="netbanking">Net Banking</option>
+                                </select>
+                                <span id="paymentMethodError" class="error-message"></span>
+                            </div>
+                            <div id="payment-form" class="payment-form-container hidden"></div>
+                            <div id="error-message" class="error-message text-center"></div>
+                            <button id="checkoutBtn" class="btn btn-primary w-100 mt-3">
+                                <i class="fas fa-lock me-1"></i> Proceed to Payment
+                            </button>
+                        </div>
+
+                        <!-- Processing Payment Section -->
+                        <div id="processing-section" class="card p-4 bg-white text-center hidden">
+                            <div class="loading-spinner mb-3"></div>
+                            <h4>Processing Your Payment</h4>
+                            <p>Please wait while we process your transaction...</p>
+                        </div>
+
+                        <!-- Success Section -->
+                        <div id="success-section" class="card p-4 bg-white text-center hidden">
+                            <i class="fas fa-check-circle success-icon"></i>
+                            <h3 class="text-success">Recharge Successful! 🎉</h3>
+                            <p class="mt-2">Your mobile recharge was successfully completed.</p>
+                            <div class="invoice p-3 rounded bg-light">
+                                <h5 class="text-center text-primary">Invoice Details</h5>
+                                <div class="row mt-3">
+                                    <div class="col-6 text-start"><strong>Transaction ID:</strong></div>
+                                    <div class="col-6 text-end" id="invoiceTxnId"></div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-6 text-start"><strong>Plan:</strong></div>
+                                    <div class="col-6 text-end" id="invoicePlan"></div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-6 text-start"><strong>Amount:</strong></div>
+                                    <div class="col-6 text-end">₹<span id="invoiceAmount"></span></div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-6 text-start"><strong>Validity:</strong></div>
+                                    <div class="col-6 text-end" id="invoiceValidity"></div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-6 text-start"><strong>Data:</strong></div>
+                                    <div class="col-6 text-end" id="invoiceData"></div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-6 text-start"><strong>Payment Method:</strong></div>
+                                    <div class="col-6 text-end" id="invoicePayment"></div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-12 text-center text-muted small" id="invoicePaymentDetails"></div>
+                                </div>
+                            </div>
+
+                            <button id="downloadInvoice" class="btn btn-warning w-100 mt-3">
+                                <i class="fas fa-file-download me-1"></i> Download Invoice
+                            </button>
+                            <button id="backHome" class="btn btn-success w-100 mt-2">
+                                <i class="fas fa-home me-1"></i> Back to Home
+                            </button><br>
+                            <p><strong>Your Invoice Bill is sent to your registerd e-mail id!</strong></p>
+                            <p>Thank you!!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <div class="container">
+                <p class="mb-0">&copy; 2025 Mobi.Comm Services. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const TransactionSystem = {
+            generateTransactionId: function () {
+                let globalCounter = localStorage.getItem("globalTxnCounter");
+                if (!globalCounter) {
+                    globalCounter = 0;
+                }
+
+                globalCounter = parseInt(globalCounter) + 1;
+                localStorage.setItem("globalTxnCounter", globalCounter);
+                return "TXN" + globalCounter.toString().padStart(4, "0");
+            },
+
+            saveTransaction: function (mobileNumber, transactionDetails) {
+                let history = JSON.parse(localStorage.getItem("rechargeHistory")) || {};
+                if (!history[mobileNumber]) {
+                    history[mobileNumber] = [];
+                }
+                history[mobileNumber].push(transactionDetails);
+                localStorage.setItem("rechargeHistory", JSON.stringify(history));
+                let allTransactions = JSON.parse(localStorage.getItem("allTransactions")) || [];
+                allTransactions.push({
+                    ...transactionDetails,
+                    mobileNumber: mobileNumber
+                });
+                localStorage.setItem("allTransactions", JSON.stringify(allTransactions));
+
+                return transactionDetails.id;
+            }
+        };
+
+        // Form Validation System
+        const ValidationSystem = {
+            validators: {
+                required: function (value) {
+                    return value.trim() !== "" ? { valid: true } : { valid: false, message: "This field is required" };
+                },
+                cardNumber: function (value) {
+                    return /^\d{16}$/.test(value) ?
+                        { valid: true } :
+                        { valid: false, message: "Card number must be 16 digits" };
+                },
+                expiryDate: function (value) {
+                    if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(value)) {
+                        return { valid: false, message: "Enter a valid expiry date (MM/YY)" };
+                    }
+                    const [month, year] = value.split('/');
+                    const expiryDate = new Date(2000 + parseInt(year), parseInt(month) - 1, 1);
+                    const today = new Date();
+
+                    return expiryDate > today ?
+                        { valid: true } :
+                        { valid: false, message: "Card has expired" };
+                },
+                cvv: function (value) {
+                    return /^\d{3}$/.test(value) ?
+                        { valid: true } :
+                        { valid: false, message: "CVV must be 3 digits" };
+                },
+                upiId: function (value) {
+                    return /^[a-zA-Z0-9.]+@[a-zA-Z]+$/.test(value) ?
+                        { valid: true } :
+                        { valid: false, message: "Invalid UPI ID format (e.g., example@upi)" };
+                },
+                upiPassword: function (value) {
+                    return /^\d{4,8}$/.test(value) ?
+                        { valid: true } :
+                        { valid: false, message: "UPI PIN must be between 4 to 8 digits" };
+                },
+                accountNumber: function (value) {
+                    return /^\d{9,18}$/.test(value) ?
+                        { valid: true } :
+                        { valid: false, message: "Account number must be 9-18 digits" };
+                }
+
+            },
+
+            validateField: function (fieldId, rules) {
+                const field = document.getElementById(fieldId);
+                if (!field) return { valid: true };
+
+                const value = field.value.trim();
+                const errorElement = document.getElementById(fieldId + "Error");
+
+                for (const rule of rules) {
+                    const validator = this.validators[rule];
+                    if (validator) {
+                        const result = validator(value);
+                        if (!result.valid) {
+                            if (errorElement) {
+                                errorElement.textContent = result.message;
+                            }
+                            return result;
+                        }
+                    }
+                }
+
+                if (errorElement) {
+                    errorElement.textContent = "";
+                }
+                return { valid: true };
+            },
+
+            validateForm: function (fieldRules) {
+                let isValid = true;
+
+                for (const [fieldId, rules] of Object.entries(fieldRules)) {
+                    const result = this.validateField(fieldId, rules);
+                    if (!result.valid) {
+                        isValid = false;
+                    }
+                }
+
+                return isValid;
+            }
+        };
+
+        // Payment Form System
+        const PaymentFormSystem = {
+            creditCardForm: `
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <label for="bankName" class="form-label">Bank Name:</label>
+                        <input type="text" class="form-control" id="bankName" placeholder="Enter Bank Name" required>
+                        <span class="error-message" id="bankNameError"></span>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="cardHolder" class="form-label">Card Holder Name:</label>
+                        <input type="text" class="form-control" id="cardHolder" placeholder="Enter Card Holder Name" required>
+                        <span class="error-message" id="cardHolderError"></span>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="cardNumber" class="form-label">Card Number:</label>
+                        <input type="text" class="form-control" id="cardNumber" placeholder="1234 5678 9012 3456" required maxlength="16">
+                        <span class="error-message" id="cardNumberError"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="expiryDate" class="form-label">Expiry Date:</label>
+                        <input type="text" class="form-control" id="expiryDate" placeholder="MM/YY" required>
+                        <span class="error-message" id="expiryDateError"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="cvv" class="form-label">CVV:</label>
+                        <input type="password" class="form-control" id="cvv" placeholder="***" required maxlength="3">
+                        <span class="error-message" id="cvvError"></span>
+                    </div>
+                </div>
+            `,
+
+            upiForm: `
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <label for="upiId" class="form-label">UPI ID:</label>
+                        <input type="text" class="form-control" id="upiId" placeholder="example@upi" required>
+                        <span class="error-message" id="upiIdError"></span>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="upiPassword" class="form-label">UPI PIN:</label>
+                        <input type="password" class="form-control" id="upiPassword" placeholder="Enter UPI PIN" required>
+                        <span class="error-message" id="upiPasswordError"></span>
+                    </div>
+                </div>
+            `,
+
+            netbankingForm: `
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <label for="netBankName" class="form-label">Bank Name:</label>
+                        <input type="text" class="form-control" id="netBankName" placeholder="Enter Bank Name" required>
+                        <span class="error-message" id="netBankNameError"></span>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="accountNumber" class="form-label">Bank Account Number:</label>
+                        <input type="text" class="form-control" id="accountNumber" placeholder="Enter Account Number" required maxlength="18">
+                        <span class="error-message" id="accountNumberError"></span>
+                    </div>
+                </div>
+            `,
+
+            getValidationRules: function (paymentMethod) {
+                switch (paymentMethod) {
+                    case "credit":
+                        return {
+                            "bankName": ["required"],
+                            "cardHolder": ["required"],
+                            "cardNumber": ["required", "cardNumber"],
+                            "expiryDate": ["required", "expiryDate"],
+                            "cvv": ["required", "cvv"]
+                        };
+                    case "upi":
+                        return {
+                            "upiId": ["required", "upiId"],
+                            "upiPassword": ["required"]
+                        };
+                    case "netbanking":
+                        return {
+                            "netBankName": ["required"],
+                            "accountNumber": ["required", "accountNumber"]
+                        };
+                    default:
+                        return {};
+                }
+            },
+
+            getForm: function (paymentMethod) {
+                switch (paymentMethod) {
+                    case "credit":
+                        return this.creditCardForm;
+                    case "upi":
+                        return this.upiForm;
+                    case "netbanking":
+                        return this.netbankingForm;
+                    default:
+                        return "";
+                }
+            },
+
+            getPaymentDetails: function (paymentMethod) {
+                switch (paymentMethod) {
+                    case "credit":
+                        return {
+                            method: "Credit Card",
+                            details: `Bank: ${document.getElementById("bankName").value}, Card: **** **** **** ${document.getElementById("cardNumber").value.slice(-4)}`
+                        };
+                    case "upi":
+                        return {
+                            method: "UPI",
+                            details: `UPI ID: ${document.getElementById("upiId").value}`
+                        };
+                    case "netbanking":
+                        return {
+                            method: "Net Banking",
+                            details: `Bank: ${document.getElementById("netBankName").value}, Account: ****${document.getElementById("accountNumber").value.slice(-4)}`
+                        };
+                    default:
+                        return { method: "Unknown", details: "" };
+                }
+            }
+        };
+
+        // Invoice Generator System
+        const InvoiceSystem = {
+            generatePDF: function (data) {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                // Get current date for invoice
+                const currentDate = new Date().toLocaleDateString();
+
+                // Company logo and header
+                doc.setFontSize(22);
+                doc.setTextColor(0, 150, 136); // Mobi.Comm brand color
+                doc.text("Mobi.Comm Service", 105, 20, { align: "center" });
+
+                // Invoice title
+                doc.setFontSize(16);
+                doc.setTextColor(0, 0, 0);
+                doc.text("INVOICE", 105, 30, { align: "center" });
+
+                // Add a line separator
+                doc.setLineWidth(0.5);
+                doc.line(20, 35, 190, 35);
+
+                // Invoice details section
+                doc.setFontSize(10);
+                doc.text("Invoice Number:", 20, 45);
+                doc.text(data.transactionId, 70, 45);
+                doc.text("Date:", 20, 50);
+                doc.text(currentDate, 70, 50);
+
+                // Customer details section
+                doc.setFontSize(12);
+                doc.text("Customer Details", 20, 65);
+                doc.setFontSize(10);
+
+                doc.text("Name:", 20, 75);
+                doc.text(data.customerName || "Yuvasree", 70, 75);
+                doc.text("Mobile:", 20, 80);
+                doc.text(data.customerMobile || "", 70, 80);
+
+                // Add a line separator
+                doc.line(20, 90, 190, 90);
+
+                // Plan details header
+                doc.setFontSize(12);
+                doc.text("Recharge Details", 20, 100);
+
+                // Plan details as a table
+                doc.setFontSize(10);
+                let yPos = 110;
+
+                // Plan Name
+                doc.text("Plan:", 20, yPos);
+                doc.text(data.plan || "-", 70, yPos);
+                yPos += 8;
+
+                // Validity
+                doc.text("Validity:", 20, yPos);
+                doc.text(data.validity || "-", 70, yPos);
+                yPos += 8;
+
+                // Data
+                doc.text("Data:", 20, yPos);
+                doc.text(data.data || "-", 70, yPos);
+                yPos += 8;
+
+                // Add a line separator
+                doc.line(20, yPos + 5, 190, yPos + 5);
+                yPos += 15;
+
+                // Payment details
+                doc.setFontSize(12);
+                doc.text("Payment Details", 20, yPos);
+                yPos += 10;
+
+                doc.setFontSize(10);
+                doc.text("Payment Method:", 20, yPos);
+                doc.text(data.paymentMethod || "-", 70, yPos);
+                yPos += 8;
+
+                // Amount in bold
+                doc.text("Amount:", 20, yPos);
+                doc.setFont(undefined, 'bold');
+                doc.text(`₹${data.amount || "0"}`, 70, yPos);
+                doc.setFont(undefined, 'normal');
+                yPos += 20;
+
+                // Add a line separator
+                doc.line(20, yPos - 5, 190, yPos - 5);
+
+                // Footer with terms and customer service
+                doc.setFontSize(8);
+                doc.text("Thank you for choosing Mobi.Comm Service.", 105, yPos + 5, { align: "center" });
+
+                // Add timestamp to filename to make each download unique
+                const timestamp = new Date().getTime();
+                doc.save(`Mobi.Comm_Invoice_${data.transactionId}_${timestamp}.pdf`);
+            }
+        };
+
+        // Main Application
+        document.addEventListener("DOMContentLoaded", function () {
+            // Get URL parameters
+            const params = new URLSearchParams(window.location.search);
+            const mobilenumber = params.get("mobile") || "+91 94880 18781";
+
+            // Populate plan details
+            const planName = params.get("name") || "Unknown Plan";
+            const planPrice = params.get("price") || "0";
+            const planValidity = params.get("validity") || "N/A";
+            const planData = params.get("data") || "N/A";
+
+            document.getElementById("planDetails").innerText =
+                `${planName} | ₹${planPrice} | ${planValidity} | ${planData}`;
+
+            // Payment method selection
+            document.getElementById("paymentMethod").addEventListener("change", function () {
+                const method = this.value;
+                const formContainer = document.getElementById("payment-form");
+
+                if (method) {
+                    formContainer.innerHTML = PaymentFormSystem.getForm(method);
+                    formContainer.classList.remove("hidden");
+
+                    // Add input validation listeners
+                    document.querySelectorAll("#payment-form input").forEach(input => {
+                        input.addEventListener("input", function () {
+                            const rules = PaymentFormSystem.getValidationRules(method)[this.id] || ["required"];
+                            ValidationSystem.validateField(this.id, rules);
+                        });
+
+                        input.addEventListener("blur", function () {
+                            const rules = PaymentFormSystem.getValidationRules(method)[this.id] || ["required"];
+                            ValidationSystem.validateField(this.id, rules);
+                        });
+                    });
+                } else {
+                    formContainer.classList.add("hidden");
+                }
+            });
+
+            // Remove error message immediately when payment method is selected
+            document.getElementById("paymentMethod").addEventListener("change", function () {
+                document.getElementById("paymentMethodError").textContent = "";
+            });
+
+            document.getElementById("checkoutBtn").addEventListener("click", function () {
+                const selectedPayment = document.getElementById("paymentMethod").value;
+                const paymentMethodError = document.getElementById("paymentMethodError");
+                const errorMessage = document.getElementById("error-message");
+
+                if (!selectedPayment) {
+                    paymentMethodError.textContent = "Please select a payment method";
+                    return;
+                } else {
+                    paymentMethodError.textContent = "";  // Clear error when valid
+                }
+
+                const validationRules = PaymentFormSystem.getValidationRules(selectedPayment);
+                const isFormValid = ValidationSystem.validateForm(validationRules);
+
+                if (!isFormValid) {
+                    errorMessage.textContent = "Please correct the errors in the form";
+                    return;
+                } else {
+                    errorMessage.textContent = "";  // Clear error when valid
+                }
+
+
+                document.getElementById("recharge-section").classList.add("hidden");
+                document.getElementById("processing-section").classList.remove("hidden");
+                setTimeout(function () {
+                    const transactionId = TransactionSystem.generateTransactionId();
+                    const paymentInfo = PaymentFormSystem.getPaymentDetails(selectedPayment);
+                    const transactionDetails = {
+                        id: transactionId,
+                        date: new Date().toISOString(),
+                        planName: planName,
+                        amount: planPrice,
+                        validity: planValidity,
+                        data: planData,
+                        paymentMethod: paymentInfo.method,
+                        paymentDetails: paymentInfo.details
+                    };
+                    TransactionSystem.saveTransaction(mobilenumber, transactionDetails);
+                    showInvoice(transactionDetails);
+                }, 1000);
+            });
+            function showInvoice(transaction) {
+                document.getElementById("processing-section").classList.add("hidden");
+                document.getElementById("success-section").classList.remove("hidden");
+
+                document.getElementById("invoiceTxnId").innerText = transaction.id;
+                document.getElementById("invoicePlan").innerText = transaction.planName;
+                document.getElementById("invoiceAmount").innerText = `${transaction.amount}`;
+                document.getElementById("invoiceValidity").innerText = transaction.validity;
+                document.getElementById("invoiceData").innerText = transaction.data;
+                document.getElementById("invoicePayment").innerText = transaction.paymentMethod;
+            }
+            document.getElementById("downloadInvoice").addEventListener("click", function () {
+                const transaction = {
+                    transactionId: document.getElementById("invoiceTxnId").innerText,
+                    customerMobile: mobilenumber,
+                    plan: document.getElementById("invoicePlan").innerText,
+                    amount: document.getElementById("invoiceAmount").innerText.replace('₹', ''),
+                    validity: document.getElementById("invoiceValidity").innerText,
+                    data: document.getElementById("invoiceData").innerText,
+                    paymentMethod: document.getElementById("invoicePayment").innerText,
+                };
+                InvoiceSystem.generatePDF(transaction);
+            });
+            document.getElementById("backHome").addEventListener("click", function () {
+                window.location.href = "index.html";
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const breadcrumbContainer = document.getElementById("breadcrumb");
+            const pathSegments = window.location.pathname.split("/").filter(segment => segment);
+
+            let breadcrumbHTML = `<li class="breadcrumb-item"><a href="index.html">Home</a></li>`;
+
+            let path = "";
+            pathSegments.forEach((segment, index) => {
+                path += `/${segment}`;
+                const isLast = index === pathSegments.length - 1;
+                const formattedSegment = segment.replace(/-/g, " ").replace(/\b\w/g, char => char.toUpperCase());
+
+                breadcrumbHTML += isLast
+                    ? `<li class="breadcrumb-item active" aria-current="page">${formattedSegment}</li>`
+                    : `<li class="breadcrumb-item"><a href="${path}">${formattedSegment}</a></li>`;
+            });
+
+            breadcrumbContainer.innerHTML = breadcrumbHTML;
+        });
+
+    </script>
+</body>
+
+</html>

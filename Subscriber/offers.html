@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Offers - Mobi.Comm</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        /* Global Styles */
+        :root {
+            --primary-color: #00796B;
+            --secondary-color: #009688;
+            --accent-color: #FFD700;
+            --text-color: #0e0f0f;
+            --light-bg: #E0F2F1;
+            --hover-bg: rgba(255, 255, 255, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        html {
+            scroll-padding-top: 80px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Navbar Styling */
+        .navbar {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            padding: 10px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--accent-color) !important;
+            margin-right: 30px;
+        }
+
+        .nav-link {
+            color: white !important;
+            font-size: 1.1rem;
+            padding: 8px 15px;
+            border-radius: 4px;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-color) !important;
+            background-color: var(--hover-bg);
+            transform: translateY(-2px);
+        }
+
+        .nav-link.active {
+            color: var(--accent-color) !important;
+            font-weight: bold;
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 15%;
+            width: 70%;
+            height: 2px;
+            background-color: var(--accent-color);
+            transition: width 0.3s;
+        }
+
+        /* Avatar Dropdown */
+        .avatar-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgb(254, 254, 254);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-left: 15px;
+        }
+
+        .avatar-icon:hover {
+            background-color: var(--accent-color);
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            transform: scale(1.1);
+        }
+
+        .dropdown-menu {
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: none;
+            margin-top: 10px;
+        }
+
+        .dropdown-item {
+            padding: 8px 20px;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--light-bg);
+        }
+
+        .offers-section {
+            background-color: var(--light-bg);
+            padding: 5rem 0;
+        }
+
+        .offers-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .card {
+            height: 100%;
+            transition: transform 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-img-top {
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .card-body {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            color: var(--primary-color);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-features {
+            margin: 1rem 0;
+            padding-left: 0;
+        }
+
+        .card-features li {
+            list-style: none;
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .card-features li::before {
+            content: "✓";
+            color: var(--primary-color);
+            position: absolute;
+            left: 0;
+        }
+
+        .card-price {
+            font-size: 1.25rem;
+            color: var(--primary-color);
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            margin-top: auto;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+
+        /* Footer Styling */
+        .footer {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 4rem 0 2rem;
+        }
+
+        .footer h5 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--accent-color);
+        }
+
+        .footer p {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.8;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+
+        .social-icons {
+            margin-top: 1.5rem;
+        }
+
+        .social-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--hover-bg);
+            margin-right: 1rem;
+            transition: var(--transition);
+        }
+
+        .social-icon:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-3px);
+            color: var(--primary-color);
+        }
+
+        .footer-bottom {
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 2rem;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.5rem;
+            }
+
+            .offers-section h2 {
+                font-size: 2rem;
+            }
+
+            .card {
+                margin-bottom: 2rem;
+            }
+
+            .footer {
+                padding: 3rem 0 1rem;
+            }
+        }
+
+         /* Back to Top Button */
+         #homeButton {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: none;
+            background: #FFA000;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 50%;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+            width: 50px;
+            height: 50px;
+        }
+
+        #homeButton:hover {
+            background: #FF8F00;
+            transform: scale(1.1);
+        }
+
+    </style>
+</head>
+
+<body>
+    <!--  Navbar with Menu and Avatar Dropdown -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">Mobi.Comm</a>
+
+
+            <!-- Navbar content -->
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#offers">Offers</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- Avatar dropdown -->
+            <div class="dropdown">
+                <div class="avatar-icon" data-bs-toggle="dropdown">
+                    <i class="fas fa-user"></i>
+                </div>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="login.html">Login</a></li>
+                    <li><a class="dropdown-item" href="signup.html">Sign Up</a></li>
+                </ul>
+            </div>
+            <!-- Toggle button for mobile -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+        </div>
+
+        </div>
+
+
+    </nav>
+    <!-- Offers Section -->
+    <!-- Offers Section -->
+    <section class="offers-section" id="offers">
+        <div class="container">
+            <h2 class="text-center mb-4">Latest Offers</h2>
+            <div class="offers-grid">
+                <!-- Offer 1 -->
+                <div class="card">
+                    <img src="Images/image1.avif" class="card-img-top" alt="Unlimited 5G Plan">
+                    <div class="card-body">
+                        <h5 class="card-title" style="font-weight: bold; text-align: center;">Unlimited 5G Plan</h5>
+                        <p class="card-text">Experience lightning-fast internet with our premium 5G plan.</p>
+                        <ul class="card-features">
+                            <li>Unlimited 5G data</li>
+                            <li>Unlimited calls & SMS</li>
+                            <li>Netflix subscription included</li>
+                            <li>Priority customer support</li>
+                        </ul>
+                        <div class="card-price" style="text-align: center;">₹199.99/month</div>
+                    </div>
+                </div>
+
+                <!-- Offer 2 -->
+                <div class="card">
+                    <img src="Images/image3.avif" class="card-img-top" alt="Family Pack Deal">
+                    <div class="card-body">
+                        <h5 class="card-title" style="font-weight: bold; text-align: center;">Family Pack Deal</h5>
+                        <p class="card-text">Perfect solution for the whole family's connectivity needs.</p>
+                        <ul class="card-features">
+                            <li>4 SIM cards included</li>
+                            <li>50GB data per SIM</li>
+                            <li>Shared family dashboard</li>
+                            <li>Parental controls</li>
+                        </ul>
+                        <div class="card-price" style="text-align: center;">₹499.99/month</div>
+                    </div>
+                </div>
+
+                <!-- Offer 3 -->
+                <div class="card">
+                    <img src="Images/image3.jpeg" class="card-img-top" alt="Student Special">
+                    <div class="card-body">
+                        <h5 class="card-title" style="font-weight: bold; text-align: center;">Student Special</h5>
+                        <p class="card-text">Tailored plan for students with extra educational benefits.</p>
+                        <ul class="card-features">
+                            <li>30GB high-speed data</li>
+                            <li>Free access to educational platforms</li>
+                            <li>Weekend data bonus</li>
+                            <li>Special student support</li>
+                        </ul>
+                        <div class="card-price" style="text-align: center;">₹149.99/month</div>
+                    </div>
+                </div>
+
+                <!-- Offer 4 -->
+                <div class="card">
+                    <img src="Images/image1.avif" class="card-img-top" alt="Business Pro">
+                    <div class="card-body">
+                        <h5 class="card-title" style="font-weight: bold; text-align: center;">Business Pro</h5>
+                        <p class="card-text">Professional plan designed for business users.</p>
+                        <ul class="card-features">
+                            <li>100GB high-speed data</li>
+                            <li>International roaming included</li>
+                            <li>24/7 priority support</li>
+                            <li>Conference calling features</li>
+                        </ul>
+                        <div class="card-price" style="text-align: center;">₹399.99/month</div>
+                    </div>
+                </div>
+
+                <!-- Offer 5 -->
+                <div class="card">
+                    <img src="Images/image3.avif" class="card-img-top" alt="Senior Citizen Plan">
+                    <div class="card-body">
+                        <h5 class="card-title" style="font-weight: bold; text-align: center;">Senior Citizen Plan</h5>
+                        <p class="card-text">Simplified plan with essential features for seniors.</p>
+                        <ul class="card-features">
+                            <li>15GB data</li>
+                            <li>Unlimited voice calls</li>
+                            <li>Emergency assistance</li>
+                            <li>Large text support</li>
+                        </ul>
+                        <div class="card-price" style="text-align: center;">₹129.99/month</div>
+                    </div>
+                </div>
+
+                <!-- Offer 6 -->
+                <div class="card">
+                    <img src="Images/image3.jpeg" class="card-img-top" alt="Weekend Special">
+                    <div class="card-body">
+                        <h5 class="card-title" style="font-weight: bold; text-align: center;">Weekend Special</h5>
+                        <p class="card-text">Extra benefits for weekend power users.</p>
+                        <ul class="card-features">
+                            <li>40GB regular data</li>
+                            <li>Unlimited weekend data</li>
+                            <li>Free movie streaming</li>
+                            <li>Gaming optimization</li>
+                        </ul>
+                        <div class="card-price" style="text-align: center;">₹249.99/month</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <button id="homeButton"><i class="fas fa-arrow-up"></i></button>
+
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+        <div class="container py-5">
+            <div class="row">
+                <div class="col-md-6 footer-column mb-4 mb-md-0">
+                    <h5>About Mobi.Comm</h5>
+                    <p>We provide quick and secure mobile recharges for prepaid users. Our goal is to make recharge
+                        services simple, efficient, and accessible.</p>
+                </div>
+                <div class="col-md-6 footer-column">
+                    <h5>Contact</h5>
+                    <p>Email: <a href="mailto:support@mobi.comm">support@mobi.comm</a></p>
+                    <p>Phone: +1 234 567 890</p>
+                    <div class="social-icons">
+                        <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom text-center mt-4">
+                <p>&copy; 2025 Mobi.Comm - All Rights Reserved</p>
+            </div>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+       // Handle smooth scrolling for nav links with fixed navbar
+       const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    // Remove active class from all links
+                    navLinks.forEach(navLink => navLink.classList.remove('active'));
+
+                    // Add active class to clicked link
+                    this.classList.add('active');
+
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetElement = document.getElementById(targetId);
+
+                    if (targetElement) {
+                        // Let the browser handle the scrolling with scroll-padding-top
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+        // Show/hide home button based on scroll position
+        window.addEventListener("scroll", function () {
+            let homeButton = document.getElementById("homeButton");
+            if (window.scrollY > 200) {
+                homeButton.style.display = "block";
+            } else {
+                homeButton.style.display = "none";
+            }
+            updateActiveNavItem();
+        });
+
+        document.getElementById("homeButton").addEventListener("click", function () {
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        });
+
+        // Function to update active nav item based on scroll position
+        function updateActiveNavItem() {
+            const navbarHeight = document.querySelector('.navbar').offsetHeight;
+            const sections = ['home', 'offers', 'quick-recharge', 'plans', 'faq', 'contact'];
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            let currentSection = '';
+
+            sections.forEach(section => {
+                const element = document.getElementById(section);
+                if (element) {
+                    const rect = element.getBoundingClientRect();
+                    if (rect.top <= navbarHeight + 20 && rect.bottom >= navbarHeight + 20) {
+                        currentSection = section;
+                    }
+                }
+            });
+
+            if (currentSection) {
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${currentSection}`) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+
+</html>
