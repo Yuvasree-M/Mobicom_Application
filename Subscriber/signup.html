@@ -9,55 +9,8 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/jquery.validation/1.19.5/jquery.validate.min.js"></script>
 <script src="https://cdn.jsdelivr.net/jquery.validation/1.19.5/additional-methods.min.js"></script>
+<link rel="stylesheet" href="styles.css">
 
-
-    <style>
-        body {
-            background-color: #ECEFF1;
-        }
-        .navbar {
-            background: linear-gradient(90deg, #009688, #00796B);
-        }
-        .navbar-brand {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #FFD700 !important;
-        }
-        .signup-container {
-            max-width: 1000px;
-            margin: 20px auto;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            display: flex;
-        }
-        .left-panel {
-            background-color: #009688;
-            color: white;
-            width: 50%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 30px;
-        }
-        .right-panel {
-            width: 50%;
-            padding: 40px;
-        }
-        .error-message {
-            color: red;
-            font-size: 14px;
-            display: none;
-        }
-        .toast-container {
-            position: fixed;
-            top:15%;
-            right: 20px;
-            z-index: 1050;
-        }
-    </style>
 </head>
 <body>
 
@@ -65,7 +18,16 @@
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="index.html">Mobi.Comm</a>
+            <div class="dropdown">
+                <div class="avatar-icon" data-bs-toggle="dropdown">
+                    <i class="fas fa-user"></i>
+                </div>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="login.html">Login</a></li>
+                </ul>
+            </div>
         </div>
+        
     </nav>
 
     <div class="container">
@@ -75,7 +37,7 @@
                 <p>Register to manage your mobile recharges easily.</p>
             </div>
             <div class="right-panel">
-                <h3 class="mb-4 text-center">Buy New SIM</h3>
+                <h3 class="mb-4 text-center">Get New SIM</h3>
                 <form id="signupForm">
                     <div class="mb-3">
                         <label class="form-label">Full Name</label>
@@ -91,8 +53,8 @@
 
                     <div class="mb-3">
                         <label class="form-label">Mobile Number</label>
-                        <input type="tel" id="signupMobileNumber" class="form-control" placeholder="Enter your mobile number">
-                        <div class="error-message" id="mobileError">Enter a valid 10-digit mobile number.</div>
+                        <input type="tel" id="signupMobileNumber" class="form-control" placeholder="+91 XXXXX XXXXX">
+                        <div class="error-message" id="mobileError">Enter a valid mobile number.</div>
                     </div>
 
                     <div class="mb-3">

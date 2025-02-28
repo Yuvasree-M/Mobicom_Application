@@ -180,7 +180,7 @@
             border-radius: 15px;
             text-align: center;
             margin: 30px auto;
-            width: 60%;
+            width: 40%;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
 
@@ -215,10 +215,12 @@
 
         .popular-plans {
             padding: 40px;
-            background: linear-gradient(90deg, #00796B, #009688);
-            color: white;
+            /* background: linear-gradient(90deg, #00796B, #009688); */
+            background: #E0F2F1;
+            color: #00796B,;
             text-align: center;
         }
+
         .plan-wrapper {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -267,7 +269,7 @@
             color: #444;
         }
 
-       
+
         .plan-card .btn-plan {
             background: #FFA000;
             color: white;
@@ -279,13 +281,13 @@
             display: inline-block;
         }
 
-        
+
         .plan-card .btn-plan:hover {
             background: #FF8F00;
             transform: translateY(-2px);
         }
 
-        
+
         @media (max-width: 768px) {
 
             .plan-wrapper {
@@ -313,7 +315,7 @@
             }
         }
 
-        
+
         .faq-section {
             padding: 50px 20px;
             background: #fbfbfb;
@@ -377,7 +379,7 @@
 
         .footer a {
             color: #FFD700;
-           
+
             margin: 0 15px;
             text-decoration: none;
             transition: color 0.3s;
@@ -385,7 +387,7 @@
 
         .footer a:hover {
             color: #FFA000;
-        
+
             text-decoration: underline;
         }
 
@@ -424,7 +426,7 @@
 
         .footer-column a:hover {
             color: #FFA000;
-       }
+        }
 
         .social-icons {
             margin-top: 15px;
@@ -447,13 +449,14 @@
             padding-top: 10px;
             font-size: 14px;
         }
+
         #homeButton {
             position: fixed;
             bottom: 20px;
             right: 20px;
             display: none;
-            background: #FFA000;
-            color: white;
+            background: white;
+            color: #2d796d;
             border: none;
             padding: 15px;
             border-radius: 50%;
@@ -466,7 +469,7 @@
         }
 
         #homeButton:hover {
-            background: #FF8F00;
+            background:#FFD700 ;
             transform: scale(1.1);
         }
 
@@ -535,6 +538,21 @@
                 border-radius: 0 0 10px 10px;
             }
         }
+
+        .btn-warning {
+            background-color: #2d796d;
+            color: #fff;
+            padding: 10px 30px;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s;
+         
+        }
+
+        .btn-warning:hover {
+            background-color: #009688;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -577,7 +595,7 @@
                 </div>
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="login.html">Login</a></li>
-                    <li><a class="dropdown-item" href="signup.html">Buy New Sim</a></li>
+                    <li><a class="dropdown-item" href="signup.html">Get New Sim</a></li>
                 </ul>
             </div>
             <!-- Toggle button for mobile -->
@@ -636,7 +654,7 @@
                             connected without worrying about overcharges.</p>
                         <p>Switch to Mobi.Comm today and experience lightning-fast 5G speeds, seamless connectivity, and
                             customer support that truly cares about your needs.</p>
-                        <a class="btn" href="offers.html">View Offers</a>
+                        <a class="btn btn-warning" href="offers.html">View Offers</a>
                     </div>
                 </div>
             </div>
@@ -646,7 +664,8 @@
     <!--  Quick Recharge Section -->
     <div class="quick-recharge" id="quick-recharge">
         <h3>Quick Recharge</h3>
-        <input type="text" id="mobileNumber" class="recharge-input" placeholder="+91 Enter Mobile Number">
+        <label for="number">Mobile Number</label><br>
+        <input type="text" id="mobileNumber" class="recharge-input" placeholder="+91 xxxxx xxxxx">
         <div id="error-message" style="color: red; margin-top: 10px;"></div>
         <button class="btn btn-success" id="rechargeButton">Recharge Now</button>
     </div>
@@ -869,7 +888,7 @@
                         <p>Calls: <strong> ${plan.calls}</strong></p>
                         <p>SMS: <strong> ${plan.sms}</strong></p>
                         <p>Data: <strong> ${plan.data}</strong></p>
-                        <a class="btn btn-plan recharge-btn" href="login.html">
+                        <a class="btn btn-warning" href="login.html">
                             Recharge
                         </a>
                     </div>

@@ -10,376 +10,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
 
-    <style>
-        :root {
-            --primary-color: #008080;
-            --primary-light: #4db6ac;
-            --primary-dark: #00695c;
-            --secondary-color: #ffa000;
-            --secondary-light: #ffb74d;
-            --secondary-dark: #ff8f00;
-            --light-gray: #f5f5f5;
-            --dark-gray: #424242;
-            --white: #ffffff;
-        }
-
-        .current-plan {
-            background-color: white;
-            border-radius: 12px;
-            margin: 15px;
-            padding: 15px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-            border-left: 4px solid var(--primary-color);
-        }
-
-        .card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-            height: 100%;
-        }
-
-
-        .add-data-card {
-            border-left: 4px solid var(--secondary-color);
-        }
-
-        .usage-card {
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-            height: 100%;
-        }
-
-        .data-card {
-            border-top: 4px solid var(--primary-light);
-        }
-
-        .call-card {
-            border-top: 4px solid var(--primary-color);
-        }
-
-        .sms-card {
-            border-top: 4px solid var(--secondary-color);
-        }
-
-        .validity-card {
-            border-top: 4px solid var(--secondary-dark);
-        }
-
-        .icon-circle {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 10px;
-            font-size: 20px;
-        }
-
-        .data-icon {
-            background-color: rgba(0, 128, 128, 0.1);
-            color: var(--primary-color);
-        }
-
-        .call-icon {
-            background-color: rgba(0, 128, 128, 0.1);
-            color: var(--primary-dark);
-        }
-
-        .sms-icon {
-            background-color: rgba(255, 160, 0, 0.1);
-            color: var(--secondary-color);
-        }
-
-        .validity-icon {
-            background-color: rgba(255, 160, 0, 0.1);
-            color: var(--secondary-dark);
-        }
-
-        .plan-section {
-            padding: 40px;
-            background: white;
-            color: black;
-            text-align: center;
-            margin-top: 100px;
-        }
-        .plan-wrapper {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            justify-content: center;
-            align-items: stretch;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .plan-section {
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .plan-card {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            text-align: center;
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-            position: relative;
-            overflow: hidden;
-            height: 100%;
-            min-height: 320px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .btn-plan {
-            background: #00796B;
-            color: white;
-            border-radius: 20px;
-            font-weight: bold;
-            transition: background 0.3s ease, transform 0.2s;
-            padding: 10px 20px;
-            margin-top: auto;
-            display: inline-block;
-            border: none;
-            width: 70%;
-        }
-        h3 {
-            text-align: center;
-            width: 100%;
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 30px;
-            margin-top: 20px;
-            color: #00796B;
-        }
-        .plan-card::before {
-            content: "";
-            position: absolute;
-            width: 100%;
-            height: 5px;
-            top: 0;
-            left: 0;
-            background: linear-gradient(90deg, #FFA000, #FFD700);
-        }
-        .plan-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-        }
-        .plan-card h4 {
-            font-size: 1.6rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #00796B;
-        }
-        .plan-card p {
-            font-size: 1.1rem;
-            color: #444;
-        }
-        .btn-plan:hover {
-            background: #FF8F00;
-            transform: translateY(-2px);
-        }
-        .modal-content {
-            border-radius: 15px;
-            border: none;
-        }
-
-        .modal-header {
-            background: linear-gradient(90deg, #00796B, #009688);
-            color: white;
-            border-top-left-radius: 15px;
-            border-top-right-radius: 15px;
-            border-bottom: none;
-        }
-
-        .modal-title {
-            font-weight: bold;
-        }
-
-        .btn-close {
-            color: white;
-        }
-
-        #homeButton {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            display: none;
-            background: #FFA000;
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 50%;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background 0.3s ease, transform 0.2s ease;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
-            width: 50px;
-            height: 50px;
-        }
-
-        #homeButton:hover {
-            background: #FF8F00;
-            transform: scale(1.1);
-        }
-
-        @media (max-width: 768px) {
-
-            /* Tablets */
-            .plan-wrapper {
-                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            }
-
-            .plan-card {
-                min-height: 300px;
-            }
-        }
-
-        @media (max-width: 480px) {
-
-                      .plan-card {
-                min-height: 280px;
-                padding: 20px;
-            }
-
-            .plan-card h4 {
-                font-size: 1.4rem;
-            }
-
-            .plan-card p {
-                font-size: 1rem;
-            }
-
-            .btn-plan {
-                font-size: 1rem;
-                padding: 8px 15px;
-            }
-        }
-
-        @media (max-width: 767px) {
-            .navbar {
-                padding: 8px 0;
-            }
-
-            .navbar-brand {
-                font-size: 1.5rem;
-            }
-
-            .nav-link {
-                font-size: 0.95rem;
-                padding: 5px 10px;
-            }
-
-            .avatar-icon {
-                width: 30px;
-                height: 30px;
-            }
-
-            .plan-section {
-                padding: 40px 15px;
-                margin-top: 10%;
-            }
-
-            .plan-wrapper {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .plan-card {
-                width: 90%;
-                max-width: 90%;
-                height: auto;
-                padding: 20px;
-            }
-
-            .plan-card h4 {
-                font-size: 1.2rem;
-            }
-
-            .plan-card p {
-                font-size: 0.95rem;
-            }
-
-            .btn-plan {
-                padding: 8px 16px;
-            }
-        }
-
-        /* Fixed Navbar Example */
-.navbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background-color: #007bff; /* Adjust based on your theme */
-    color: white;
-    padding: 15px;
-    z-index: 1000;
-}
-
-/* Ensure body content starts below the navbar */
-body {
-    padding-top: 80px; /* Adjust according to your navbar height */
-}
-
-/* Styling for Filter Section */
-.filter-section {
-    background: #f8f9fa;
-    padding: 15px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 80px; /* Same as navbar height */
-    z-index: 999;
-}
-
-/* Input Fields */
-.filter-section input {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    width: 150px;
-}
-
-/* Buttons */
-.filter-section button {
-    padding: 8px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.filter-section .btn-primary {
-    background-color: #007bff;
-    color: white;
-}
-
-.filter-section .btn-secondary {
-    background-color: #6c757d;
-    color: white;
-}
-
-    </style>
+   
 </head>
 
 <body>
-    <!--  Navbar with Menu and Avatar Dropdown -->
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="#dashboard">Mobi.Comm</a>
-
-            <!-- Toggle button for mobile -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
                 <span class="navbar-toggler-icon"></span>
             </button>
-
-            <!-- Navbar content -->
             <div class="collapse navbar-collapse" id="navbarContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
@@ -398,13 +38,10 @@ body {
             </div>
 
             <div class="icon-container">
-                <!-- Notification Icon -->
                 <div class="notification-icon" onclick="showSection('notifications')">
                     <i class="fas fa-bell"></i>
                     <span class="notification-badge" id="notifBadge">3</span>
                 </div>
-
-                <!-- Avatar Dropdown -->
                 <div class="dropdown">
                     <div class="avatar-icon" data-bs-toggle="dropdown" aria-expanded="false">
                         <img id="navbarAvatar" src="Images/profile.jpeg" alt="Avatar" class="rounded-circle" width="40"
@@ -434,7 +71,6 @@ body {
                 <div class="row g-4">
                     <h2 class="mb-4 text-center" style="margin-top: 50px;">Welcome, <span id="username"
                             class="text-primary fw-bold">Yuvasree</span></h2>
-                    <!-- Plan Selection -->
                     <div class="col-md-6">
                         <h4 class="mb-3" style="margin-left: 20%;"><b>current plan</b></h4>
                         <div class="plan-wrapper">
@@ -449,13 +85,9 @@ body {
                             </div>
                         </div>
                     </div>
-
-                    <!-- Usage Section -->
                     <div class="col-md-6">
                         <h4 class="mb-3 text-center"><b>Today's Usage</b></h4>
                         <div class="row g-3">
-
-                            <!-- Data Usage -->
                             <div class="col-sm-6">
                                 <div class="card usage-card data-card">
                                     <div class="card-body text-center">
@@ -473,8 +105,6 @@ body {
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Call Usage -->
                             <div class="col-sm-6">
                                 <div class="card usage-card call-card">
                                     <div class="card-body text-center">
@@ -492,8 +122,6 @@ body {
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- SMS Usage -->
                             <div class="col-sm-6">
                                 <div class="card usage-card sms-card">
                                     <div class="card-body text-center">
@@ -548,13 +176,16 @@ body {
                             <h4>Basic Plan | ₹299</h4>
                             <p>Validity: 28 Days</p>
                             <p>Calls: 500 minutes</p>
-                            <p>SMS: 100</p>
+                            <p>SMS: 100/day</p>
+                            <p>Data: Nil</p>
                             <button class="btn btn-plan recharge-btn">Recharge</button>
                         </div>
                         <div class="plan-card" data-price="599" data-name="Data Booster plan" data-validity="28 Days"
                             data-calls="N/A" data-sms="N/A" data-data="2GB Total">
                             <h4>Data Booster Plan | ₹599</h4>
                             <p>Validity: 28 Days</p>
+                            <p>Calls: Nil</p>
+                            <p>SMS: Nil</p>
                             <p>Data: 2GB Total</p>
                             <button class="btn btn-plan recharge-btn">Recharge</button>
                         </div>
@@ -572,15 +203,18 @@ body {
                             <h4>Basic Plan | ₹299</h4>
                             <p>Validity: 28 Days</p>
                             <p>Calls: 500 minutes</p>
-                            <p>SMS: 100</p>
+                            <p>SMS: 100/day</p>
+                            <p>Data: Nil</p>
                             <button class="btn btn-plan recharge-btn">Recharge</button>
                         </div>
                         <div class="plan-card" data-price="599" data-name="Data Booster Plan" data-validity="28 Days"
                             data-calls="N/A" data-sms="N/A" data-data="2GB Total">
                             <h4>Data Booster Plan | ₹599</h4>
                             <p>Validity: 28 Days</p>
+                            <p>Calls: Nil</p>
+                            <p>SMS: Nil</p>
                             <p>Data: 2GB Total</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
+                            <button class="btn btn-plan btn-warning">Recharge</button>
                         </div>
                     </div>
                 </div>
