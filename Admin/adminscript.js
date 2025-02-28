@@ -153,21 +153,21 @@ document.addEventListener("DOMContentLoaded", function () {
     const itemsPerPage = 5;
     let currentPage = 1;
 
-    async function fetchSubscribers() {
-        try {
-            const response = await fetch(subscribersUrl);
-            const data = await response.json();
-
-            let storedSubscribers = JSON.parse(localStorage.getItem("subscribers")) || [];
-            subscribers = mergeSubscribers(data.subscribers, storedSubscribers);
-            filteredSubscribers = [...subscribers];
-
-            saveToLocalStorage();
-            displaySubscribers();
-        } catch (error) {
-            console.error("Error fetching subscribers:", error);
-        }
+    function fetchSubscribers() {
+        fetch(subscribersUrl)
+            .then(response => response.json())
+            .then(data => {
+                let storedSubscribers = JSON.parse(localStorage.getItem("subscribers")) || [];
+    
+                subscribers = mergeSubscribers(data.subscribers, storedSubscribers);
+                filteredSubscribers = [...subscribers];
+    
+                saveToLocalStorage();
+                displaySubscribers();
+            })
+            .catch(error => console.error("Error fetching subscribers:", error));
     }
+    
 
     function mergeSubscribers(jsonData, localData) {
         let allSubscribers = [...jsonData];
@@ -175,7 +175,7 @@ document.addEventListener("DOMContentLoaded", function () {
         localData.forEach(newSub => {
             let existingSub = allSubscribers.find(sub => sub.mobile === newSub.mobile);
             if (existingSub) {
-                existingSub.status = newSub.status;
+                Object.assign(existingSub, newSub);
             } else {
                 allSubscribers.push(newSub);
             }
@@ -199,13 +199,17 @@ document.addEventListener("DOMContentLoaded", function () {
         paginatedSubscribers.forEach(subscriber => {
             const row = `
                 <tr>
-                    <td>${subscriber.name}</td>
-                    <td>${subscriber.mobile}</td>
-                    <td>${subscriber.email}</td>
-                    <td id="status-${subscriber.mobile}">${subscriber.status}</td>
+                    <td>${subscriber.name || "N/A"}</td>
+                    <td>${subscriber.mobile || "N/A"}</td>
+                    <td>${subscriber.email || "N/A"}</td>
+                    <td><a href="${subscriber.aadhar_card || "#"}" target="_blank">View Aadhar</a></td>
                     <td>
-                        <button class="btn btn-success btn-sm" onclick="showConfirmationModal('${subscriber.name}', '${subscriber.mobile}', '${subscriber.email}', '${subscriber.status}', 'approve')">Approve</button>
-                        <button class="btn btn-danger btn-sm" onclick="showConfirmationModal('${subscriber.name}', '${subscriber.mobile}', '${subscriber.email}', '${subscriber.status}', 'delete')">Delete</button>
+                        <img src="${subscriber.photo || "default-avatar.jpg"}" alt="Subscriber Photo" class="img-thumbnail" width="60">
+                    </td>
+                    <td id="status-${subscriber.mobile}">${subscriber.status || "Pending"}</td>
+                    <td>
+                        <button class="btn btn-success btn-sm" onclick="showConfirmationModal('${subscriber.mobile}', 'approve')">Approve</button>
+                        <button class="btn btn-danger btn-sm" onclick="showConfirmationModal('${subscriber.mobile}', 'delete')">Delete</button>
                     </td>
                 </tr>
             `;
@@ -236,7 +240,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         pagination.innerHTML += `
             <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-                <button class="page-link" onclick="changePage(${currentPage + 1})"> &raquo;</button>
+                <button class="page-link" onclick="changePage(${currentPage + 1})">&raquo;</button>
             </li>`;
     }
 
@@ -247,81 +251,84 @@ document.addEventListener("DOMContentLoaded", function () {
         displaySubscribers();
     };
 
-    window.showConfirmationModal = function (name, mobile, email, status, action) {
-        document.getElementById("modalSubscriberName").textContent = name;
-        document.getElementById("modalSubscriberMobile").textContent = mobile;
-        document.getElementById("modalSubscriberEmail").textContent = email;
-        document.getElementById("modalSubscriberStatus").textContent = status;
+    window.showConfirmationModal = function (mobile, action) {
+        let subscriber = subscribers.find(sub => sub.mobile === mobile);
+        if (!subscriber) return;
 
         let confirmText = document.getElementById("confirmText");
         let confirmActionBtn = document.getElementById("confirmActionBtn");
+        let modalBody = document.getElementById("confirmModalBody");
+        let deleteOptions = document.getElementById("deleteOptions");
+
+        modalBody.innerHTML = `
+            <p><strong>Name:</strong> ${subscriber.name}</p>
+            <p><strong>Email:</strong> ${subscriber.email}</p>
+            <p><strong>Mobile:</strong> ${subscriber.mobile}</p>
+            <p><strong>Aadhar Card:</strong> <a href="${subscriber.aadhar_card || "#"}" target="_blank">View Aadhar</a></p>
+            <p><strong>Photo:</strong><br>
+                <img src="${subscriber.photo || "default-avatar.jpg"}" class="img-thumbnail" width="100">
+            </p>
+        `;
 
         if (action === 'approve') {
-            confirmText.textContent = "Are you sure you want to approve this subscriber?";
+            confirmText.textContent = "Approve this subscriber?";
             confirmActionBtn.className = "btn btn-success";
-            confirmActionBtn.onclick = function () { approveSubscriber(mobile); };
-        } else {
-            confirmText.textContent = "Are you sure you want to delete this subscriber?";
-            confirmActionBtn.className = "btn btn-danger";
-            confirmActionBtn.onclick = function () { deleteSubscriber(mobile); };
+            confirmActionBtn.textContent = "Approve";
+            confirmActionBtn.style.display = "block";
+            confirmActionBtn.onclick = function () { updateSubscriberStatus(mobile, "Active"); };
+            deleteOptions.innerHTML = "";
+        } else if (action === 'delete') {
+            confirmText.textContent = "What do you want to do with this subscriber?";
+            confirmActionBtn.style.display = "none";
+
+            deleteOptions.innerHTML = `
+                <button id="makeInactiveBtn" class="btn btn-warning">Make Inactive</button>
+                <button id="removeEntryBtn" class="btn btn-danger">Remove Entry</button>
+            `;
+
+            setTimeout(() => {
+                document.getElementById("makeInactiveBtn").addEventListener("click", function () {
+                    updateSubscriberStatus(mobile, "Inactive");
+                });
+
+                document.getElementById("removeEntryBtn").addEventListener("click", function () {
+                    removeSubscriber(mobile);
+                });
+            }, 100);
         }
 
         let modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
         modal.show();
     };
 
-    function approveSubscriber(mobile) {
+    function updateSubscriberStatus(mobile, newStatus) {
         let subscriber = subscribers.find(sub => sub.mobile === mobile);
         if (subscriber) {
-            subscriber.status = "Active";
-            document.getElementById(`status-${mobile}`).textContent = "Active";
+            subscriber.status = newStatus;
+            document.getElementById(`status-${mobile}`).textContent = newStatus;
             saveToLocalStorage();
-            showToast("Subscriber approved successfully!", "success");
+            showToast(`Subscriber marked as ${newStatus}!`, newStatus === "Active" ? "success" : "warning");
         }
+
         let modal = bootstrap.Modal.getInstance(document.getElementById('confirmationModal'));
         modal.hide();
-    }
-
-    // function deleteSubscriber(mobile) {
-    //     filteredSubscribers = filteredSubscribers.filter(sub => sub.mobile !== mobile);
-    //     subscribers = subscribers.filter(sub => sub.mobile !== mobile);
-    //     saveToLocalStorage();
-    //     displaySubscribers();
-    //     showToast("Subscriber deleted successfully!", "danger");
-
-    //     let modal = bootstrap.Modal.getInstance(document.getElementById('confirmationModal'));
-    //     modal.hide();
-    // }
-
-    function deleteSubscriber(mobile) {
-        let subscriber = subscribers.find(sub => sub.mobile === mobile);
-        if (subscriber) {
-            subscriber.status = "Inactive"; // 
-            document.getElementById(`status-${mobile}`).textContent = "Inactive";
-            saveToLocalStorage();
-            showToast("Subscriber marked as inactive!", "warning");
-        }
-    
-        // Close the confirmation modal
-        let modal = bootstrap.Modal.getInstance(document.getElementById('confirmationModal'));
-        modal.hide();
-    }
-    
-
-    window.filterSubscribers = function () {
-        let searchInput = document.getElementById("searchSubscribers").value.toLowerCase();
-        filteredSubscribers = subscribers.filter(subscriber =>
-            subscriber.name.toLowerCase().includes(searchInput) ||
-            subscriber.mobile.includes(searchInput)
-        );
-        currentPage = 1;
         displaySubscribers();
-    };
+    }
+
+    function removeSubscriber(mobile) {
+        subscribers = subscribers.filter(sub => sub.mobile !== mobile);
+        saveToLocalStorage();
+        showToast("Subscriber removed successfully!", "danger");
+
+        let modal = bootstrap.Modal.getInstance(document.getElementById('confirmationModal'));
+        modal.hide();
+        displaySubscribers();
+    }
 
     function showToast(message, type) {
         let toastContainer = document.getElementById("toastContainer");
         let toastHTML = `
-            <div class="toast align-items-center text-white bg-${type} border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast show text-white bg-${type}" role="alert">
                 <div class="d-flex">
                     <div class="toast-body">${message}</div>
                     <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
@@ -329,51 +336,85 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
         `;
         toastContainer.innerHTML = toastHTML;
-        setTimeout(() => {
-            toastContainer.innerHTML = "";
-        }, 3000);
+        setTimeout(() => { toastContainer.innerHTML = ""; }, 3000);
     }
-
-   // Download CSV
-window.exportSubscribersToCSV = function () {
-    let csv = "Name,Mobile,Email,Status\n";
-    filteredSubscribers.forEach(sub => {
-        csv += `${sub.name},${sub.mobile},${sub.email},${sub.status}\n`;
+    document.getElementById("searchSubscribers").addEventListener("keyup", function () {
+        filterSubscribers();
     });
-
-    let blob = new Blob([csv], { type: 'text/csv' });
-    let link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "subscribers.csv";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-};
-
-// WDownload PDF
-window.exportSubscribersToPDF = function () {
-    if (window.jspdf) {
-        const { jsPDF } = window.jspdf;
+    
+    function filterSubscribers() {
+        let searchInput = document.getElementById("searchSubscribers").value.toLowerCase();
+        
+        filteredSubscribers = subscribers.filter(subscriber => {
+            return (
+                (subscriber.name && subscriber.name.toLowerCase().includes(searchInput)) ||
+                (subscriber.mobile && subscriber.mobile.includes(searchInput)) ||
+                (subscriber.status && subscriber.status.toLowerCase().includes(searchInput))
+            );
+        });
+    
+       
+        displaySubscribers();
+    }
+    
+    document.getElementById("exportCSV").addEventListener("click", function () {
+        exportSubscribersToCSV(filteredSubscribers, "subscribers.csv");
+    });
+    
+    document.getElementById("exportPDF").addEventListener("click", function () {
+        exportSubscribersToPDF(filteredSubscribers, "subscribers.pdf");
+    });
+    
+    function exportSubscribersToCSV(data, filename) {
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Name,Mobile,Email,Aadhar Card,Status\n";
+    
+        data.forEach(subscriber => {
+            let row = [
+                subscriber.name || "N/A",
+                subscriber.mobile || "N/A",
+                subscriber.email || "N/A",
+                subscriber.aadhar_card || "N/A",
+                subscriber.status || "Pending"
+            ].join(",");
+            csvContent += row + "\n";
+        });
+    
+        let encodedUri = encodeURI(csvContent);
+        let link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", filename);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    
+    function exportSubscribersToPDF(data, filename) {
+        let { jsPDF } = window.jspdf;
         let doc = new jsPDF();
-
-        doc.text("Subscriber List", 10, 10);
-
-        let rows = filteredSubscribers.map(sub => [sub.name, sub.mobile, sub.email, sub.status]);
-
+        
+        let headers = ["Name", "Mobile", "Email", "Aadhar Card", "Status"];
+        let rows = data.map(subscriber => [
+            subscriber.name || "N/A",
+            subscriber.mobile || "N/A",
+            subscriber.email || "N/A",
+            subscriber.aadhar_card || "N/A",
+            subscriber.status || "Pending"
+        ]);
+    
+        doc.text("Subscriber List", 14, 10);
         doc.autoTable({
-            head: [["Name", "Mobile", "Email", "Status"]],
+            head: [headers],
             body: rows,
             startY: 20
         });
-
-        doc.save("subscribers.pdf");
-    } else {
-        console.error("jsPDF is not loaded.");
+    
+        doc.save(filename);
     }
-};
-
+    
     fetchSubscribers();
 });
+
 
 
 // Transcation management
@@ -1228,7 +1269,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 labels: data.rechargePlanPopularity.plans,
                 datasets: [{
                     data: data.rechargePlanPopularity.values,
-                    backgroundColor: ['#4CAF50', '#2196F3', '#FF9800']
+                    backgroundColor: ['#4CAF50', '#2196F3', '#FF9800','#E91E63','#9C27B0']
                 }]
             },
             options: { responsive: true, maintainAspectRatio: false }

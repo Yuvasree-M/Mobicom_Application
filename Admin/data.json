@@ -51,21 +51,70 @@
         "values": [500, 600, 700, 800, 900]
     },
     "rechargePlanPopularity": {
-        "plans": ["Baisc Plan", "Unlimited Plan", "Data Booster Plan"],
-        "values": [30, 40, 20]
+        "plans": ["Baisc Plan", "Unlimited Plan", "Data Booster Plan","Family Packs","Internatiol Packs"],
+        "values": [30, 40, 20,10,5]
     },
     "paymentModeUsage": {
         "modes": ["Credit/Debit Card","Net Banking","UPI"],
         "values": [40, 30, 20]
     },
-    "subscribers": [
-        { "name": "Yuvasree", "mobile": "+91 98765 43210", "email": "yuvasree@example.com", "status": "Pending" },
-        { "name": "Yuva", "mobile": "+91 98765 43211", "email": "yuva@example.com", "status": "Pending" },
-        { "name": "Subscriber 1", "mobile": "+91 98765 43212", "email": "subscriber1@example.com", "status": "Pending" },
-        { "name": "Subscriber 2", "mobile": "+91 98765 43213", "email": "subscriber2@example.com", "status": "Pending" },
-        { "name": "Subscriber 3", "mobile": "+91 98765 43214", "email": "subscriber3@example.com", "status": "Pending" },
-        { "name": "Vaishiya", "mobile": "+91 98765 43215", "email": "vaishiya@example.com", "status": "Pending" },
-        { "name": "Subscriber 4", "mobile": "+91 98765 43216", "email": "subscriber4l@example.com", "status": "Pending" }
+   "subscribers": [
+        {
+            "name": "Yuvasree",
+            "email": "yuvasree@example.com",
+            "mobile": "+91 98765 43210",
+            "aadhar_card": "yuvasree_aadhar.pdf",
+            "photo": "yuvasree_photo.jpg",
+            "status": "Pending"
+        },
+        {
+            "name": "Yuva",
+            "email": "yuva@example.com",
+            "mobile": "+91 98765 43211",
+            "aadhar_card": "yuva_aadhar.pdf",
+            "photo": "yuva_photo.png",
+            "status": "Pending"
+        },
+        {
+            "name": "Subscriber 1",
+            "email": "subscriber1@example.com",
+            "mobile": "+91 98765 43212",
+            "aadhar_card": "subscriber1_aadhar.pdf",
+            "photo": "subscriber1_photo.jpeg",
+            "status": "Pending"
+        },
+        {
+            "name": "Subscriber 2",
+            "email": "subscriber2@example.com",
+            "mobile": "+91 98765 43213",
+            "aadhar_card": "subscriber2_aadhar.pdf",
+            "photo": "subscriber2_photo.jpg",
+            "status": "Pending"
+        },
+        {
+            "name": "Subscriber 3",
+            "email": "subscriber3@example.com",
+            "mobile": "+91 98765 43214",
+            "aadhar_card": "subscriber3_aadhar.pdf",
+            "photo": "subscriber3_photo.png",
+            "status": "Pending"
+        },
+        {
+            "name": "Vaishiya",
+            "email": "vaishiya@example.com",
+            "mobile": "+91 98765 43215",
+            "aadhar_card": "vaishiya_aadhar.pdf",
+            "photo": "vaishiya_photo.jpeg",
+            "status": "Pending"
+        },
+        {
+            "name": "Subscriber 4",
+            "email": "subscriber4@example.com",
+            "mobile": "+91 98765 43216",
+            "aadhar_card": "subscriber4_aadhar.pdf",
+            "photo": "subscriber4_photo.jpg",
+            "status": "Pending"
+        }
     ],
     "plans": [
         { "name": "Basic Plan", "price": 199, "validity": "30 Days", "dataLimit": "Nil", "smsLimit": "100 SMS", "callLimit": "Unlimited", "status": "Active" },

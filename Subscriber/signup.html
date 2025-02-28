@@ -6,6 +6,11 @@
     <title>Signup | Mobi.Comm</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.19.5/jquery.validate.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.19.5/additional-methods.min.js"></script>
+
+
     <style>
         body {
             background-color: #ECEFF1;
@@ -19,7 +24,7 @@
             color: #FFD700 !important;
         }
         .signup-container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 20px auto;
             background: white;
             border-radius: 10px;
@@ -48,7 +53,7 @@
         }
         .toast-container {
             position: fixed;
-            top: 20px;
+            top:15%;
             right: 20px;
             z-index: 1050;
         }
@@ -70,30 +75,53 @@
                 <p>Register to manage your mobile recharges easily.</p>
             </div>
             <div class="right-panel">
-                <h3 class="mb-4 text-center">Register</h3>
+                <h3 class="mb-4 text-center">Buy New SIM</h3>
                 <form id="signupForm">
                     <div class="mb-3">
                         <label class="form-label">Full Name</label>
                         <input type="text" id="fullName" class="form-control" placeholder="Enter your full name">
-                        <div id="nameError" class="error-message">Name must contain only letters and spaces.</div>
+                        <div class="error-message" id="nameError">Only letters and spaces are allowed (Min: 3 characters).</div>
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label">Email</label>
                         <input type="email" id="email" class="form-control" placeholder="Enter your email">
-                        <div id="emailError" class="error-message">Enter a valid email address.</div>
+                        <div class="error-message" id="emailError">Enter a valid email address.</div>
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label">Mobile Number</label>
-                        <input type="tel" id="mobileNumber" class="form-control" placeholder="Enter your mobile number">
-                        <div id="mobileError" class="error-message">Enter a valid 10-digit number (ex : +91 xxxxx xxxxx).</div>
+                        <input type="tel" id="signupMobileNumber" class="form-control" placeholder="Enter your mobile number">
+                        <div class="error-message" id="mobileError">Enter a valid 10-digit mobile number.</div>
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label">Password</label>
                         <input type="password" id="password" class="form-control" placeholder="Enter your password">
-                        <div id="passwordError" class="error-message">Password must be at least 6 characters with letters & numbers.</div>
+                        <div class="error-message" id="passwordError">Password must be at least 6 characters, including letters & numbers.</div>
                     </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Confirm Password</label>
+                        <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm your password">
+                        <div class="error-message" id="confirmPasswordError">Passwords do not match.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Upload Aadhar Card</label>
+                        <input type="file" id="aadharFile" class="form-control" accept=".pdf">
+                        <div class="error-message" id="aadharError">Only PDF files are allowed.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Upload Your Photo</label>
+                        <input type="file" id="profileImage" class="form-control" accept=".jpg, .jpeg, .png">
+                        <div class="error-message" id="profileImageError">Only JPG, JPEG, or PNG files are allowed.</div>
+                    </div>
+
                     <button type="submit" class="btn btn-primary w-100">Register</button>
                 </form>
+                
                 <p class="text-center mt-3">Already have an account? <a href="login.html">Login</a></p>
             </div>
         </div>
@@ -109,53 +137,162 @@
         </div>
     </div>
 
+    <div class="modal fade" id="duplicateNumberModal" tabindex="-1" aria-labelledby="duplicateNumberModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="duplicateNumberModalLabel">Number Already Registered</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="duplicateNumberText"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.getElementById("signupForm").addEventListener("submit", function(event) {
-            event.preventDefault();
+       document.getElementById("signupForm").addEventListener("submit", function (event) {
+    event.preventDefault();
+    let isValid = true;
 
-            let isValid = true;
+    function validateField(inputId, errorId, emptyMsg, logicMsg, validationRegex) {
+        let inputField = document.getElementById(inputId);
+        let errorField = document.getElementById(errorId);
+        let value = inputField.value.trim();
 
-            let fullName = document.getElementById("fullName").value.trim();
-            let email = document.getElementById("email").value.trim();
-            let mobileNumber = document.getElementById("mobileNumber").value.trim();
-            let password = document.getElementById("password").value.trim();
+        if (value === "") {
+            errorField.textContent = emptyMsg;
+            errorField.style.display = "block";
+            inputField.classList.add("is-invalid");
+            isValid = false;
+        } else if (validationRegex && !validationRegex.test(value)) {
+            errorField.textContent = logicMsg;
+            errorField.style.display = "block";
+            inputField.classList.add("is-invalid");
+            isValid = false;
+        } else {
+            errorField.style.display = "none";
+            inputField.classList.remove("is-invalid");
+        }
 
-            let nameError = document.getElementById("nameError");
-            let emailError = document.getElementById("emailError");
-            let mobileError = document.getElementById("mobileError");
-            let passwordError = document.getElementById("passwordError");
-
-            nameError.style.display = /^[a-zA-Z\s]+$/.test(fullName) && fullName !== "" ? "none" : "block";
-            emailError.style.display = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email !== "" ? "none" : "block";
-            mobileError.style.display = /^\+91 \d{5} \d{5}$/.test(mobileNumber) && mobileNumber !== "" ? "none" : "block";
-            passwordError.style.display = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/.test(password) && password !== "" ? "none" : "block";
-
-            isValid = !(nameError.style.display === "block" || emailError.style.display === "block" || mobileError.style.display === "block" || passwordError.style.display === "block");
-
-            if (isValid) {
-                let users = JSON.parse(localStorage.getItem("users") || "[]");
-                let newUser = { name: fullName, number: mobileNumber, email: email };
-                users.push(newUser);
-                localStorage.setItem("users", JSON.stringify(users));
-
-                // Show toast notification
-                let toast = new bootstrap.Toast(document.getElementById("signupToast"));
-                toast.show();
-
-                setTimeout(() => {
-                    window.location.href = "login.html";
-                }, 2000);
-            }
+        inputField.addEventListener("input", function () {
+            errorField.style.display = "none";
+            inputField.classList.remove("is-invalid");
         });
+    }
 
-        // Hide error messages on input
-        document.querySelectorAll(".form-control").forEach(input => {
-            input.addEventListener("input", function() {
-                this.parentElement.querySelector(".error-message").style.display = "none";
-            });
-        });
+    validateField("fullName", "nameError", "Full Name is required!", "Only letters and spaces (Min: 3 characters).", /^[a-zA-Z\s]{3,}$/);
+    validateField("email", "emailError", "Email is required!", "Enter a valid email address.", /^\S+@\S+\.\S+$/);
+    validateField("signupMobileNumber", "mobileError", "Mobile number is required!", "Enter a valid 10-digit mobile number.", /^\+91\s\d{5}\s\d{5}$/);
+    validateField("password", "passwordError", "Password is required!", "At least 6 characters with letters & numbers.", /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/);
+
+    let password = document.getElementById("password").value.trim();
+    let confirmPassword = document.getElementById("confirmPassword").value.trim();
+    let confirmPasswordError = document.getElementById("confirmPasswordError");
+
+    if (confirmPassword === "") {
+        confirmPasswordError.textContent = "Confirm Password is required!";
+        confirmPasswordError.style.display = "block";
+        document.getElementById("confirmPassword").classList.add("is-invalid");
+        isValid = false;
+    } else if (confirmPassword !== password) {
+        confirmPasswordError.textContent = "Passwords do not match!";
+        confirmPasswordError.style.display = "block";
+        document.getElementById("confirmPassword").classList.add("is-invalid");
+        isValid = false;
+    } else {
+        confirmPasswordError.style.display = "none";
+        document.getElementById("confirmPassword").classList.remove("is-invalid");
+    }
+
+    document.getElementById("confirmPassword").addEventListener("input", function () {
+        confirmPasswordError.style.display = "none";
+        document.getElementById("confirmPassword").classList.remove("is-invalid");
+    });
+
+    let aadharFile = document.getElementById("aadharFile").files[0];
+    let aadharError = document.getElementById("aadharError");
+
+    if (!aadharFile) {
+        aadharError.textContent = "Aadhar file is required!";
+        aadharError.style.display = "block";
+        isValid = false;
+    } else if (!aadharFile.name.endsWith(".pdf")) {
+        aadharError.textContent = "Only PDF files are allowed!";
+        aadharError.style.display = "block";
+        isValid = false;
+    } else {
+        aadharError.style.display = "none";
+    }
+
+    document.getElementById("aadharFile").addEventListener("change", function () {
+        aadharError.style.display = "none";
+    });
+
+    let profileImage = document.getElementById("profileImage").files[0];
+    let profileImageError = document.getElementById("profileImageError");
+
+    if (!profileImage) {
+        profileImageError.textContent = "Profile image is required!";
+        profileImageError.style.display = "block";
+        isValid = false;
+    } else if (!/\.(jpg|jpeg|png)$/i.test(profileImage.name)) {
+        profileImageError.textContent = "Only JPG, JPEG, or PNG files are allowed!";
+        profileImageError.style.display = "block";
+        isValid = false;
+    } else {
+        profileImageError.style.display = "none";
+    }
+
+    document.getElementById("profileImage").addEventListener("change", function () {
+        profileImageError.style.display = "none";
+    });
+
+    let mobileNumber = document.getElementById("signupMobileNumber").value.trim();
+    let subscribers = JSON.parse(localStorage.getItem("subscribers")) || [];
+
+    // Check if the mobile number already exists
+    let existingSubscriber = subscribers.find(sub => sub.mobile === mobileNumber);
+
+    if (existingSubscriber) {
+        // Show modal if the number already exists
+        document.getElementById("duplicateNumberText").innerHTML = `The number <strong>${mobileNumber}</strong> is already registered. Please use another SIM.`;
+        let duplicateModal = new bootstrap.Modal(document.getElementById("duplicateNumberModal"));
+        duplicateModal.show();
+        return;
+    }
+
+    if (isValid) {
+        let newSubscriber = {
+            name: document.getElementById("fullName").value.trim(),
+            email: document.getElementById("email").value.trim(),
+            mobile: mobileNumber,
+            aadhar_card: aadharFile.name,
+            photo: profileImage.name,
+            status: "Pending"
+        };
+
+        subscribers.push(newSubscriber);
+        localStorage.setItem("subscribers", JSON.stringify(subscribers));
+
+        let toast = new bootstrap.Toast(document.getElementById("signupToast"));
+        toast.show();
+
+        setTimeout(() => {
+            window.location.href = "login.html";
+        }, 2000);
+    }
+});
+
+
     </script>
+    
 
 </body>
 </html>

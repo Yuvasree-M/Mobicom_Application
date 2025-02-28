@@ -306,6 +306,65 @@
                 padding: 8px 16px;
             }
         }
+
+        /* Fixed Navbar Example */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #007bff; /* Adjust based on your theme */
+    color: white;
+    padding: 15px;
+    z-index: 1000;
+}
+
+/* Ensure body content starts below the navbar */
+body {
+    padding-top: 80px; /* Adjust according to your navbar height */
+}
+
+/* Styling for Filter Section */
+.filter-section {
+    background: #f8f9fa;
+    padding: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 80px; /* Same as navbar height */
+    z-index: 999;
+}
+
+/* Input Fields */
+.filter-section input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 150px;
+}
+
+/* Buttons */
+.filter-section button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.filter-section .btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.filter-section .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
     </style>
 </head>
 
@@ -532,351 +591,45 @@
 
         <!-- Popular Plans -->
         <div id="plans" class="content-section">
-            <nav class="navbar navbar-expand-lg fixed-top">
 
-                <div class="container" style="width: 100%;">
-                    <a class="navbar-brand" href="user.html">Mobi.Comm</a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#plansNav">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="plansNav">
-                        <ul class="navbar-nav mx-auto">
-                            <li class="nav-item"><a class="nav-link active" href="#popular-plans">Popular</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#unlimited-plans">Unlimited</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#basic-plans">Basic</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#databooster-plans">Data Booster</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#family-plans">Family</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#international-plans">International</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="icon-container">
-                        <!-- Notification Icon -->
-                        <div class="notification-icon" onclick="showSection('notifications')">
-                            <i class="fas fa-bell"></i>
-                            <span class="notification-badge" id="notifBadge">3</span>
-                        </div>
-
-                        <!-- Avatar Dropdown -->
-                        <div class="dropdown">
-                            <div class="avatar-icon" data-bs-toggle="dropdown" aria-expanded="false">
-                                <img id="navbarAvatar" src="Images/profile.jpeg" alt="Avatar" class="rounded-circle"
-                                    width="40" height="40">
+            <div class="filter-section">
+                <label for="filter-name">Plan Name:</label>
+                <input type="text" id="filter-name" placeholder="Search by name">
+                
+                <label for="filter-price">Max Price:</label>
+                <input type="number" id="filter-price" placeholder="Max price">
+                
+                <label for="filter-data">Min Data (GB/day):</label>
+                <input type="number" id="filter-data" placeholder="Min data">
+                
+                <label for="filter-validity">Min Validity (Days):</label>
+                <input type="number" id="filter-validity" placeholder="Min validity">
+                
+                <button class="btn" id="apply-filters">Apply Filters</button>
+                <button class="btn" id="clear-filters">Clear Filters</button>
+            </div>
+            
+            <div class="plan-sections">
+                <div class="plan-section" id="popular-plans">
+                    <div class="container">
+                        <h3>Popular Plans</h3>
+                        <div class="plan-wrapper">
+                            <div class="plan-card" data-price="999" data-name="Unlimited Plan" data-validity="90" data-data="5">
+                                <h4>Unlimited Plan | ₹999</h4>
+                                <p>Validity: 90 Days</p>
+                                <p>Data: 5GB/day</p>
+                                <button class="btn btn-plan recharge-btn">Recharge</button>
                             </div>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" onclick="showSection('profile')">Profile</a></li>
-                                <li><a class="dropdown-item" onclick="showSection('history')">Recharge History</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item text-danger" href="index.html"
-                                        onclick="confirmLogout()">Logout</a>
-                                </li>
-                            </ul>
+                            <div class="plan-card" data-price="599" data-name="Data Booster Plan" data-validity="28" data-data="2">
+                                <h4>Data Booster Plan | ₹599</h4>
+                                <p>Validity: 28 Days</p>
+                                <p>Data: 2GB Total</p>
+                                <button class="btn btn-plan recharge-btn">Recharge</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </nav>
-
-            <div class="plan-section" id="popular-plans">
-                <div class="container">
-                    <h3>Popular Plans</h3>
-                    <div class="plan-wrapper">
-                        <div class="plan-card" data-price="999" data-name="Unlimited Plan" data-validity="90 Days"
-                            data-calls="Unlimited" data-sms="100/Day" data-data="5GB/Day">
-                            <h4>Unlimited Plan | ₹999</h4>
-                            <p>Validity: 90 Days</p>
-                            <p>Calls: Unlimited</p>
-                            <p>SMS: 100/day</p>
-                            <p>Data: 5GB/day</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                        <div class="plan-card" data-price="299" data-name="Basic Plan" data-validity="28 Days"
-                            data-calls="500 minutes" data-sms="100" data-data="Nil">
-                            <h4>Basic Plan | ₹299</h4>
-                            <p>Validity: 28 Days</p>
-                            <p>Calls: 500 minutes</p>
-                            <p>SMS: 100</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                        <div class="plan-card" data-price="599" data-name="Data Booster Plan" data-validity="28 Days"
-                            data-calls="N/A" data-sms="N/A" data-data="2GB Total">
-                            <h4>Data Booster Plan | ₹599</h4>
-                            <p>Validity: 28 Days</p>
-                            <p>Data: 2GB Total</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                        <div class="plan-card" data-price="999" data-name="Unlimited Plan" data-validity="90 Days"
-                            data-calls="Unlimited" data-sms="100/Day" data-data="5GB/Day">
-                            <h4>Unlimited Plan | ₹999</h4>
-                            <p>Validity: 90 Days</p>
-                            <p>Calls: Unlimited</p>
-                            <p>SMS: 100/day</p>
-                            <p>Data: 5GB/day</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                        <div class="plan-card" data-price="299" data-name="Basic Plan" data-validity="28 Days"
-                            data-calls="500 minutes" data-sms="100" data-data="Nil">
-                            <h4>Basic Plan | ₹299</h4>
-                            <p>Validity: 28 Days</p>
-                            <p>Calls: 500 minutes</p>
-                            <p>SMS: 100</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                        <div class="plan-card" data-price="599" data-name="Data Booster Plan" data-validity="28 Days"
-                            data-calls="N/A" data-sms="N/A" data-data="2GB Total">
-                            <h4>Data Booster Plan | ₹599</h4>
-                            <p>Validity: 28 Days</p>
-                            <p>Data: 2GB Total</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Unlimited Plans Section -->
-            <div class="plan-section" id="unlimited-plans">
-                <div class="container">
-                    <h3>Unlimited Plans</h3>
-                    <div class="plan-wrapper">
-                        <div class="plan-card" data-price="599" data-name="Unlimited Plan" data-validity="28 Days"
-                            data-calls="Unlimited" data-sms="100/Day" data-data="2GB/Day">
-                            <h4>Unlimited Plan| ₹599</h4>
-                            <p>Validity: 28 Days</p>
-                            <p>Calls: Unlimited</p>
-                            <p>SMS: 100/day</p>
-                            <p>Data: 2GB/day</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                        <div class="plan-card" data-price="799" data-name="Unlimited Plan" data-validity="60 Days"
-                            data-calls="Unlimited" data-sms="100/Day" data-data="3GB/Day">
-                            <h4>Unlimited Plan | ₹799</h4>
-                            <p>Validity: 60 Days</p>
-                            <p>Calls: Unlimited</p>
-                            <p>SMS: 100/day</p>
-                            <p>Data: 3GB/day</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                        <div class="plan-card" data-price="1299" data-name="Unlimited plan" data-validity="120 Days"
-                            data-calls="Unlimited" data-sms="100/Day" data-data="3GB/Day">
-                            <h4>Unlimited Plan| ₹1299</h4>
-                            <p>Validity: 120 Days</p>
-                            <p>Calls: Unlimited</p>
-                            <p>SMS: 100/day</p>
-                            <p>Data: 3GB/day</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                        <div class="plan-card" data-price="599" data-name="Unlimited Plan" data-validity="28 Days"
-                            data-calls="Unlimited" data-sms="100/Day" data-data="2GB/Day">
-                            <h4>Unlimited Plan| ₹599</h4>
-                            <p>Validity: 28 Days</p>
-                            <p>Calls: Unlimited</p>
-                            <p>SMS: 100/day</p>
-                            <p>Data: 2GB/day</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                        <div class="plan-card" data-price="799" data-name="Unlimited Plan" data-validity="60 Days"
-                            data-calls="Unlimited" data-sms="100/Day" data-data="3GB/Day">
-                            <h4>Unlimited Plan | ₹799</h4>
-                            <p>Validity: 60 Days</p>
-                            <p>Calls: Unlimited</p>
-                            <p>SMS: 100/day</p>
-                            <p>Data: 3GB/day</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                        <div class="plan-card" data-price="1299" data-name="Unlimited Plan" data-validity="120 Days"
-                            data-calls="Unlimited" data-sms="100/Day" data-data="3GB/Day">
-                            <h4>Unlimited Plan| ₹1299</h4>
-                            <p>Validity: 120 Days</p>
-                            <p>Calls: Unlimited</p>
-                            <p>SMS: 100/day</p>
-                            <p>Data: 3GB/day</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Basic Plans Section -->
-            <div class="plan-section" id="basic-plans">
-                <div class="container">
-                    <h3>Basic Plans</h3>
-                    <div class="plan-wrapper">
-                        <div class="plan-card" data-price="199" data-name="Basic Plan" data-validity="14 Days"
-                            data-calls="250 minutes" data-sms="50" data-data="Nil">
-                            <h4>Basic Plan | ₹199</h4>
-                            <p>Validity: 14 Days</p>
-                            <p>Calls: 250 minutes</p>
-                            <p>SMS: 50</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                        <div class="plan-card" data-price="299" data-name="Basic Plan" data-validity="28 Days"
-                            data-calls="500 minutes" data-sms="100" data-data="Nil">
-                            <h4>BasicPlan | ₹299</h4>
-                            <p>Validity: 28 Days</p>
-                            <p>Calls: 500 minutes</p>
-                            <p>SMS: 100</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                        <div class="plan-card" data-price="399" data-name="Basic Plan" data-validity="56 Days"
-                            data-calls="1000 minutes" data-sms="200" data-data="Nill">
-                            <h4>Basic Plan | ₹399</h4>
-                            <p>Validity: 56 Days</p>
-                            <p>Calls: 1000 minutes</p>
-                            <p>SMS: 200</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                        <div class="plan-card" data-price="199" data-name="Basic Plan" data-validity="14 Days"
-                            data-calls="250 minutes" data-sms="50" data-data="Nil">
-                            <h4>Basic Plan | ₹199</h4>
-                            <p>Validity: 14 Days</p>
-                            <p>Calls: 250 minutes</p>
-                            <p>SMS: 50</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                        <div class="plan-card" data-price="299" data-name="Basic Plan" data-validity="28 Days"
-                            data-calls="500 minutes" data-sms="100" data-data="Nil">
-                            <h4>BasicPlan | ₹299</h4>
-                            <p>Validity: 28 Days</p>
-                            <p>Calls: 500 minutes</p>
-                            <p>SMS: 100</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                        <div class="plan-card" data-price="399" data-name="Basic Plan" data-validity="56 Days"
-                            data-calls="1000 minutes" data-sms="200" data-data="Nill">
-                            <h4>Basic Plan | ₹399</h4>
-                            <p>Validity: 56 Days</p>
-                            <p>Calls: 1000 minutes</p>
-                            <p>SMS: 200</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Data Booster Plans Section -->
-            <div class="plan-section" id="databooster-plans">
-                <div class="container">
-                    <h3>Data Booster Plans</h3>
-                    <div class="plan-wrapper">
-                        <div class="plan-card" data-price="299" data-name="Data Booster Plan" data-validity="7 Days"
-                            data-calls="N/A" data-sms="N/A" data-data="1GB Total">
-                            <h4>Data Booster Plan | ₹299</h4>
-                            <p>Validity: 7 Days</p>
-                            <p>Data: 1GB Total</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                        <div class="plan-card" data-price="599" data-name="Data Booster Plan" data-validity="28 Days"
-                            data-calls="N/A" data-sms="N/A" data-data="2GB Total">
-                            <h4>Data Booster PLan | ₹599</h4>
-                            <p>Validity: 28 Days</p>
-                            <p>Data: 2GB Total</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                        <div class="plan-card" data-price="899" data-name="Data Booster Plan" data-validity="28 Days"
-                            data-calls="N/A" data-sms="N/A" data-data="5GB Total">
-                            <h4>Data Booster Plan | ₹899</h4>
-                            <p>Validity: 28 Days</p>
-                            <p>Data: 5GB Total</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                        <div class="plan-card" data-price="299" data-name="Data Booster Plan" data-validity="7 Days"
-                            data-calls="N/A" data-sms="N/A" data-data="1GB Total">
-                            <h4>Data Booster Plan | ₹299</h4>
-                            <p>Validity: 7 Days</p>
-                            <p>Data: 1GB Total</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                        <div class="plan-card" data-price="599" data-name="Data Booster Plan" data-validity="28 Days"
-                            data-calls="N/A" data-sms="N/A" data-data="2GB Total">
-                            <h4>Data Booster PLan | ₹599</h4>
-                            <p>Validity: 28 Days</p>
-                            <p>Data: 2GB Total</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                        <div class="plan-card" data-price="899" data-name="Data Booster Plan" data-validity="28 Days"
-                            data-calls="N/A" data-sms="N/A" data-data="5GB Total">
-                            <h4>Data Booster Plan | ₹899</h4>
-                            <p>Validity: 28 Days</p>
-                            <p>Data: 5GB Total</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-            <!-- Family Plans Section -->
-            <div class="plan-section" id="family-plans">
-                <div class="container">
-                    <h3>Family Plans</h3>
-                    <div class="plan-wrapper">
-                        <div class="plan-card" data-price="1499" data-name="Family Pack" data-validity="30 Days"
-                            data-calls="Unlimited" data-sms="100/Day" data-data="2GB/Day/Connection (2 Connections)">
-                            <h4>Family Pack | ₹1499</h4>
-                            <p>Validity: 30 Days</p>
-                            <p>Connections: 2</p>
-                            <p>Calls: Unlimited</p>
-                            <p>SMS: 100/day</p>
-                            <p>Data: 2GB/day/connection</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                        <div class="plan-card" data-price="1999" data-name="Family Pack" data-validity="30 Days"
-                            data-calls="Unlimited" data-sms="100/Day" data-data="3GB/Day/Connection (3 Connections)">
-                            <h4>Family Pack| ₹1999</h4>
-                            <p>Validity: 30 Days</p>
-                            <p>Connections: 3</p>
-                            <p>Calls: Unlimited</p>
-                            <p>SMS: 100/day</p>
-                            <p>Data: 3GB/day/connection</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                        <div class="plan-card" data-price="2499" data-name="Family Pack" data-validity="30 Days"
-                            data-calls="Unlimited" data-sms="100/Day" data-data="5GB/Day/Connection (4 Connections)">
-                            <h4>Family Pack | ₹2499</h4>
-                            <p>Validity: 30 Days</p>
-                            <p>Connections: 4</p>
-                            <p>Calls: Unlimited</p>
-                            <p>SMS: 100/day</p>
-                            <p>Data: 5GB/day/connection</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- International Plans Section -->
-            <div class="plan-section" id="international-plans">
-                <div class="container">
-                    <h3>International Plans</h3>
-                    <div class="plan-wrapper">
-                        <div class="plan-card" data-price="499" data-name="Global Pack" data-validity="7 Days"
-                            data-calls="60 minutes" data-sms="10/Day" data-data="1GB Total">
-                            <h4>Global Pack | ₹499</h4>
-                            <p>Validity: 7 Days</p>
-                            <p>International Calls: 60 minutes</p>
-                            <p>International SMS: 10/day</p>
-                            <p>International Data: 1GB Total</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                        <div class="plan-card" data-price="999" data-name="Global Pack" data-validity="15 Days"
-                            data-calls="120 minutes" data-sms="20/Day" data-data="2GB Total">
-                            <h4>Global Pack | ₹999</h4>
-                            <p>Validity: 15 Days</p>
-                            <p>International Calls: 120 minutes</p>
-                            <p>International SMS: 20/day</p>
-                            <p>International Data: 2GB Total</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                        <div class="plan-card" data-price="1999" data-name="Global Pack" data-validity="30 Days"
-                            data-calls="300 minutes" data-sms="50/Day" data-data="5GB Total">
-                            <h4>Global Pack | ₹1999</h4>
-                            <p>Validity: 30 Days</p>
-                            <p>International Calls: 300 minutes</p>
-                            <p>International SMS: 50/day</p>
-                            <p>International Data: 5GB Total</p>
-                            <button class="btn btn-plan recharge-btn">Recharge</button>
-                        </div>
-                    </div>
-                </div>
+                <!-- Other plan sections go here -->
             </div>
             <!-- Confirmation Modal -->
             <div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
@@ -1437,6 +1190,54 @@ document.addEventListener("DOMContentLoaded", function () {
                 behavior: "smooth"
             });
         });
+
+        document.addEventListener("DOMContentLoaded", function () {
+    const filterName = document.getElementById("filter-name");
+    const filterPrice = document.getElementById("filter-price");
+    const filterData = document.getElementById("filter-data");
+    const filterValidity = document.getElementById("filter-validity");
+    const applyFiltersBtn = document.getElementById("apply-filters");
+    const clearFiltersBtn = document.getElementById("clear-filters");
+    const planCards = document.querySelectorAll(".plan-card");
+
+    function applyFilters() {
+        const nameValue = filterName.value.toLowerCase();
+        const priceValue = filterPrice.value ? parseFloat(filterPrice.value) : Infinity;
+        const dataValue = filterData.value ? parseFloat(filterData.value) : 0;
+        const validityValue = filterValidity.value ? parseInt(filterValidity.value) : 0;
+
+        planCards.forEach(card => {
+            const planName = card.dataset.name.toLowerCase();
+            const planPrice = parseFloat(card.dataset.price);
+            const planData = parseFloat(card.dataset.data) || 0; // Extract numeric data (e.g., "5GB" -> 5)
+            const planValidity = parseInt(card.dataset.validity);
+
+            // Check filters
+            const matchesName = nameValue === "" || planName.includes(nameValue);
+            const matchesPrice = planPrice <= priceValue;
+            const matchesData = planData >= dataValue;
+            const matchesValidity = planValidity >= validityValue;
+
+            if (matchesName && matchesPrice && matchesData && matchesValidity) {
+                card.style.display = "block";
+            } else {
+                card.style.display = "none";
+            }
+        });
+    }
+
+    function clearFilters() {
+        filterName.value = "";
+        filterPrice.value = "";
+        filterData.value = "";
+        filterValidity.value = "";
+        planCards.forEach(card => card.style.display = "block");
+    }
+
+    applyFiltersBtn.addEventListener("click", applyFilters);
+    clearFiltersBtn.addEventListener("click", clearFilters);
+});
+
     </script>
     <script src="script.js"></script>
 

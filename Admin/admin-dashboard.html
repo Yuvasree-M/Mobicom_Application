@@ -13,10 +13,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <!-- Brand Name -->
             <a class="navbar-brand" href="#" onclick="showPage('dashboard')">Mobi.Comm</a>
-
-            <!-- Navbar Links -->
             <div class="collapse navbar-collapse" id="navbarContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
@@ -37,13 +34,11 @@
                 </ul>
             </div>
 
-            <!-- Notification Icon -->
             <div class="notification-icon" onclick="showPage('notification')">
                 <i class="fas fa-bell"></i>
                 <span class="notification-badge" id="notifBadge">3</span>
             </div>
 
-            <!-- Avatar Dropdown -->
             <div class="dropdown">
                 <div class="avatar-icon" data-bs-toggle="dropdown" aria-expanded="false">
                     <img id="navbarAvatar" src="Images/profile.jpeg" alt="Avatar" class="rounded-circle" width="40"
@@ -61,7 +56,6 @@
                 </ul>
             </div>
 
-            <!-- Navbar Toggle Button -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -124,14 +118,12 @@
                         </tr>
                     </thead>
                     <tbody id="expiringSubscribersTable">
-                        <!-- Data will be inserted dynamically -->
                     </tbody>
                 </table>
             </div>
             <!-- Bootstrap Pagination -->
             <nav aria-label="Page navigation example">
                 <ul class="pagination justify-content-center" id="pagination">
-                    <!-- Pagination will be generated dynamically here -->
                 </ul>
             </nav>
             <!-- Notify Modal -->
@@ -159,16 +151,13 @@
         <!-- Subscriber Management Section -->
         <div id="subscribers" class="content-section" style="display: none;">
             <h2 class="text-center mb-4">Subscriber Management</h2>
-
-            <!-- Search Bar -->
             <div class="search-bar position-relative mb-3">
                 <input type="text" class="form-control ps-5" id="searchSubscribers"
-                    placeholder="Search Subscribers by Name or Mobile Number" onkeyup="filterSubscribers()">
+                    placeholder="Search Subscribers by Name | Mobile Number | Status" onkeyup="filterSubscribers()">
                 <i class="fas fa-search position-absolute text-muted"
                     style="top: 50%; left: 15px; transform: translateY(-50%);"></i>
             </div>
 
-            <!-- Card for Pending Subscribers -->
             <div class="card">
                 <div class="card-header">
                     <h5 class="text-center">Pending Subscribers</h5>
@@ -179,8 +168,10 @@
                             <thead>
                                 <tr>
                                     <th>Name</th>
-                                    <th>Mobile No.</th>
                                     <th>Email</th>
+                                    <th>Mobile No.</th>
+                                    <th>Aadhar Card</th>
+                                    <th></th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
@@ -194,55 +185,48 @@
                     <!-- Bootstrap Pagination -->
                     <nav aria-label="Page navigation">
                         <ul class="pagination justify-content-center" id="pagination0">
-                            <!-- Pagination will be generated dynamically -->
+        
                         </ul>
                     </nav>
-
-                    <!-- Export Buttons -->
                     <div class="text-center mt-3">
-                        <button class="btn btn-warning me-2" onclick="exportSubscribersToCSV()">Export to CSV</button>
-                        <button class="btn btn-warning" onclick="exportSubscribersToPDF()">Export to PDF</button>
+                        <button id="exportCSV"class="btn btn-warning me-2" onclick="exportSubscribersToCSV()">Export to CSV</button>
+                        <button id="exportPDF" class="btn btn-warning" onclick="exportSubscribersToPDF()">Export to PDF</button>
                     </div>
                 </div>
             </div>
         </div>
         <div id="toastContainer" class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050;"></div>
 
-        <div class="modal fade" id="confirmationModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Confirm Action</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p id="confirmText"></p>
-                        <p><strong>Name:</strong> <span id="modalSubscriberName"></span></p>
-                        <p><strong>Mobile:</strong> <span id="modalSubscriberMobile"></span></p>
-                        <p><strong>Email:</strong> <span id="modalSubscriberEmail"></span></p>
-                        <p><strong>Status:</strong> <span id="modalSubscriberStatus"></span></p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button id="confirmActionBtn" class="btn">Confirm</button>
-                    </div>
-                </div>
+       <!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmationModalLabel">Confirmation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmText"></p>
+                <div id="confirmModalBody"></div>
+                <div id="deleteOptions" class="mt-3 text-center"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button id="confirmActionBtn" class="btn btn-success">Confirm</button>
             </div>
         </div>
+    </div>
+</div>
 
-        <!-- Transaction History Section -->
+        
         <div id="recharge-history" class="content-section" style="display: none;">
             <h2 class="text-center mb-4">Transaction History</h2>
-
-            <!-- Search Bar -->
             <div class="search-bar position-relative mb-3">
                 <input type="text" class="form-control ps-5" id="searchTransactions"
                     placeholder="Search by Name or Mobile" onkeyup="filterTransactions()">
                 <i class="fas fa-search position-absolute text-muted"
                     style="top: 50%; left: 15px; transform: translateY(-50%);"></i>
             </div>
-
-            <!-- Transaction Table -->
             <div class="card">
                 <div class="card-header">
                     <h5 class="text-center">Recharge Transactions</h5>
@@ -272,7 +256,6 @@
                     <!-- Pagination -->
                     <nav aria-label="Page navigation">
                         <ul class="pagination justify-content-center" id="pagination5">
-                            <!-- Pagination will be generated dynamically -->
                         </ul>
                     </nav>
 
@@ -340,7 +323,6 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Dynamic Plan Rows Here -->
                             </tbody>
                         </table>
                     </div>
@@ -606,7 +588,7 @@
             <div class="card text-center">
                 <div class="card-header">Total revenue</div>
                 <div class="card-body">
-                    <p id="totalRevenue"><b>0 (This Month)</b></p>
+                    <p id="totalRevenue"><b>₹50,000 (This Month)</b></p>
                 </div>
             </div>
         </div>
@@ -614,7 +596,7 @@
             <div class="card text-center">
                 <div class="card-header">Total Recharge</div>
                 <div class="card-body">
-                    <p id="totalRecharge"><b>0 (This Month)</b></p>
+                    <p id="totalRecharge"><b>500 (This Month)</b></p>
                 </div>
             </div>
         </div>
@@ -622,7 +604,7 @@
             <div class="card text-center">
                 <div class="card-header">New Subscribers</div>
                 <div class="card-body">
-                    <p id="newSubscribers"><b>0 (This Month)</b></p>
+                    <p id="newSubscribers"><b>10 (This Month)</b></p>
                 </div>
             </div>
         </div>
@@ -793,7 +775,6 @@
                         <textarea class="form-control" id="address"></textarea>
                         <small class="text-danger d-none" id="addressError">Address cannot be empty</small>
                     </div>
-
                     <!-- Change Password Toggle -->
                     <div class="mb-3 text-start">
                         <button type="button" class="btn btn-outline-secondary w-100" id="togglePasswordFields">
@@ -818,6 +799,7 @@
                     </div>
 
                     <button type="button" class="btn btn-primary w-100" id="updateProfile">Update Profile</button>
+
                 </form>
 
                 <!-- Toast Notification -->
@@ -896,6 +878,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
 
 
 

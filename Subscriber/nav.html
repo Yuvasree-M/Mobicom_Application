@@ -1,0 +1,74 @@
+<div id="plans" class="content-section">
+    <div class="filter-section">
+        <label for="filter-name">Plan Name:</label>
+        <input type="text" id="filter-name" placeholder="Search by name">
+        
+        <label for="filter-price">Max Price:</label>
+        <input type="number" id="filter-price" placeholder="Max price">
+        
+        <label for="filter-data">Min Data (GB/day):</label>
+        <input type="number" id="filter-data" placeholder="Min data">
+        
+        <label for="filter-validity">Min Validity (Days):</label>
+        <input type="number" id="filter-validity" placeholder="Min validity">
+        
+        <button class="btn" id="apply-filters">Apply Filters</button>
+        <button class="btn" id="clear-filters">Clear Filters</button>
+    </div>
+    
+    <div class="plan-sections">
+        <div class="plan-section" id="popular-plans">
+            <div class="container">
+                <h3>Popular Plans</h3>
+                <div class="plan-wrapper">
+                    <div class="plan-card" data-price="999" data-name="Unlimited Plan" data-validity="90" data-data="5">
+                        <h4>Unlimited Plan | ₹999</h4>
+                        <p>Validity: 90 Days</p>
+                        <p>Data: 5GB/day</p>
+                        <button class="btn btn-plan recharge-btn">Recharge</button>
+                    </div>
+                    <div class="plan-card" data-price="599" data-name="Data Booster Plan" data-validity="28" data-data="2">
+                        <h4>Data Booster Plan | ₹599</h4>
+                        <p>Validity: 28 Days</p>
+                        <p>Data: 2GB Total</p>
+                        <button class="btn btn-plan recharge-btn">Recharge</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Other plan sections go here -->
+    </div>
+</div>
+
+<script>
+    document.getElementById("apply-filters").addEventListener("click", function() {
+        let nameFilter = document.getElementById("filter-name").value.toLowerCase();
+        let priceFilter = document.getElementById("filter-price").value;
+        let dataFilter = document.getElementById("filter-data").value;
+        let validityFilter = document.getElementById("filter-validity").value;
+        
+        document.querySelectorAll(".plan-card").forEach(card => {
+            let name = card.getAttribute("data-name").toLowerCase();
+            let price = parseInt(card.getAttribute("data-price"));
+            let data = parseFloat(card.getAttribute("data-data")) || 0;
+            let validity = parseInt(card.getAttribute("data-validity"));
+            
+            if ((nameFilter && !name.includes(nameFilter)) ||
+                (priceFilter && price > priceFilter) ||
+                (dataFilter && data < dataFilter) ||
+                (validityFilter && validity < validityFilter)) {
+                card.style.display = "none";
+            } else {
+                card.style.display = "block";
+            }
+        });
+    });
+
+    document.getElementById("clear-filters").addEventListener("click", function() {
+        document.getElementById("filter-name").value = "";
+        document.getElementById("filter-price").value = "";
+        document.getElementById("filter-data").value = "";
+        document.getElementById("filter-validity").value = "";
+        document.querySelectorAll(".plan-card").forEach(card => card.style.display = "block");
+    });
+</script>

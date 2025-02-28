@@ -15,7 +15,6 @@ body {
     flex: 1;
 }
 
-/* Navbar Styling - Fixed Position */
 .navbar {
     background: linear-gradient(90deg, #00796B, #009688);
     padding: 10px 0;
