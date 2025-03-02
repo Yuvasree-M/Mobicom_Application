@@ -210,7 +210,7 @@
                 if (email === "admin@mobi.comm" && password === "admin123") {
                     showToast("Login Successful!", "success");
                     setTimeout(() => {
-                        window.location.href = "admin-dashboard.html";
+                        window.location.href = "dashboard.html";
                     }, 1500);
                 } else {
                     showToast("Invalid Credentials! Please try again.", "danger");
@@ -220,7 +220,6 @@
             }
         });
 
-        // Hide error messages when the user starts typing
         document.getElementById("email").addEventListener("input", function () {
             document.getElementById("emailError").style.display = "none";
         });

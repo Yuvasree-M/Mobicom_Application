@@ -18,33 +18,31 @@
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-dark">
             <div class="container">
-                <a class="navbar-brand" href="index.html">Mobi.Comm</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-
-                        <li class="nav-item">
-                            <a class="nav-link" style="color:--accent-color" href="plans.html">Plans</a>
-                        </li>
-
+                <a class="navbar-brand" href="user.html">Mobi.Comm</a>
+                <div class="dropdown">
+                    <div class="avatar-icon" data-bs-toggle="dropdown">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="plans.html">Browse Plan</a></li>
                     </ul>
                 </div>
             </div>
+            
         </nav>
+    
 
-        <!-- Breadcrumb Navigation
+        <!-- Breadcrumb Navigation -->
 
         <div class="container breadcrumb-container">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb custom-breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                    <li class="breadcrumb-item"><a href="user.html">Home</a></li>
                     <li class="breadcrumb-item"><a href="plans.html">Plans</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Recharge</li>
                 </ol>
             </nav>
-        </div> -->
+        </div>
 
 
         <!-- Main Content -->
@@ -139,10 +137,12 @@
         </div>
 
         <!-- Footer -->
-        <footer>
-            <div class="container">
-                <p class="mb-0">&copy; 2025 Mobi.Comm Services. All rights reserved.</p>
-            </div>
+        <footer class="footer">
+            
+                <div class="footer-bottom text-center mt-4">
+                    <p>&copy; 2025 Mobi.Comm - All Rights Reserved</p>
+                </div>
+         
         </footer>
     </div>
 
@@ -465,43 +465,29 @@
                 doc.text("Payment Method:", 20, yPos);
                 doc.text(data.paymentMethod || "-", 70, yPos);
                 yPos += 8;
-
-                // Amount in bold
                 doc.text("Amount:", 20, yPos);
                 doc.setFont(undefined, 'bold');
                 doc.text(`₹${data.amount || "0"}`, 70, yPos);
                 doc.setFont(undefined, 'normal');
                 yPos += 20;
-
-                // Add a line separator
                 doc.line(20, yPos - 5, 190, yPos - 5);
-
-                // Footer with terms and customer service
                 doc.setFontSize(8);
                 doc.text("Thank you for choosing Mobi.Comm Service.", 105, yPos + 5, { align: "center" });
-
-                // Add timestamp to filename to make each download unique
                 const timestamp = new Date().getTime();
                 doc.save(`Mobi.Comm_Invoice_${data.transactionId}_${timestamp}.pdf`);
             }
         };
 
-        // Main Application
         document.addEventListener("DOMContentLoaded", function () {
-            // Get URL parameters
             const params = new URLSearchParams(window.location.search);
             const mobilenumber = params.get("mobile") || "+91 94880 18781";
-
-            // Populate plan details
-            const planName = params.get("name") || "Unknown Plan";
+            const planName = params.get("name") || "Yuvasree";
             const planPrice = params.get("price") || "0";
             const planValidity = params.get("validity") || "N/A";
             const planData = params.get("data") || "N/A";
 
             document.getElementById("planDetails").innerText =
                 `${planName} | ₹${planPrice} | ${planValidity} | ${planData}`;
-
-            // Payment method selection
             document.getElementById("paymentMethod").addEventListener("change", function () {
                 const method = this.value;
                 const formContainer = document.getElementById("payment-form");
@@ -509,8 +495,6 @@
                 if (method) {
                     formContainer.innerHTML = PaymentFormSystem.getForm(method);
                     formContainer.classList.remove("hidden");
-
-                    // Add input validation listeners
                     document.querySelectorAll("#payment-form input").forEach(input => {
                         input.addEventListener("input", function () {
                             const rules = PaymentFormSystem.getValidationRules(method)[this.id] || ["required"];
@@ -526,8 +510,6 @@
                     formContainer.classList.add("hidden");
                 }
             });
-
-            // Remove error message immediately when payment method is selected
             document.getElementById("paymentMethod").addEventListener("change", function () {
                 document.getElementById("paymentMethodError").textContent = "";
             });
@@ -541,7 +523,7 @@
                     paymentMethodError.textContent = "Please select a payment method";
                     return;
                 } else {
-                    paymentMethodError.textContent = "";  // Clear error when valid
+                    paymentMethodError.textContent = ""; 
                 }
 
                 const validationRules = PaymentFormSystem.getValidationRules(selectedPayment);
@@ -551,7 +533,7 @@
                     errorMessage.textContent = "Please correct the errors in the form";
                     return;
                 } else {
-                    errorMessage.textContent = "";  // Clear error when valid
+                    errorMessage.textContent = ""; 
                 }
 
 
@@ -598,7 +580,7 @@
                 InvoiceSystem.generatePDF(transaction);
             });
             document.getElementById("backHome").addEventListener("click", function () {
-                window.location.href = "index.html";
+                window.location.href = "user.html";
             });
         });
 
@@ -606,7 +588,7 @@
             const breadcrumbContainer = document.getElementById("breadcrumb");
             const pathSegments = window.location.pathname.split("/").filter(segment => segment);
 
-            let breadcrumbHTML = `<li class="breadcrumb-item"><a href="index.html">Home</a></li>`;
+            let breadcrumbHTML = `<li class="breadcrumb-item"><a href="user.html">Home</a></li>`;
 
             let path = "";
             pathSegments.forEach((segment, index) => {

@@ -7,7 +7,7 @@
     <title>Admin Dashboard | Mobi.Comm</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="adminstyles.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
@@ -41,7 +41,7 @@
 
             <div class="dropdown">
                 <div class="avatar-icon" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img id="navbarAvatar" src="Images/profile.jpeg" alt="Avatar" class="rounded-circle" width="40"
+                    <img id="navbarAvatar" src="../assesst/Images/profile.jpeg" alt="Avatar" class="rounded-circle" width="40"
                         height="40">
                 </div>
                 <ul class="dropdown-menu dropdown-menu-end">
@@ -51,7 +51,7 @@
                     <li>
                         <hr class="dropdown-divider">
                     </li>
-                    <li><a class="dropdown-item text-danger" href="admin-login.html"
+                    <li><a class="dropdown-item text-danger" href="login.html"
                             onclick="confirmLogout()">Logout</a></li>
                 </ul>
             </div>
@@ -748,7 +748,7 @@
 
                 <!-- Profile Image -->
                 <div class="profile-image-container">
-                    <img id="profileImage" src="avatar.png" class="profile-image" alt="Profile Image">
+                    <img id="profileImage" src="../assesst/Images/profile.jpeg" class="profile-image" alt="Profile Image">
                     <span id="editProfileImage" class="edit-icon text-primary">
                         <i class="fas fa-edit"></i>
                     </span>
@@ -775,14 +775,11 @@
                         <textarea class="form-control" id="address"></textarea>
                         <small class="text-danger d-none" id="addressError">Address cannot be empty</small>
                     </div>
-                    <!-- Change Password Toggle -->
                     <div class="mb-3 text-start">
                         <button type="button" class="btn btn-outline-secondary w-100" id="togglePasswordFields">
                             Change Password
                         </button>
                     </div>
-
-                    <!-- Password Fields (Initially Hidden) -->
                     <div id="passwordFields" style="display: none;">
                         <h5 class="text-start">Change Password</h5>
                         <div class="mb-3 text-start">
@@ -884,7 +881,7 @@
 
 
 
-    <script src="adminscript.js"></script>
+    <script src="script.js"></script>
 
 
 </body>

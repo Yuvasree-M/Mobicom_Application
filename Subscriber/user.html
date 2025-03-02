@@ -16,7 +16,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="#dashboard">Mobi.Comm</a>
+            <a class="navbar-brand" href="user.html">Mobi.Comm</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -24,9 +24,6 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link active" href="#dashboard" onclick="showSection('dashboard')">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#popular-plans">Popular Plan</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#" onclick="showSection('plans')">Browse Plans</a>
@@ -53,8 +50,10 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item text-danger" href="index.html" onclick="confirmLogout()">Logout</a>
+                        <li><button class="dropdown-item" class="btn btn-success" onclick="confirmLogout()">Logout</button>
+                            
                         </li>
+                        
                     </ul>
                 </div>
             </div>
@@ -214,7 +213,7 @@
                             <p>Calls: Nil</p>
                             <p>SMS: Nil</p>
                             <p>Data: 2GB Total</p>
-                            <button class="btn btn-plan btn-warning">Recharge</button>
+                            <button class="btn btn-plan recharge-btn">Recharge</button>
                         </div>
                     </div>
                 </div>
@@ -239,8 +238,8 @@
                 <label for="filter-validity">Min Validity (Days):</label>
                 <input type="number" id="filter-validity" placeholder="Min validity">
                 
-                <button class="btn" id="apply-filters">Apply Filters</button>
-                <button class="btn" id="clear-filters">Clear Filters</button>
+                <button class="btn btn-success" id="apply-filters">Apply Filters</button>
+                <button class="btn btn-secondary" id="clear-filters">Clear Filters</button>
             </div>
             
             <div class="plan-sections">
@@ -248,41 +247,141 @@
                     <div class="container">
                         <h3>Popular Plans</h3>
                         <div class="plan-wrapper">
-                            <div class="plan-card" data-price="999" data-name="Unlimited Plan" data-validity="90" data-data="5">
+                            <div class="plan-card" data-price="999" data-name="Unlimited Plan" data-validity="90 Days"
+                                data-calls="Unlimited" data-sms="100/Day" data-data="5GB/Day">
                                 <h4>Unlimited Plan | ₹999</h4>
                                 <p>Validity: 90 Days</p>
+                                <p>Calls: Unlimited</p>
+                                <p>SMS: 100/day</p>
                                 <p>Data: 5GB/day</p>
                                 <button class="btn btn-plan recharge-btn">Recharge</button>
                             </div>
-                            <div class="plan-card" data-price="599" data-name="Data Booster Plan" data-validity="28" data-data="2">
+                         
+                            <div class="plan-card" data-price="599" data-name="Data Booster Plan" data-validity="28 Days"
+                                data-calls="N/A" data-sms="N/A" data-data="2GB Total">
                                 <h4>Data Booster Plan | ₹599</h4>
                                 <p>Validity: 28 Days</p>
                                 <p>Data: 2GB Total</p>
                                 <button class="btn btn-plan recharge-btn">Recharge</button>
                             </div>
+                           
                         </div>
                     </div>
                 </div>
-                <!-- Other plan sections go here -->
-            </div>
-            <!-- Confirmation Modal -->
-            <div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Confirm Recharge</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <p id="modal-plan-details"></p>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-plan" id="confirmRecharge">Confirm</button>
+    
+                <!-- Unlimited Plans Section -->
+                <div class="plan-section" id="unlimited-plans">
+                    <div class="container">
+                        <h3>Unlimited Plans</h3>
+                        <div class="plan-wrapper">
+                            <div class="plan-card" data-price="599" data-name="Unlimited Plan" data-validity="28 Days"
+                                data-calls="Unlimited" data-sms="100/Day" data-data="2GB/Day">
+                                <h4>Unlimited Plan| ₹599</h4>
+                                <p>Validity: 28 Days</p>
+                                <p>Calls: Unlimited</p>
+                                <p>SMS: 100/day</p>
+                                <p>Data: 2GB/day</p>
+                                <button class="btn btn-plan recharge-btn">Recharge</button>
+                            </div>
+                         
+                          
                         </div>
                     </div>
                 </div>
-            </div>
+    
+                <!-- Basic Plans Section -->
+                <div class="plan-section" id="basic-plans">
+                    <div class="container">
+                        <h3>Basic Plans</h3>
+                        <div class="plan-wrapper">
+                            <div class="plan-card" data-price="199" data-name="Basic Plan" data-validity="14 Days"
+                                data-calls="250 minutes" data-sms="50" data-data="Nil">
+                                <h4>Basic Plan | ₹199</h4>
+                                <p>Validity: 14 Days</p>
+                                <p>Calls: 250 minutes</p>
+                                <p>SMS: 50</p>
+                                <button class="btn btn-plan recharge-btn">Recharge</button>
+                            </div>
+                           
+                            
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Data Booster Plans Section -->
+                <div class="plan-section" id="databooster-plans">
+                    <div class="container">
+                        <h3>Data Booster Plans</h3>
+                        <div class="plan-wrapper">
+                            <div class="plan-card" data-price="299" data-name="Data Booster Plan" data-validity="7 Days"
+                                data-calls="N/A" data-sms="N/A" data-data="1GB Total">
+                                <h4>Data Booster Plan | ₹299</h4>
+                                <p>Validity: 7 Days</p>
+                                <p>Data: 1GB Total</p>
+                                <button class="btn btn-plan recharge-btn">Recharge</button>
+                            </div>
+                      
+                        </div>
+    
+                    </div>
+                </div>
+                <!-- Family Plans Section -->
+                <div class="plan-section" id="family-plans">
+                    <div class="container">
+                        <h3>Family Packs</h3>
+                        <div class="plan-wrapper">
+                            <div class="plan-card" data-price="1499" data-name="Family Pack" data-validity="30 Days"
+                                data-calls="Unlimited" data-sms="100/Day" data-data="2GB/Day/Connection (2 Connections)">
+                                <h4>Family Pack | ₹1499</h4>
+                                <p>Validity: 30 Days</p>
+                                <p>Connections: 2</p>
+                                <p>Calls: Unlimited</p>
+                                <p>SMS: 100/day</p>
+                                <p>Data: 2GB/day/connection</p>
+                                <button class="btn btn-plan recharge-btn">Recharge</button>
+                            </div>
+              
+                        </div>
+                    </div>
+                </div>
+                <!-- International Plans Section -->
+                <div class="plan-section" id="international-plans">
+                    <div class="container">
+                        <h3>International Plans</h3>
+                        <div class="plan-wrapper">
+                            <div class="plan-card" data-price="499" data-name="Global Pack" data-validity="7 Days"
+                                data-calls="60 minutes" data-sms="10/Day" data-data="1GB Total">
+                                <h4>Global Pack | ₹499</h4>
+                                <p>Validity: 7 Days</p>
+                                <p>International Calls: 60 minutes</p>
+                                <p>International SMS: 10/day</p>
+                                <p>International Data: 1GB Total</p>
+                                <button class="btn btn-plan recharge-btn">Recharge</button>
+                            </div>
+               
+                        </div>
+                    </div>
+                </div>
+                <!-- Confirmation Modal -->
+                <div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Confirm Recharge</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p id="modal-plan-details"></p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-plan" id="confirmRecharge">Confirm</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+           
         </div>
 
 
@@ -462,6 +561,29 @@
 
     <button id="homeButton"><i class="fas fa-arrow-up"></i></button>
 
+
+
+    <!-- Logout Confirmation Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to log out?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmLogoutBtn">Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="container py-5">
@@ -491,6 +613,9 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -843,7 +968,7 @@ document.addEventListener("DOMContentLoaded", function () {
         planCards.forEach(card => {
             const planName = card.dataset.name.toLowerCase();
             const planPrice = parseFloat(card.dataset.price);
-            const planData = parseFloat(card.dataset.data) || 0; // Extract numeric data (e.g., "5GB" -> 5)
+            const planData = parseFloat(card.dataset.data) || 0;
             const planValidity = parseInt(card.dataset.validity);
 
             // Check filters
