@@ -117,16 +117,16 @@
         }
     ],
     "plans": [
-        { "name": "Basic Plan", "price": 199, "validity": "30 Days", "dataLimit": "Nil", "smsLimit": "100 SMS", "callLimit": "Unlimited", "status": "Active" },
-        { "name": "Unlimited Plan", "price": 399, "validity": "60 Days", "dataLimit": "2GB/Day", "smsLimit": "200 SMS", "callLimit": "Unlimited", "status": "Active" },
-        { "name": "Data Booster Plan", "price": 599, "validity": "90 Days", "dataLimit": "50GB Total", "smsLimit": "Nil", "callLimit": "Nil", "status": "Inactive" },
-        { "name": "Basic Plan", "price": 199, "validity": "30 Days", "dataLimit": "Nil", "smsLimit": "100 SMS", "callLimit": "Unlimited", "status": "Inactive" },
-        { "name": "Unlimited Plan", "price": 399, "validity": "60 Days", "dataLimit": "2GB/Day", "smsLimit": "200 SMS", "callLimit": "Unlimited", "status": "Inactive" },
-        { "name": "Data Booster Plan", "price": 599, "validity": "90 Days", "dataLimit": "50GB Total", "smsLimit": "Nil", "callLimit": "Nil", "status": "Active" },
-        { "name": "Basic Plan", "price": 199, "validity": "30 Days", "dataLimit": "Nil", "smsLimit": "100 SMS", "callLimit": "Unlimited", "status": "Active" },
-        { "name": "Unlimited Plan", "price": 399, "validity": "60 Days", "dataLimit": "2GB/Day", "smsLimit": "200 SMS", "callLimit": "Unlimited", "status": "Active" },
-        { "name": "Data Booster Plan", "price": 599, "validity": "90 Days", "dataLimit": "50GB Total", "smsLimit": "Nil", "callLimit": "Nil", "status": "Inactive" },
-        { "name": "Basic Plan", "price": 199, "validity": "30 Days", "dataLimit": "Nil", "smsLimit": "100 SMS", "callLimit": "Unlimited", "status": "Active" }
+        { "name": "Basic Plan", "category": "Basic", "price": 199, "validity": "30 Days", "dataLimit": "Nil", "smsLimit": "100 SMS", "callLimit": "Unlimited", "status": "Active" },
+    { "name": "Unlimited Plan", "category": "Unlimited", "price": 399, "validity": "60 Days", "dataLimit": "2GB/Day", "smsLimit": "200 SMS", "callLimit": "Unlimited", "status": "Active" },
+    { "name": "Data Booster Plan", "category": "Data Booster", "price": 599, "validity": "90 Days", "dataLimit": "50GB Total", "smsLimit": "Nil", "callLimit": "Nil", "status": "Active" },
+
+    { "name": "Basic Plan", "category": "Basic", "price": 199, "validity": "30 Days", "dataLimit": "Nil", "smsLimit": "100 SMS", "callLimit": "Unlimited", "status": "Active" },
+    { "name": "Unlimited Plan", "category": "Unlimited", "price": 399, "validity": "60 Days", "dataLimit": "2GB/Day", "smsLimit": "200 SMS", "callLimit": "Unlimited", "status": "Active" },
+    { "name": "Data Booster Plan", "category": "Data Booster", "price": 599, "validity": "90 Days", "dataLimit": "50GB Total", "smsLimit": "Nil", "callLimit": "Nil", "status": "Active" },
+    { "name": "Basic Plan", "category": "Basic", "price": 199, "validity": "30 Days", "dataLimit": "Nil", "smsLimit": "100 SMS", "callLimit": "Unlimited", "status": "Active" },
+    { "name": "Unlimited Plan", "category": "Unlimited", "price": 399, "validity": "60 Days", "dataLimit": "2GB/Day", "smsLimit": "200 SMS", "callLimit": "Unlimited", "status": "Active" },
+    { "name": "Data Booster Plan", "category": "Data Booster", "price": 599, "validity": "90 Days", "dataLimit": "50GB Total", "smsLimit": "Nil", "callLimit": "Nil", "status": "Active" }
     ],
 
     "transactionHistory": [
@@ -197,5 +197,28 @@
             "status": "Successful"
         }
        
-    ]
+    ],
+    "users": [
+    {
+      "mobile": "+91 94880 18781",
+      "name": "Yuvasree",
+      "currentPlan": {
+        "name": "Unlimited Plan",
+        "price": 999,
+        "validity": "90 Days",
+        "calls": "Unlimited",
+        "sms": "100/Day",
+        "data": "5GB/Day",
+        "remainingValidity": "58 Days"
+      },
+      "usage": {
+        "dataUsed": "1.2GB",
+        "dataLimit": "1.5GB",
+        "callsUsed": "60 min",
+        "callsLimit": "Unlimited",
+        "smsUsed": "30",
+        "smsLimit": "100"
+      }
+    }
+  ]
 }

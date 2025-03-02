@@ -20,7 +20,7 @@ body {
     line-height: 1.6;
     margin: 0;
     padding: 0;
-    padding-top: 80px;
+    padding-top: 20px;
     height: 100vh;
 }
 
@@ -517,12 +517,12 @@ textarea {
     resize: none;
 }
 
-.filter-section {
+/* .filter-section {
     margin-bottom: 20px;
     text-align: center;
-}
+} */
 
-/* .filter-section {
+.filter-section {
     background: #f8f9fa;
     padding: 15px;
     display: flex;
@@ -534,7 +534,7 @@ textarea {
     position: sticky;
     top: 80px;
     z-index: 999;
-} */
+}
 
 .filter-container {
     max-width: 500px;
@@ -675,6 +675,8 @@ textarea {
     display: flex;
     flex-wrap: wrap;
     margin: 20px auto;
+    margin-top: 9%;
+    margin-bottom: 9%;
 }
 
 .container-box {
@@ -833,7 +835,9 @@ textarea {
     justify-content: center;
     padding: 20px 0;
 }
-
+.hidden {
+            display: none;
+        }
 /* Footer */
 .footer {
     background: linear-gradient(90deg, #00796B, #009688);
