@@ -14,7 +14,7 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="index.html">Mobi.Comm</a>
+            <a class="navbar-brand" href="../index.html">Mobi.Comm</a>
             <div class="dropdown">
                 <div class="avatar-icon" data-bs-toggle="dropdown">
                     <i class="fas fa-user"></i>
@@ -29,36 +29,34 @@
 
     <div class="container-box d-flex justify-content-center">
         <div class="row login-container w-100">
-            <!-- Left Side -->
-            <div class="col-md-6 left-panel text-center">
-                <h2>Mobi.Comm</h2>
-                <p>Welcome back! Please login to continue.</p>
-            </div>
-
-            <!-- Right Side (Login Form) -->
-            <div class="col-md-6 right-panel">
-                <h4 class="mb-4 text-center"><b>Subscriber Login</b></h4>
-                <form id="loginForm">
-                    <div class="mb-3">
-                        <label for="mobileNumber" class="form-label">Mobile Number</label>
-                        <input type="tel" class="form-control" id="mobileNumber" placeholder="+91 XXXXX XXXXX" required>
-                        <span id="mobileError" class="error-message"></span>
-                    </div>
-                    <div class="mb-3">
-                        <label for="otp" class="form-label">OTP</label>
-                        <input type="text" class="form-control" id="otp" placeholder="Enter OTP" disabled>
-                        <span id="otpError" class="error-message"></span>
-                    </div>
-
-                    <div class="d-flex justify-content-between">
-                        <button type="button" class="btn btn-primary" id="generateOTPBtn">Send OTP</button>
-                        <button type="submit" class="btn btn-warning" id="loginBtn" disabled>Login</button>
-                    </div>
-                </form>
-                <p class="text-center">Not registered? <a href="signup.html">Kindly Register</a></p>
-            </div>
-        </div>
-    </div>
+          <!-- Left Side -->
+          <div class="col-md-6 left-panel text-center">
+            <h2>Mobi.Comm</h2>
+            <p>Welcome back! Please login to continue.</p>
+          </div>
+    
+          <!-- Right Side (Login Form) -->
+          <div class="col-md-6 right-panel">
+            <h4 class="mb-4 text-center"><b>Subscriber Login</b></h4>
+            <form id="loginForm">
+              <div class="mb-3">
+                <label for="mobileNumber" class="form-label">Mobile Number</label>
+                <input type="tel" class="form-control" id="mobileNumber" placeholder="+91 XXXXX XXXXX" required>
+                <span id="mobileError" class="error-message"></span>
+              </div>
+              <div class="mb-3">
+                <label for="otp" class="form-label">OTP</label>
+                <input type="text" class="form-control" id="otp" placeholder="Enter OTP" disabled>
+                <span id="otpError" class="error-message"></span>
+              </div>
+    
+              <div class="d-flex justify-content-between">
+                <button type="button" class="btn btn-primary" id="generateOTPBtn">Send OTP</button>
+                <button type="submit" class="btn btn-warning" id="loginBtn" disabled>Login</button>
+              </div>
+            </form>
+            <p class="text-center">Not registered? <a href="signup.html">Kindly Register</a></p>
+          </div>
 
     <!-- OTP Modal -->
     <div class="modal fade" id="otpModal" tabindex="-1">

@@ -947,3 +947,41 @@ textarea {
     padding-top: 10px;
     font-size: 14px;
 }
+@media (max-width: 768px) {
+    .container-box {
+        padding: 0;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+
+    .login-container {
+        width: 100%;
+        max-width: 400px; /* Ensures it's not too wide */
+        padding: 20px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        background: #fff;
+        border-radius: 8px;
+    }
+
+    .right-panel {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn {
+        width: 100%; /* Full-width buttons */
+    }
+
+    .text-center a {
+        display: block;
+        margin-top: 5px;
+    }
+}
