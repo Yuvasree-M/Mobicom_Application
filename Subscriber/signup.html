@@ -119,7 +119,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-       document.getElementById("signupForm").addEventListener("submit", function (event) {
+     document.getElementById("signupForm").addEventListener("submit", function (event) {
     event.preventDefault();
     let isValid = true;
 
@@ -142,7 +142,11 @@
             errorField.style.display = "none";
             inputField.classList.remove("is-invalid");
         }
+    }
 
+    function addInputListener(inputId, errorId) {
+        let inputField = document.getElementById(inputId);
+        let errorField = document.getElementById(errorId);
         inputField.addEventListener("input", function () {
             errorField.style.display = "none";
             inputField.classList.remove("is-invalid");
@@ -154,6 +158,12 @@
     validateField("signupMobileNumber", "mobileError", "Mobile number is required!", "Enter a valid 10-digit mobile number.", /^\+91\s\d{5}\s\d{5}$/);
     validateField("password", "passwordError", "Password is required!", "At least 6 characters with letters & numbers.", /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/);
 
+    addInputListener("fullName", "nameError");
+    addInputListener("email", "emailError");
+    addInputListener("signupMobileNumber", "mobileError");
+    addInputListener("password", "passwordError");
+    addInputListener("confirmPassword", "confirmPasswordError");
+    
     let password = document.getElementById("password").value.trim();
     let confirmPassword = document.getElementById("confirmPassword").value.trim();
     let confirmPasswordError = document.getElementById("confirmPasswordError");
@@ -161,26 +171,18 @@
     if (confirmPassword === "") {
         confirmPasswordError.textContent = "Confirm Password is required!";
         confirmPasswordError.style.display = "block";
-        document.getElementById("confirmPassword").classList.add("is-invalid");
         isValid = false;
     } else if (confirmPassword !== password) {
         confirmPasswordError.textContent = "Passwords do not match!";
         confirmPasswordError.style.display = "block";
-        document.getElementById("confirmPassword").classList.add("is-invalid");
         isValid = false;
     } else {
         confirmPasswordError.style.display = "none";
-        document.getElementById("confirmPassword").classList.remove("is-invalid");
     }
-
-    document.getElementById("confirmPassword").addEventListener("input", function () {
-        confirmPasswordError.style.display = "none";
-        document.getElementById("confirmPassword").classList.remove("is-invalid");
-    });
 
     let aadharFile = document.getElementById("aadharFile").files[0];
     let aadharError = document.getElementById("aadharError");
-
+    
     if (!aadharFile) {
         aadharError.textContent = "Aadhar file is required!";
         aadharError.style.display = "block";
@@ -199,7 +201,7 @@
 
     let profileImage = document.getElementById("profileImage").files[0];
     let profileImageError = document.getElementById("profileImageError");
-
+    
     if (!profileImage) {
         profileImageError.textContent = "Profile image is required!";
         profileImageError.style.display = "block";
@@ -218,12 +220,9 @@
 
     let mobileNumber = document.getElementById("signupMobileNumber").value.trim();
     let subscribers = JSON.parse(localStorage.getItem("subscribers")) || [];
-
-    // Check if the mobile number already exists
     let existingSubscriber = subscribers.find(sub => sub.mobile === mobileNumber);
 
     if (existingSubscriber) {
-        // Show modal if the number already exists
         document.getElementById("duplicateNumberText").innerHTML = `The number <strong>${mobileNumber}</strong> is already registered. Please use another SIM.`;
         let duplicateModal = new bootstrap.Modal(document.getElementById("duplicateNumberModal"));
         duplicateModal.show();
@@ -251,7 +250,6 @@
         }, 2000);
     }
 });
-
 
     </script>
     

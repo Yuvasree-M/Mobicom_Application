@@ -666,6 +666,23 @@ textarea {
     cursor: pointer;
 }
 
+.btn-login{
+    background-color: #08796d;
+    color: white;
+    border-color: #030a09;
+}
+
+.btn-login:disabled{
+    background-color: #30c7b8;
+    color: white;
+    border-color: #030a09;
+}
+.btn-login:hover{
+    background-color: #30c7b8;
+    color: white;
+    border-color: #030a09;
+}
+
 
 /* Login/Signup Containers */
 .login-container, .signup-container {

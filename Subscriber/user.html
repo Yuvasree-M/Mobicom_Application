@@ -520,7 +520,6 @@
 
     </div>
     <div id="support" class="content-section">
-        <!-- Support & Feedback Form -->
         <div class="container mt-5">
             <div class="card p-4 shadow">
                 <h3 class="text-center mb-4">Contact Support</h3>
@@ -556,7 +555,7 @@
         </div>
     </div>
 
-    <!-- Toast Container (Fixed at Bottom Right) -->
+    <!-- Toast Container -->
     <div id="toastContainer" class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050;"></div>
 
     <button id="homeButton"><i class="fas fa-arrow-up"></i></button>
@@ -786,131 +785,127 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         document.addEventListener("DOMContentLoaded", function () {
-            const supportForm = document.getElementById("supportForm");
-            const nameInput = document.getElementById("name");
-            const emailInput = document.getElementById("email");
-            const subjectInput = document.getElementById("subject");
-            const messageInput = document.getElementById("message");
+    const supportForm = document.getElementById("supportForm");
+    const nameInput = document.getElementById("name");
+    const emailInput = document.getElementById("email");
+    const subjectInput = document.getElementById("subject");
+    const messageInput = document.getElementById("message");
 
-            const nameError = document.getElementById("nameError");
-            const emailError = document.getElementById("emailError");
-            const subjectError = document.getElementById("subjectError");
-            const messageError = document.getElementById("messageError");
+    const nameError = document.getElementById("nameError");
+    const emailError = document.getElementById("emailError");
+    const subjectError = document.getElementById("subjectError");
+    const messageError = document.getElementById("messageError");
 
-           
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-            function showError(input, errorElement, message) {
-                errorElement.textContent = message;
-                errorElement.classList.remove("d-none");
-                input.classList.add("is-invalid");
-            }
+    function showError(input, errorElement, message) {
+        errorElement.textContent = message;
+        errorElement.classList.remove("d-none");  // Ensure error message is visible
+        input.classList.add("is-invalid");
+    }
 
-            function clearError(input, errorElement) {
-                errorElement.classList.add("d-none");
-                input.classList.remove("is-invalid");
-            }
+    function clearError(input, errorElement) {
+        errorElement.classList.add("d-none");  // Hide the error message
+        input.classList.remove("is-invalid");
+    }
 
-            function validateName() {
-                let nameValue = nameInput.value.trim();
-                if (nameValue === "") {
-                    showError(nameInput, nameError, "Name is required.");
-                    return false;
-                } else if (nameValue.length < 3) {
-                    showError(nameInput, nameError, "Name must be at least 3 characters long.");
-                    return false;
-                }
-                clearError(nameInput, nameError);
-                return true;
-            }
+    function validateName() {
+        let nameValue = nameInput.value.trim();
+        if (nameValue === "") {
+            showError(nameInput, nameError, "Name is required.");
+            return false;
+        } else if (nameValue.length < 3) {
+            showError(nameInput, nameError, "Name must be at least 3 characters long.");
+            return false;
+        }
+        clearError(nameInput, nameError);
+        return true;
+    }
 
-           
-            function validateEmail() {
-                let emailValue = emailInput.value.trim();
-                if (emailValue === "") {
-                    showError(emailInput, emailError, "Email is required.");
-                    return false;
-                } else if (!emailRegex.test(emailValue)) {
-                    showError(emailInput, emailError, "Enter a valid email address (e.g., user@example.com).");
-                    return false;
-                }
-                clearError(emailInput, emailError);
-                return true;
-            }
+    function validateEmail() {
+        let emailValue = emailInput.value.trim();
+        if (emailValue === "") {
+            showError(emailInput, emailError, "Email is required.");
+            return false;
+        } else if (!emailRegex.test(emailValue)) {
+            showError(emailInput, emailError, "Enter a valid email address (e.g., user@example.com).");
+            return false;
+        }
+        clearError(emailInput, emailError);
+        return true;
+    }
 
-           
-            function validateSubject() {
-                let subjectValue = subjectInput.value.trim();
-                if (subjectValue === "") {
-                    showError(subjectInput, subjectError, "Subject is required.");
-                    return false;
-                } else if (subjectValue.length < 5) {
-                    showError(subjectInput, subjectError, "Subject must be at least 5 characters long.");
-                    return false;
-                }
-                clearError(subjectInput, subjectError);
-                return true;
-            }
+    function validateSubject() {
+        let subjectValue = subjectInput.value.trim();
+        if (subjectValue === "") {
+            showError(subjectInput, subjectError, "Subject is required.");
+            return false;
+        } else if (subjectValue.length < 5) {
+            showError(subjectInput, subjectError, "Subject must be at least 5 characters long.");
+            return false;
+        }
+        clearError(subjectInput, subjectError);
+        return true;
+    }
 
-           
-            function validateMessage() {
-                let messageValue = messageInput.value.trim();
-                if (messageValue === "") {
-                    showError(messageInput, messageError, "Message cannot be empty.");
-                    return false;
-                } else if (messageValue.length < 10) {
-                    showError(messageInput, messageError, "Message must be at least 10 characters long.");
-                    return false;
-                }
-                clearError(messageInput, messageError);
-                return true;
-            }
+    function validateMessage() {
+        let messageValue = messageInput.value.trim();
+        if (messageValue === "") {
+            showError(messageInput, messageError, "Message cannot be empty.");
+            return false;
+        } else if (messageValue.length < 10) {
+            showError(messageInput, messageError, "Message must be at least 10 characters long.");
+            return false;
+        }
+        clearError(messageInput, messageError);
+        return true;
+    }
 
-            
-            nameInput.addEventListener("input", validateName);
-            emailInput.addEventListener("input", validateEmail);
-            subjectInput.addEventListener("input", validateSubject);
-            messageInput.addEventListener("input", validateMessage);
+    // Event listeners to validate in real-time
+    nameInput.addEventListener("input", validateName);
+    emailInput.addEventListener("input", validateEmail);
+    subjectInput.addEventListener("input", validateSubject);
+    messageInput.addEventListener("input", validateMessage);
 
-            function showToast(message, type) {
-                const toastContainer = document.getElementById("toastContainer") || createToastContainer();
-                const toast = document.createElement("div");
-                toast.className = `toast align-items-center text-white bg-${type} border-0 show`;
-                toast.style = "position: relative; min-width: 250px;";
-                toast.innerHTML = `
+    function showToast(message, type) {
+        const toastContainer = document.getElementById("toastContainer") || createToastContainer();
+        const toast = document.createElement("div");
+        toast.className = `toast align-items-center text-white bg-${type} border-0 show`;
+        toast.style = "position: relative; min-width: 250px;";
+        toast.innerHTML = `
             <div class="d-flex">
                 <div class="toast-body">${message}</div>
                 <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
             </div>
         `;
-                toastContainer.appendChild(toast);
+        toastContainer.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
 
-                setTimeout(() => toast.remove(), 3000);
-            }
+    function createToastContainer() {
+        const container = document.createElement("div");
+        container.id = "toastContainer";
+        container.className = "position-fixed bottom-0 end-0 p-3";
+        container.style.zIndex = "1050";
+        document.body.appendChild(container);
+        return container;
+    }
 
-            function createToastContainer() {
-                const container = document.createElement("div");
-                container.id = "toastContainer";
-                container.className = "position-fixed bottom-0 end-0 p-3";
-                container.style.zIndex = "1050";
-                document.body.appendChild(container);
-                return container;
-            }
+    supportForm.addEventListener("submit", function (event) {
+        event.preventDefault();
 
-            supportForm.addEventListener("submit", function (event) {
-                event.preventDefault(); 
+        const isNameValid = validateName();
+        const isEmailValid = validateEmail();
+        const isSubjectValid = validateSubject();
+        const isMessageValid = validateMessage();
 
-                const isNameValid = validateName();
-                const isEmailValid = validateEmail();
-                const isSubjectValid = validateSubject();
-                const isMessageValid = validateMessage();
+        if (isNameValid && isEmailValid && isSubjectValid && isMessageValid) {
+            showToast("Message Sent Successfully!", "success");
+            supportForm.reset();
+        }
+    });
+});
 
-                if (isNameValid && isEmailValid && isSubjectValid && isMessageValid) {
-                    showToast("Message Sent Successfully!", "success");
-                    supportForm.reset();
-                }
-            });
-        });
 
 
         document.addEventListener("DOMContentLoaded", () => {
