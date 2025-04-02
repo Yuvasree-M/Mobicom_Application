@@ -19,16 +19,15 @@ import java.util.List;
 @Service
 public class AdminService {
     private final SubscriberRepository subscriberRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public AdminService(SubscriberRepository subscriberRepository,AdminLoginRepository adminLoginRepository, PasswordEncoder passwordEncoder) {
+    public AdminService(SubscriberRepository subscriberRepository, PasswordEncoder passwordEncoder) {
         this.subscriberRepository = subscriberRepository;
-        this.adminLoginRepository = adminLoginRepository;
         this.passwordEncoder = passwordEncoder;
     }
     
-    private final AdminLoginRepository adminLoginRepository;
-    private final PasswordEncoder passwordEncoder;
 
+   
     @Autowired
     private AdminLoginRepository adminRepository;
   

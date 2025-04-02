@@ -1,7 +1,5 @@
 package com.mobileprepaid.services;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +8,8 @@ import org.springframework.stereotype.Service;
 import com.mobileprepaid.dto.CurrentPlanDTO;
 import com.mobileprepaid.dto.SubscriberAccountDTO;
 import com.mobileprepaid.dto.SubscriberProfileDTO;
-import com.mobileprepaid.entities.Plan;
 import com.mobileprepaid.entities.Subscriber;
 import com.mobileprepaid.entities.Transaction;
-import com.mobileprepaid.repository.PlanRepository;
 import com.mobileprepaid.repository.SubscriberRepository;
 import com.mobileprepaid.repository.TransactionRepository;
 
@@ -23,13 +19,8 @@ public class SubscriberService {
 
     @Autowired
     private SubscriberRepository subscriberRepository;
-
     @Autowired
     private TransactionRepository transactionRepository;
-
-    @Autowired
-    private PlanRepository planRepository;
-    
     @Autowired
     private TransactionService transactionService;
 
