@@ -155,7 +155,6 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-// Add event listener to handle file selection for profile image update
 profileImageInput.addEventListener('change', function (event) {
     const file = event.target.files[0];
     if (file) {

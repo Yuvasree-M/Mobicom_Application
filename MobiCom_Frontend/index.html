@@ -14,13 +14,10 @@
 
 <body>
 
-    <!--  Navbar with Menu and Avatar Dropdown -->
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="#home">Mobi.Comm</a>
-
-
-            <!-- Navbar content -->
+            
             <div class="collapse navbar-collapse" id="navbarContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
@@ -33,7 +30,7 @@
                         <a class="nav-link" href="#quick-recharge">Quick Recharge</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#plans">Plans</a>
+                        <a class="nav-link" href="#how-it-works">About</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#faq">FAQ</a>
@@ -44,18 +41,17 @@
                 </ul>
             </div>
 
-            <!-- Avatar dropdown -->
             <div class="dropdown">
                 <div class="avatar-icon" data-bs-toggle="dropdown">
                     <i class="fas fa-user"></i>
                 </div>
                 <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="Admin/login.html">Login As Admin</a></li>
-                    <li><a class="dropdown-item" href="Subscriber/login.html">Login As Subscriber</a></li>
-                    <li><a class="dropdown-item" href="Subscriber/signup.html">Get New Sim</a></li>
+                    <li><a class="dropdown-item" href="Admin/login.html">Admin</a></li>
+                    <li><a class="dropdown-item" href="Subscriber/login.html">Subscriber</a></li>
+                    <li><a class="dropdown-item" href="Subscriber/signup.html">New Subscriber</a></li>
                 </ul>
             </div>
-            <!-- Toggle button for mobile -->
+            
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -71,11 +67,9 @@
         <p>Recharge your mobile in just a few clicks.</p>
     </div>
 
-    <!--  Updated Carousel Section with Text -->
     <div class="carousel-section" id="offers">
         <div class="container">
             <div class="row align-items-center">
-                <!-- Left side: Carousel (50% width) -->
                 <div class="col-md-6">
                     <div id="offerCarousel" class="carousel slide" data-bs-ride="carousel">
                         <div class="carousel-inner">
@@ -121,20 +115,71 @@
     <!--  Quick Recharge Section -->
     <div class="quick-recharge" id="quick-recharge">
         <h3>Quick Recharge</h3>
-        <label for="number">Mobile Number</label><br>
-        <input type="text" id="mobileNumber" class="recharge-input" placeholder="+91 xxxxx xxxxx">
-        <div id="error-message" style="color: red; margin-top: 10px;"></div>
+        <label for="mobileNumber">Mobile Number</label><br>
+        <input type="text" id="mobileNumber" class="recharge-input" value="+91 " maxlength="14"><br>
+        <div id="error-message" style="color: red;"></div><br>
         <button class="btn btn-success" id="rechargeButton">Recharge Now</button>
     </div>
-
+    
     <!-- Popular plan -->
-    <div class="popular-plans" id="plans">
-        <div class="container">
-            <h3 style="text-align: center; padding-bottom: 20px;">Popular Plans</h3>
-            <div id="plans-container" class="row justify-content-center">
+    <div class="popular-plans" id="how-it-works">
+        <div class="container py-5">
+            <h3 style="text-align: center; padding-bottom: 20px;">How It Works</h3>
+            <div id="steps-container" class="row justify-content-center">
+                <!-- Step 1 Card -->
+                <div class="col-md-4 mb-4">
+                    <div class="card card-step h-100 text-center card-gold">
+                        <div class="card-body d-flex flex-column p-4">
+                            <div class="icon-container mb-4 mx-auto">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <h5 class="card-title">1. Register & Login</h5>
+                            <p class="card-text flex-grow-1">Create your account in minutes with simple verification. Sign in securely with your mobile number or email to access all features and manage your prepaid services.</p>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 text-center pb-4">
+                            <small class="card-note">Takes only 2 minutes</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 2 Card -->
+                <div class="col-md-4 mb-4">
+                    <div class="card card-step h-100 text-center card-gold">
+                        <div class="card-body d-flex flex-column p-4">
+                            <div class="icon-container mb-4 mx-auto">
+                                <i class="fas fa-credit-card"></i>
+                            </div>
+                            <h5 class="card-title">2. Choose & Pay</h5>
+                            <p class="card-text flex-grow-1">Select from our range of prepaid plans that fit your needs. Pay securely using multiple payment options available.</p>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 text-center pb-4">
+                            <small class="card-note">Secure payment options</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 3 Card -->
+                <div class="col-md-4 mb-4">
+                    <div class="card card-step h-100 text-center card-gold">
+                        <div class="card-body d-flex flex-column p-4">
+                            <div class="icon-container mb-4 mx-auto">
+                                <i class="fas fa-signal"></i>
+                            </div>
+                            <h5 class="card-title">3. Enjoy Connectivity</h5>
+                            <p class="card-text flex-grow-1">Your plan activates instantly. Track usage, manage your account, and enjoy seamless connectivity on our network.</p>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 text-center pb-4">
+                            <small class="card-note">Instant activation</small>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+    
+  
+    
+    
 
     <!-- FAQ Section -->
     <div class="faq-section" id="faq">

@@ -209,100 +209,93 @@ body {
     text-align: center;
 }
 
-.plan-wrapper {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-    justify-content: center;
-    align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.plan-card {
-    background: white;
-    border-radius: 15px;
-    padding: 30px;
-    text-align: center;
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-    position: relative;
+/* Card Styles */
+.card-step {
+    transition: all 0.3s ease;
     overflow: hidden;
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.plan-card::before {
+.card-gold {
+    border-top: 4px solid #FFD700;
+}
+.card-title {
+    font-size: 20px;
+    margin-bottom: 15px;
+    font-weight: 700;
+    font-family: 'Playfair Display', serif;
+    color: #00695c;
+}
+
+.card-text {
+    color: #555;
+    line-height: 1.6;
+    font-family: 'Lato', sans-serif;
+}
+
+.card-note {
+    color: #00796b;
+    font-style: italic;
+    font-family: 'Lato', sans-serif;
+}
+
+/* Icon Container */
+.icon-container {
+    width: 80px;
+    height: 80px;
+    background-color: #e0f2f1;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.icon-container i {
+    font-size: 36px;
+    color: #00897b;
+}
+
+/* Hover Effects */
+.card-step:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 150, 136, 0.15);
+}
+
+.card-step:hover .icon-container {
+    background-color: #009688;
+    transform: scale(1.1);
+}
+
+.card-step:hover .icon-container i {
+    color: white;
+}
+
+.card-step:before {
     content: "";
     position: absolute;
-    width: 100%;
-    height: 5px;
-    top: 0;
-    left: 0;
-    background: linear-gradient(90deg, #FFA000, #FFD700);
+    bottom: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 0 40px 40px;
+    border-color: transparent transparent #e0f2f1 transparent;
+    transition: all 0.3s ease;
 }
 
-.plan-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+.card-step:hover:before {
+    border-color: transparent transparent #b2dfdb transparent;
 }
 
-.plan-card h4 {
-    font-size: 1.6rem;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #00796B;
-}
-
-.plan-card p {
-    font-size: 1.1rem;
-    color: #444;
-}
-
-
-.plan-card .btn-plan {
-    background: #FFA000;
-    color: white;
-    border-radius: 20px;
-    font-weight: bold;
-    transition: background 0.3s ease, transform 0.2s;
-    padding: 10px 20px;
-    margin-top: 15px;
-    display: inline-block;
-}
-
-
-.plan-card .btn-plan:hover {
-    background: #FF8F00;
-    transform: translateY(-2px);
-}
-
-
+/* Responsive Adjustments */
 @media (max-width: 768px) {
-
-    .plan-wrapper {
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    .container {
+        padding: 15px;
     }
 }
-
-@media (max-width: 480px) {
-
-    .plan-card {
-        padding: 20px;
-    }
-
-    .plan-card h4 {
-        font-size: 1.4rem;
-    }
-
-    .plan-card p {
-        font-size: 1rem;
-    }
-
-    .plan-card .btn-plan {
-        font-size: 1rem;
-        padding: 8px 15px;
-    }
-}
-
 
 .faq-section {
     padding: 50px 20px;
@@ -483,12 +476,6 @@ body {
     .recharge-input {
         width: 100%;
     }
-
-    .plan-card {
-        width: 100%;
-        max-width: 300px;
-    }
-
     .footer-columns {
         flex-direction: column;
         text-align: center;

@@ -53,6 +53,7 @@
                         <!-- Recharge Section -->
                         <div id="recharge-section" class="card p-4 bg-white">
                             <h3 class="text-center mb-3">Complete Your Recharge</h3>
+                            <span class="text-primary" id="mobile"></span> 
                             <div class="alert alert-info">
                                 <p class="text-center mb-0"><strong>Plan Selected:</strong> <span id="planDetails"
                                         class="fw-bold"></span></p>
@@ -481,7 +482,7 @@
         document.addEventListener("DOMContentLoaded", function () {
             const params = new URLSearchParams(window.location.search);
             const mobilenumber = params.get("mobile") || "+91 94880 18781";
-            const planName = params.get("name") || "Yuvasree";
+            const planName = params.get("name") || "Unlimited";
             const planPrice = params.get("price") || "0";
             const planValidity = params.get("validity") || "N/A";
             const planData = params.get("data") || "N/A";

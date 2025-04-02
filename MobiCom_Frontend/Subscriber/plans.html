@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Plans</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+       <!-- Navbar -->
+       <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">Mobi.Comm</a>
+            <div class="dropdown">
+                <div class="avatar-icon" data-bs-toggle="dropdown">
+                    <i class="fas fa-user"></i>
+                </div>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="login.html">Login</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2 style="padding-bottom: 20px;">Select a Plan</h2>
+        <input type="hidden" id="mobileNumber" value="">
+        <div id="plansContainer" class="row"></div>
+    </div>
+
+    
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Recharge</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" id="close-confirmation-btn"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="modal-plan-details"></p>
+                    <div class="mb-3">
+                        <label for="payment-mode" class="form-label">Payment Mode</label>
+                        <select id="payment-mode" class="form-select">
+                            <option value="CARD">CARD</option>
+                            <option value="UPI">UPI</option>
+                            <option value="NETBANKING">NET BANKING</option>
+                            
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancel" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmRecharge">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoice Modal -->
+    <div class="modal fade" id="invoiceModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Recharge Invoice</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Transaction ID:</strong> <span id="invoice-number"></span></p>
+                    <p><strong>Subscriber Name:</strong> <span id="subscriber-name"></span></p>
+                    <p><strong>Subscriber Number:</strong> <span id="subscriber-number"></span></p>
+                    <p><strong>Plan Name:</strong> <span id="plan-name"></span></p>
+                    <p><strong>Amount:</strong> ₹<span id="amount"></span></p>
+                    <p><strong>Validity:</strong> <span id="plan-validity"></span></p>
+                    <p><strong>Payment Method:</strong> <span id="payment-method"></span></p>
+                    <p><strong>Issue Date:</strong> <span id="issue-date"></span></p>
+                    <p><strong>Status:</strong> <span id="invoice-status"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="download-invoice-btn">Download Invoice</button>
+                    <button type="button" class="btn btn-secondary" id="back-to-home-btn" data-bs-dismiss="modal">Back to Home</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const apiBaseUrl = 'http://localhost:8083';
+
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        async function fetchWithAuth(url, options = {}) {
+            const token = sessionStorage.getItem('jwtToken');
+            if (!token) {
+                window.location.href = '../index.html';
+                throw new Error('No JWT token found.');
+            }
+
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            };
+            const response = await fetch(url, { ...options, headers });
+            if (response.status === 403 || response.status === 401) {
+                sessionStorage.removeItem('jwtToken');
+                window.location.href = '../index.html';
+                throw new Error('Invalid or expired token.');
+            }
+            if (!response.ok) {
+                throw new Error('Failed to fetch: ' + response.statusText);
+            }
+            return response.json();
+        }
+
+        async function loadPlans() {
+            const mobileNumber = getQueryParam('mobileNumber');
+            document.getElementById('mobileNumber').value = mobileNumber;
+
+            try {
+                const plansPage = await fetchWithAuth(`${apiBaseUrl}/subscriber/plans`);
+                const plans = plansPage.content;
+
+                const container = document.getElementById('plansContainer');
+                plans.forEach(plan => {
+                    const card = `
+                        <div class="col-md-4">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">${plan.name}</h5>
+                                    <p>Price: ₹${plan.price}</p>
+                                    <p>Validity: ${plan.validity} days</p>
+                                    <p>Data: ${plan.dataLimit || 'N/A'}</p>
+                                    <button class="btn btn-primary" 
+                                            data-plan-id="${plan.id}" 
+                                            data-plan-name="${plan.name}" 
+                                            data-plan-price="${plan.price}" 
+                                            data-plan-validity="${plan.validity}"
+                                            onclick="showRechargeModal(event)">Recharge</button>
+                                </div>
+                            </div>
+                        </div>`;
+                    container.innerHTML += card;
+                });
+            } catch (error) {
+                console.error('Error loading plans:', error);
+                alert('Failed to load plans: ' + error.message);
+            }
+        }
+
+        function showRechargeModal(event) {
+            const btn = event.target;
+            const planId = btn.dataset.planId;
+            const planName = btn.dataset.planName;
+            const planPrice = parseFloat(btn.dataset.planPrice);
+            const planValidity = btn.dataset.planValidity;
+
+            document.getElementById('modal-plan-details').textContent = 
+                `Recharge Plan: ${planName} for ₹${planPrice} (${planValidity} days)`;
+            const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+            confirmationModal.show();
+
+            document.getElementById('cancel').onclick = () => confirmationModal.hide();
+            document.getElementById('close-confirmation-btn').onclick = () => confirmationModal.hide();
+            document.getElementById('confirmRecharge').onclick = () => 
+                confirmRecharge(planId, confirmationModal, planName, planPrice, planValidity);
+        }
+
+        async function confirmRecharge(planId, confirmationModal, planName, planPrice, planValidity) {
+            const mobileNumber = document.getElementById('mobileNumber').value;
+            const paymentMode = document.getElementById('payment-mode').value;
+
+            const options = {
+                key: 'rzp_test_hFoXVarHVhtB0H',
+                amount: planPrice * 100,
+                currency: 'INR',
+                name: 'Mobi.Comm',
+                description: `Recharge for ${mobileNumber}`,
+                theme: { color: '#008080' },
+                handler: async (response) => {
+                    const rechargeRequest = {
+                        mobileNumber: mobileNumber,
+                        planId: planId,
+                        planName: planName,
+                        planPrice: planPrice,
+                        planValidity: planValidity,
+                        paymentId: response.razorpay_payment_id,
+                        paymentMode: paymentMode
+                    };
+
+                    try {
+                        const rechargeResponse = await fetchWithAuth(`${apiBaseUrl}/quick/process-recharge`, {
+                            method: 'POST',
+                            body: JSON.stringify(rechargeRequest),
+                        });
+                        confirmationModal.hide();
+                        showInvoiceModal(rechargeResponse);
+                    } catch (error) {
+                        console.error('Recharge error:', error);
+                        alert('Recharge failed: ' + error.message);
+                    }
+                },
+                modal: { ondismiss: () => alert('Payment cancelled.') }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.open();
+        }
+
+        function showInvoiceModal(response) {
+            const invoiceModal = new bootstrap.Modal(document.getElementById('invoiceModal'));
+            document.getElementById('invoice-number').textContent = response.transactionId;
+            document.getElementById('subscriber-name').textContent = response.subscriberName;
+            document.getElementById('subscriber-number').textContent = response.subscriberNumber;
+            document.getElementById('plan-name').textContent = response.planName;
+            document.getElementById('amount').textContent = response.planPrice.toFixed(2);
+            document.getElementById('plan-validity').textContent = `${response.planValidity} days`;
+            document.getElementById('payment-method').textContent = response.paymentMethod;
+            document.getElementById('issue-date').textContent = response.rechargeDate;
+            document.getElementById('invoice-status').textContent = response.status;
+            invoiceModal.show();
+
+            document.getElementById('download-invoice-btn').onclick = () => downloadInvoice(response);
+            document.getElementById('back-to-home-btn').onclick = () => {
+                invoiceModal.hide();
+                window.location.href = '../index.html';
+            };
+        }
+
+        function downloadInvoice(transaction) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+   
+    doc.setFillColor(0, 128, 128);
+    doc.rect(0, 0, 210, 40, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.text('Mobi.comm Prepaid Service', 20, 20);
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "normal");
+    doc.text('Your Recharge Invoice', 20, 30);
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(12);
+    const leftMargin = 20;
+    const valueMargin = 90; 
+    const startY = 50;
+    const lineHeight = 10;
+
+    const details = [
+        { label: 'Transaction ID', value: transaction.transactionId },
+        { label: 'Subscriber Name', value: transaction.subscriberName },
+        { label: 'Subscriber Number', value: transaction.subscriberNumber },
+        { label: 'Plan Name', value: transaction.planName },
+        { label: 'Amount', value: `₹${transaction.planPrice.toFixed(2)}` },
+        { label: 'Validity', value: `${transaction.planValidity || 'N/A'} days` },
+        { label: 'Payment Method', value: transaction.paymentMethod },
+        { label: 'Issue Date', value: transaction.rechargeDate },
+        { label: 'Status', value: transaction.status }
+    ];
+
+    details.forEach((item, index) => {
+        const yPosition = startY + (index * lineHeight);
+
+        doc.setFont("helvetica", "bold");
+        doc.text(item.label, leftMargin, yPosition);
+        doc.setFont("helvetica", "normal");
+        doc.text(item.value, valueMargin, yPosition);
+        if (index < details.length) {
+            doc.setLineWidth(0.1);
+            doc.setDrawColor(200, 200, 200); 
+            doc.line(leftMargin, yPosition + 2, 190, yPosition + 2);
+        }
+    });
+
+    const footerY = startY + (details.length * lineHeight) + 20;
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+    doc.text('Thank you for choosing Mobi.comm Prepaid Service!', 105, footerY, { align: 'center' });
+    doc.text('Contact us at support@mobicomm.com for any queries.', 105, footerY + 5, { align: 'center' });
+
+    doc.save(`invoice_${transaction.transactionId}.pdf`);
+}
+        document.addEventListener('DOMContentLoaded', loadPlans);
+    </script>
+</body>
+</html>

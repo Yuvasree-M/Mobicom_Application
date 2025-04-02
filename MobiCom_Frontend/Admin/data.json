@@ -116,19 +116,121 @@
             "status": "Pending"
         }
     ],
-    "plans": [
-        { "name": "Basic Plan", "category": "Basic", "price": 199, "validity": "30 Days", "dataLimit": "Nil", "smsLimit": "100 SMS", "callLimit": "Unlimited", "status": "Active" },
-    { "name": "Unlimited Plan", "category": "Unlimited", "price": 399, "validity": "60 Days", "dataLimit": "2GB/Day", "smsLimit": "200 SMS", "callLimit": "Unlimited", "status": "Active" },
-    { "name": "Data Booster Plan", "category": "Data Booster", "price": 599, "validity": "90 Days", "dataLimit": "50GB Total", "smsLimit": "Nil", "callLimit": "Nil", "status": "Active" },
-
-    { "name": "Basic Plan", "category": "Basic", "price": 199, "validity": "30 Days", "dataLimit": "Nil", "smsLimit": "100 SMS", "callLimit": "Unlimited", "status": "Active" },
-    { "name": "Unlimited Plan", "category": "Unlimited", "price": 399, "validity": "60 Days", "dataLimit": "2GB/Day", "smsLimit": "200 SMS", "callLimit": "Unlimited", "status": "Active" },
-    { "name": "Data Booster Plan", "category": "Data Booster", "price": 599, "validity": "90 Days", "dataLimit": "50GB Total", "smsLimit": "Nil", "callLimit": "Nil", "status": "Active" },
-    { "name": "Basic Plan", "category": "Basic", "price": 199, "validity": "30 Days", "dataLimit": "Nil", "smsLimit": "100 SMS", "callLimit": "Unlimited", "status": "Active" },
-    { "name": "Unlimited Plan", "category": "Unlimited", "price": 399, "validity": "60 Days", "dataLimit": "2GB/Day", "smsLimit": "200 SMS", "callLimit": "Unlimited", "status": "Active" },
-    { "name": "Data Booster Plan", "category": "Data Booster", "price": 599, "validity": "90 Days", "dataLimit": "50GB Total", "smsLimit": "Nil", "callLimit": "Nil", "status": "Active" }
-    ],
-
+   "plans": [
+    {
+        "id": "1",
+        "name": "Basic Plan",
+        "categoryId": "1",
+        "price": 199,
+        "validity": "30 Days",
+        "dataLimit": "Nil",
+        "smsLimit": "100 SMS",
+        "callLimit": "Unlimited",
+        "status": "active"
+    },
+    {
+        "id": "2",
+        "name": "Unlimited Plan",
+        "categoryId": "2",
+        "price": 399,
+        "validity": "60 Days",
+        "dataLimit": "2GB/Day",
+        "smsLimit": "200 SMS",
+        "callLimit": "Unlimited",
+        "status": "active"
+    },
+    {
+        "id": "3",
+        "name": "Data Booster Plan", 
+        "categoryId": "3",
+        "price": 599,
+        "validity": "90 Days",
+        "dataLimit": "50GB Total",
+        "smsLimit": "Nil",
+        "callLimit": "Nil",
+        "status": "active"
+    },
+    {
+        "id": "4",
+        "name": "Basic Plan Plus",
+        "categoryId": "1",
+        "price": 249,
+        "validity": "30 Days",
+        "dataLimit": "1GB/Day",
+        "smsLimit": "150 SMS",
+        "callLimit": "Unlimited",
+        "status": "active"
+    },
+    {
+        "id": "5",
+        "name": "Unlimited Premium",
+        "categoryId": "2",
+        "price": 499,
+        "validity": "84 Days",
+        "dataLimit": "3GB/Day",
+        "smsLimit": "300 SMS",
+        "callLimit": "Unlimited",
+        "status": "active"
+    },
+    {
+        "id": "6",
+        "name": "Data Booster Pro",
+        "categoryId": "3",
+        "price": 699,
+        "validity": "120 Days",
+        "dataLimit": "100GB Total",
+        "smsLimit": "Nil",
+        "callLimit": "Nil",
+        "status": "active"
+    },
+    {
+        "id": "7",
+        "name": "Basic Annual",
+        "categoryId": "1",
+        "price": 1999,
+        "validity": "365 Days",
+        "dataLimit": "Nil",
+        "smsLimit": "1000 SMS",
+        "callLimit": "Unlimited",
+        "status": "active"
+    },
+    {
+        "id": "8",
+        "name": "Unlimited Family",
+        "categoryId": "2",
+        "price": 899,
+        "validity": "90 Days",
+        "dataLimit": "4GB/Day",
+        "smsLimit": "500 SMS",
+        "callLimit": "Unlimited",
+        "status": "active"
+    },
+    {
+        "id": "9",
+        "name": "Data Booster Weekend",
+        "categoryId": "3",
+        "price": 299,
+        "validity": "30 Days",
+        "dataLimit": "20GB Weekend",
+        "smsLimit": "50 SMS",
+        "callLimit": "Nil",
+        "status": "inactive"
+    }
+],
+"categories": [
+    {
+        "id": "1",
+        "name": "Basic"
+    },
+    {
+        "id": "2",
+        "name": "Unlimited"
+    },
+    {
+        "id": "3",
+        "name": "Data Booster"
+    }
+],
     "transactionHistory": [
         {
             "transactionID": "TXN001",
