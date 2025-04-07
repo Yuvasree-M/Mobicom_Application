@@ -3,8 +3,9 @@ package com.mobileprepaid.services;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // Added
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
 import com.mobileprepaid.dto.AdminRegisterRequest;
 import com.mobileprepaid.dto.LoginRequest;
 import com.mobileprepaid.dto.OtpRequest;
@@ -20,12 +21,13 @@ import com.mobileprepaid.repository.RoleRepository;
 import com.mobileprepaid.repository.SubscriberLoginRepository;
 import com.mobileprepaid.repository.SubscriberRepository;
 import com.mobileprepaid.security.JwtService;
+import com.mobileprepaid.security.TokenBlocklist;
 import com.mobileprepaid.utils.OtpGenerator;
 import com.mobileprepaid.utils.SmsService;
 
-
 @Service
 public class AuthService {
+
     private final SubscriberRepository subscriberRepository;
     private final SubscriberLoginRepository subscriberLoginRepository;
     private final AdminLoginRepository adminLoginRepository;
@@ -34,6 +36,7 @@ public class AuthService {
     private final OtpGenerator otpGenerator;
     private final SmsService smsService;
     private final JwtService jwtService;
+    private final TokenBlocklist tokenBlocklist;
 
     public AuthService(SubscriberRepository subscriberRepository,
                        SubscriberLoginRepository subscriberLoginRepository,
@@ -42,7 +45,8 @@ public class AuthService {
                        PasswordEncoder passwordEncoder,
                        OtpGenerator otpGenerator,
                        SmsService smsService,
-                       JwtService jwtService) {
+                       JwtService jwtService,
+                       TokenBlocklist tokenBlocklist) {
         this.subscriberRepository = subscriberRepository;
         this.subscriberLoginRepository = subscriberLoginRepository;
         this.adminLoginRepository = adminLoginRepository;
@@ -51,6 +55,7 @@ public class AuthService {
         this.otpGenerator = otpGenerator;
         this.smsService = smsService;
         this.jwtService = jwtService;
+        this.tokenBlocklist = tokenBlocklist;
     }
 
     @Transactional
@@ -92,7 +97,7 @@ public class AuthService {
         }
 
         Role subscriberRole = roleRepository.findById(request.getRoleId())
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Subscriber role not found!"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Subscriber role not found!"));
 
         Subscriber subscriber = new Subscriber();
         subscriber.setName(request.getName());
@@ -106,6 +111,7 @@ public class AuthService {
 
         return "Subscriber registered successfully! Waiting for admin approval.";
     }
+
     public String sendOtp(OtpRequest request) {
         String phoneNumber = request.getPhoneNumber();
         Subscriber subscriber = subscriberRepository.findByPhoneNumber(phoneNumber)
@@ -149,6 +155,9 @@ public class AuthService {
         if (token == null || token.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid token!");
         }
+        String jti = jwtService.extractJti(token);
+        long expiry = jwtService.getTokenExpiry(token);
+        tokenBlocklist.revokeToken(jti, expiry);
         return "Admin logged out successfully!";
     }
 
@@ -156,6 +165,9 @@ public class AuthService {
         if (token == null || token.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid token!");
         }
+        String jti = jwtService.extractJti(token);
+        long expiry = jwtService.getTokenExpiry(token);
+        tokenBlocklist.revokeToken(jti, expiry);
         return "Subscriber logged out successfully!";
     }
 }

@@ -21,14 +21,17 @@ import java.util.List;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
+
     private static final Logger logger = LoggerFactory.getLogger(JwtFilter.class);
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final TokenBlocklist tokenBlocklist;
 
-    public JwtFilter(JwtService jwtService, UserDetailsService userDetailsService) {
+    public JwtFilter(JwtService jwtService, UserDetailsService userDetailsService, TokenBlocklist tokenBlocklist) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
+        this.tokenBlocklist = tokenBlocklist;
     }
 
     @Override
@@ -38,6 +41,13 @@ public class JwtFilter extends OncePerRequestFilter {
             String token = extractToken(request);
 
             if (token != null) {
+                String jti = jwtService.extractJti(token);
+                if (tokenBlocklist.isRevoked(jti)) {
+                    logger.warn("JWT token is revoked");
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    return;
+                }
+
                 String username = jwtService.extractUsername(token);
                 String role = jwtService.extractUserRole(token);
 
@@ -45,7 +55,7 @@ public class JwtFilter extends OncePerRequestFilter {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
                     if (jwtService.validateToken(token)) {
-                        List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role)); 
+                        List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
 
                         UsernamePasswordAuthenticationToken authentication =
                                 new UsernamePasswordAuthenticationToken(userDetails, null, authorities);

@@ -2,6 +2,7 @@ package com.mobileprepaid.controllers;
 
 import com.mobileprepaid.dto.DashboardDTO;
 import com.mobileprepaid.dto.ErrorResponse;
+import com.mobileprepaid.dto.ExpiringSubscriberDTO;
 import com.mobileprepaid.dto.ExpiryNotificationDTO;
 import com.mobileprepaid.dto.NotificationDTO;
 import com.mobileprepaid.dto.ReportAnalyticsDTO;
@@ -284,7 +285,7 @@ public class AdminController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/dashboard")
     public ResponseEntity<DashboardDTO> getDashboardData() {
-        DashboardDTO dashboard = dashboardService.getDashboardData(); // Updated service call
+        DashboardDTO dashboard = dashboardService.getDashboardData();
         return ResponseEntity.ok(dashboard);
     }
     
