@@ -1335,15 +1335,18 @@ document.getElementById('clear-filters')?.addEventListener('click', () => {
 function confirmLogout() {
     const logoutModal = new bootstrap.Modal(document.getElementById('logoutModal'));
     logoutModal.show();
-    const apiBaseUrl = "http://localhost:8083/subscriber"
-    document.getElementById('confirmLogoutBtn').onclick = async () => {
+
+    const apiBaseUrl = "http://localhost:8083/auth"; 
+    const confirmBtn = document.getElementById('confirmLogoutBtn');
+
+    confirmBtn.onclick = async () => {
         const token = sessionStorage.getItem('jwtToken');
 
         if (!token) {
             showToast("errorToast", "No session token found. You are already logged out.");
-            sessionStorage.removeItem('jwtToken'); 
+            sessionStorage.removeItem('jwtToken');
             logoutModal.hide();
-            window.location.href = 'index.html';
+            window.location.href = '../index.html';
             return;
         }
 
@@ -1355,17 +1358,18 @@ function confirmLogout() {
                 }
             });
 
+            const result = await response.json();
+
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || "Logout failed");
+                throw new Error(result.error || "Logout failed!");
             }
 
-            const data = await response.json();
-            sessionStorage.removeItem('jwtToken'); 
-            showToast("successToast", data.message || "Logged out successfully!");
+            sessionStorage.removeItem('jwtToken');
+            showToast("successToast", result.message || "Logged out successfully!");
             logoutModal.hide();
+
             setTimeout(() => {
-                window.location.href = 'index.html';
+                window.location.href = '/index.html';
             }, 1000);
         } catch (error) {
             console.error("Error during logout:", error);
@@ -1373,6 +1377,7 @@ function confirmLogout() {
         }
     };
 }
+
 function showToast(toastId, message) {
     const toastContainer = document.getElementById("toastContainer");
     if (!toastContainer) {

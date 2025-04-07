@@ -1,10 +1,9 @@
+// Utility Functions
 function parseJwt(token) {
     try {
         const base64Url = token.split('.')[1];
         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
         return JSON.parse(jsonPayload);
     } catch (e) {
         console.error("Error decoding JWT:", e);
@@ -16,11 +15,13 @@ function getToken() {
     return sessionStorage.getItem("jwtToken");
 }
 
-function checkAuth() {
+function checkAuth(redirect = true) {
     const token = getToken();
     if (!token) {
-        showToast("Please log in to access this page", "danger");
-        setTimeout(() => window.location.href = "login.html", 2000);
+        if (redirect) {
+            showToast("Please log in to access this page", "danger");
+            setTimeout(() => window.location.href = "login.html", 2000);
+        }
         return false;
     }
     return true;
@@ -31,7 +32,7 @@ function showToast(message, type) {
     toastContainer.id = "toastContainer";
     toastContainer.className = "position-fixed top-0 end-0 p-3";
     toastContainer.style.zIndex = "1050";
-    document.body.appendChild(toastContainer);
+    if (!document.getElementById("toastContainer")) document.body.appendChild(toastContainer);
     toastContainer.innerHTML = `
         <div class="toast show text-white bg-${type}" role="alert">
             <div class="d-flex">
@@ -40,117 +41,100 @@ function showToast(message, type) {
             </div>
         </div>
     `;
-    setTimeout(() => (toastContainer.innerHTML = ""), 3000);
+    setTimeout(() => toastContainer.innerHTML = "", 3000);
 }
 
+// Navigation and Page Management
 document.addEventListener("DOMContentLoaded", function () {
     showPage("dashboard");
     const navLinks = document.querySelectorAll(".nav-link");
-
-    navLinks.forEach((link) => {
+    navLinks.forEach(link => {
         link.addEventListener("click", function (event) {
             event.preventDefault();
             const pageId = this.getAttribute("onclick").match(/'([^']+)'/)[1];
             showPage(pageId);
         });
     });
+    setAdminTooltip(); // Ensure this runs only once here
 });
 
 function showPage(pageId) {
-    document.querySelectorAll(".content-section").forEach((section) => {
-        section.style.display = "none";
-    });
-
+    document.querySelectorAll(".content-section").forEach(section => section.style.display = "none");
     const selectedSection = document.getElementById(pageId);
-    if (selectedSection) {
-        selectedSection.style.display = "block";
-    }
-    document.querySelectorAll(".nav-link").forEach((link) => {
-        link.classList.remove("active");
-    });
-
-    document.querySelectorAll(".nav-link").forEach((link) => {
-        if (link.getAttribute("onclick")?.includes(pageId)) {
-            link.classList.add("active");
-        }
+    if (selectedSection) selectedSection.style.display = "block";
+    document.querySelectorAll(".nav-link").forEach(link => link.classList.remove("active"));
+    document.querySelectorAll(".nav-link").forEach(link => {
+        if (link.getAttribute("onclick")?.includes(pageId)) link.classList.add("active");
     });
 }
 
 // Scroll to Top
 window.onscroll = function () {
     const scrollTopBtn = document.getElementById("scrollTopBtn");
-    if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
-        scrollTopBtn.style.display = "block";
-    } else {
-        scrollTopBtn.style.display = "none";
+    if (scrollTopBtn) {
+        scrollTopBtn.style.display = (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) ? "block" : "none";
     }
 };
 
 function scrollToTop() {
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
+
+// Admin Tooltip
 async function setAdminTooltip() {
-        try {
-            const response = await fetch(`http://localhost:8083/admin/profile`, {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${getToken()}`,
-                    "Content-Type": "application/json",
-                },
-            });
-            if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to fetch admin profile`);
-            const data = await response.json();
-            adminName = data.name || "Admin";
-            sessionStorage.setItem("adminName", adminName); 
-        } catch (error) {
-            console.error("Error fetching admin profile:", error);
-            adminName = "Admin"; 
+    const tooltipElement = document.getElementById('adminTooltip');
+    if (!tooltipElement) {
+        console.warn("Admin tooltip element not found in DOM");
+        return;
+    }
+
+    if (!checkAuth(false)) {
+        tooltipElement.setAttribute('data-bs-title', 'Please log in');
+        return;
+    }
+
+    try {
+        const token = getToken();
+        const response = await fetch('http://localhost:8083/admin/profile', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${errorText || 'Failed to fetch admin profile'}`);
         }
 
-    const navbarAvatar = document.getElementById("navbarAvatar");
-    if (navbarAvatar) {
-        navbarAvatar.setAttribute("data-bs-title", adminName);
-        const tooltip = new bootstrap.Tooltip(navbarAvatar);
+        const profileData = await response.json();
+        tooltipElement.setAttribute('data-bs-title', profileData.name || 'Admin');
+    } catch (error) {
+        console.error("Error fetching admin profile:", error);
+        tooltipElement.setAttribute('data-bs-title', 'Error loading profile');
+        showToast(`Failed to load admin profile: ${error.message}`, "danger");
     }
 }
-setAdminTooltip();
+
 // Dashboard Management
 async function notifyUser(name, phone, email, expiryDate) {
     try {
-        const token = sessionStorage.getItem('jwtToken');
-        if (!token) {
-            console.error("No JWT token found. Please log in.");
-            return;
-        }
+        if (!checkAuth()) throw new Error("No JWT token found. Please log in.");
+        if (!expiryDate || typeof expiryDate !== 'string') throw new Error("Expiry date is missing or invalid");
 
-        if (!expiryDate || typeof expiryDate !== 'string') {
-            throw new Error("Expiry date is missing or invalid");
-        }
+        let expiry = expiryDate.includes('-') && expiryDate.split('-').length === 3
+            ? (expiryDate.split('-')[0].length === 4 ? new Date(expiryDate) : new Date(`${expiryDate.split('-')[2]}-${expiryDate.split('-')[1]}-${expiryDate.split('-')[0]}`))
+            : new Date(expiryDate);
 
-        let expiry;
-        if (expiryDate.includes('-') && expiryDate.split('-').length === 3) {
-            const parts = expiryDate.split('-');
-            if (parts[0].length === 4) {
-                expiry = new Date(expiryDate);
-            } else {
-                expiry = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
-            }
-        } else {
-            expiry = new Date(expiryDate);
-        }
-
-        if (isNaN(expiry.getTime())) {
-            throw new Error("Invalid expiry date provided");
-        }
+        if (isNaN(expiry.getTime())) throw new Error("Invalid expiry date provided");
 
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         expiry.setHours(0, 0, 0, 0);
-        const timeDiff = expiry - today;
-        const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+        const daysRemaining = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
 
-        let plainMessage;
-        let subject;
+        let plainMessage, subject;
         if (daysRemaining > 3) {
             subject = "Mobi.Comm Subscription Update";
             plainMessage = `Dear ${name}, your subscription is still active and will expire in ${daysRemaining} days.`;
@@ -185,7 +169,6 @@ async function notifyUser(name, phone, email, expiryDate) {
                     .header h1 { color: #ffffff; margin: 0; font-size: 24px; }
                     .content { padding: 20px; color: #333333; line-height: 1.6; }
                     .content p { margin: 0 0 10px; }
-                    .button { display: inline-block; padding: 10px 20px; margin: 20px 0; background-color: #26A69A; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold; }
                     .footer { background-color: #f4f4f4; padding: 10px; text-align: center; font-size: 12px; color: #777777; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
                 </style>
             </head>
@@ -213,7 +196,7 @@ async function notifyUser(name, phone, email, expiryDate) {
         const response = await fetch('http://localhost:8083/admin/notify', {
             method: 'POST',
             headers: {
-                'Authorization': 'Bearer ' + token,
+                'Authorization': `Bearer ${getToken()}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(payload)
@@ -225,74 +208,66 @@ async function notifyUser(name, phone, email, expiryDate) {
         }
 
         const result = await response.json();
+        const modalElements = {
+            userName: document.getElementById('notifyUserName'),
+            userPhone: document.getElementById('notifyUserPhone'),
+            message: document.getElementById('notifyMessage'),
+            modalLabel: document.getElementById('notifyModalLabel')
+        };
 
-        const userNameElement = document.getElementById('notifyUserName');
-        const userPhoneElement = document.getElementById('notifyUserPhone');
-        const messageElement = document.getElementById('notifyMessage');
-        const modalLabelElement = document.getElementById('notifyModalLabel');
-
-        if (!userNameElement || !userPhoneElement || !messageElement || !modalLabelElement) {
-            console.error("Modal elements not found in the DOM");
-            throw new Error("Modal elements not found");
+        if (!Object.values(modalElements).every(el => el)) {
+            throw new Error("Modal elements not found in the DOM");
         }
 
-        userNameElement.textContent = name;
-        userPhoneElement.textContent = phone;
-        messageElement.textContent = `User has been notified about their plan expiry. Email sent to ${email || 'Not provided'}.`;
-        modalLabelElement.textContent = "Notification Sent";
+        modalElements.userName.textContent = name;
+        modalElements.userPhone.textContent = phone;
+        modalElements.message.textContent = `User has been notified about their plan expiry. Email sent to ${email || 'Not provided'}.`;
+        modalElements.modalLabel.textContent = "Notification Sent";
 
-        const notifyModal = new bootstrap.Modal(document.getElementById('notifyModal'), {
-            keyboard: true
-        });
+        const notifyModal = new bootstrap.Modal(document.getElementById('notifyModal'), { keyboard: true });
         notifyModal.show();
     } catch (error) {
         console.error("Error sending notification:", error);
+        const modalElements = {
+            userName: document.getElementById('notifyUserName'),
+            userPhone: document.getElementById('notifyUserPhone'),
+            message: document.getElementById('notifyMessage'),
+            modalLabel: document.getElementById('notifyModalLabel')
+        };
 
-        const userNameElement = document.getElementById('notifyUserName');
-        const userPhoneElement = document.getElementById('notifyUserPhone');
-        const messageElement = document.getElementById('notifyMessage');
-        const modalLabelElement = document.getElementById('notifyModalLabel');
-
-        if (!userNameElement || !userPhoneElement || !messageElement || !modalLabelElement) {
-            console.error("Modal elements not found in the DOM");
-            throw new Error("Modal elements not found");
+        if (Object.values(modalElements).every(el => el)) {
+            modalElements.userName.textContent = name;
+            modalElements.userPhone.textContent = phone;
+            modalElements.message.textContent = `Failed to send notification email: ${error.message}`;
+            modalElements.modalLabel.textContent = "Notification Failed";
+            const notifyModal = new bootstrap.Modal(document.getElementById('notifyModal'), { keyboard: true });
+            notifyModal.show();
+        } else {
+            showToast(`Notification failed: ${error.message}`, "danger");
         }
-
-        userNameElement.textContent = name;
-        userPhoneElement.textContent = phone;
-        messageElement.textContent = `Failed to send notification email: ${error.message}`;
-        modalLabelElement.textContent = "Notification Failed";
-
-        const notifyModal = new bootstrap.Modal(document.getElementById('notifyModal'), {
-            keyboard: true
-        });
-        notifyModal.show();
     }
 }
+
 document.addEventListener("DOMContentLoaded", function () {
     let dashboardCurrentPage = 1;
     let dashboardRecordsPerPage = 5;
     let subscriberData = [];
 
-    // Fetch dashboard data from the backend
     async function fetchDataAndUpdate() {
-        try {
-            const token = sessionStorage.getItem('jwtToken');
-            if (!token) {
-                console.error("No JWT token found in sessionStorage. Please log in.");
-                return;
-            }
+        if (!checkAuth()) return;
 
+        try {
             const response = await fetch('http://localhost:8083/admin/dashboard', {
                 method: 'GET',
                 headers: {
-                    'Authorization': 'Bearer ' + token,
+                    'Authorization': `Bearer ${getToken()}`,
                     'Content-Type': 'application/json'
                 }
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                const errorText = await response.text();
+                throw new Error(`HTTP error! Status: ${response.status}, Details: ${errorText}`);
             }
 
             const data = await response.json();
@@ -301,110 +276,89 @@ document.addEventListener("DOMContentLoaded", function () {
             updateTable();
         } catch (error) {
             console.error("Error fetching dashboard data:", error);
+            displayError(`Failed to load dashboard data: ${error.message}`);
         }
     }
 
-    // Update dashboard cards
+    function displayError(message) {
+        const tableBody = document.getElementById("expiringSubscribersTable");
+        if (tableBody) tableBody.innerHTML = `<tr><td colspan="8" class="text-danger text-center">${message}</td></tr>`;
+        ['totalSubscribers', 'activePlans', 'expiringPlans', 'totalRevenue'].forEach(id => {
+            document.getElementById(id).innerHTML = `<b>N/A</b>`;
+        });
+        document.getElementById("pagination").innerHTML = "";
+    }
+
     function updateDashboard(data) {
-        document.getElementById("totalSubscribers").innerHTML = `<b>${data.totalSubscribers}</b>`;
-        document.getElementById("activePlans").innerHTML = `<b>${data.activePlans}</b>`;
-        document.getElementById("expiringPlans").innerHTML = `<b>${data.expiringSubscribersCount}</b>`;
-        
+        document.getElementById("totalSubscribers").innerHTML = `<b>${data.totalSubscribers || 0}</b>`;
+        document.getElementById("activePlans").innerHTML = `<b>${data.activePlans || 0}</b>`;
+        document.getElementById("expiringPlans").innerHTML = `<b>${data.expiringSubscribersCount || 0}</b>`;
         const currentMonth = new Date().toISOString().slice(0, 7);
-        const revenue = data.monthlyRevenue[currentMonth] || 0;
+        const revenue = data.monthlyRevenue?.[currentMonth] || 0;
         document.getElementById("totalRevenue").innerHTML = `<b>₹${revenue.toFixed(2)}</b>`;
     }
 
-    // Update the expiring subscribers table with pagination
     function updateTable() {
         const tableBody = document.getElementById("expiringSubscribersTable");
+        if (!tableBody) return;
         tableBody.innerHTML = "";
-    
-        let start = (dashboardCurrentPage - 1) * dashboardRecordsPerPage;
-        let end = start + dashboardRecordsPerPage;
-        let paginatedData = subscriberData.slice(start, end);
-    
-        paginatedData.forEach(subscriber => {
-            console.log(`Subscriber Email: ${subscriber.email}`); // Debug log
-            let row = `<tr>
-                <td>${subscriber.name}</td>
-                <td>${subscriber.phone}</td>
-                <td>${subscriber.plan}</td>
-                <td>${subscriber.price}</td>
-                <td>${subscriber.validity}</td>
-                <td>${subscriber.rechargeDate}</td>
-                <td>${subscriber.expiryDate}</td>
-                <td><button class="btn btn-warning" onclick="notifyUser('${subscriber.name}', '${subscriber.phone}', '${subscriber.email}', '${subscriber.expiryDate}')">Notify</button></td>
-            </tr>`;
-            tableBody.innerHTML += row;
-        });
-    
+
+        const start = (dashboardCurrentPage - 1) * dashboardRecordsPerPage;
+        const end = start + dashboardRecordsPerPage;
+        const paginatedData = subscriberData.slice(start, end);
+
+        if (paginatedData.length === 0 && dashboardCurrentPage === 1) {
+            tableBody.innerHTML = '<tr><td colspan="8" class="text-center">No expiring subscribers found.</td></tr>';
+        } else {
+            paginatedData.forEach(subscriber => {
+                tableBody.innerHTML += `
+                    <tr>
+                        <td>${subscriber.name || 'N/A'}</td>
+                        <td>${subscriber.phone || 'N/A'}</td>
+                        <td>${subscriber.plan || 'N/A'}</td>
+                        <td>${subscriber.price || 'N/A'}</td>
+                        <td>${subscriber.validity || 'N/A'}</td>
+                        <td>${subscriber.rechargeDate || 'N/A'}</td>
+                        <td>${subscriber.expiryDate || 'N/A'}</td>
+                        <td><button class="btn btn-warning" onclick="notifyUser('${subscriber.name || ''}', '${subscriber.phone || ''}', '${subscriber.email || ''}', '${subscriber.expiryDate || ''}')">Notify</button></td>
+                    </tr>`;
+            });
+        }
         updatePaginationControls();
     }
 
-
-    // Update pagination controls
     function updatePaginationControls() {
         const paginationContainer = document.getElementById("pagination");
+        if (!paginationContainer) return;
         paginationContainer.innerHTML = "";
 
-        let dashboardTotalPages = Math.ceil(subscriberData.length / dashboardRecordsPerPage);
+        const dashboardTotalPages = Math.ceil(subscriberData.length / dashboardRecordsPerPage);
+        if (dashboardTotalPages === 0) return;
 
-        // Previous button
-        const prevItem = document.createElement("li");
-        prevItem.className = `page-item ${dashboardCurrentPage === 1 ? "disabled" : ""}`;
-        const prevLink = document.createElement("a");
-        prevLink.className = "page-link";
-        prevLink.href = "#";
-        prevLink.innerHTML = '<span aria-hidden="true">«</span>';
-        prevLink.addEventListener("click", (e) => {
-            e.preventDefault();
-            changePage(dashboardCurrentPage - 1);
-        });
-        prevItem.appendChild(prevLink);
-        paginationContainer.appendChild(prevItem);
-
-        // Page numbers
+        paginationContainer.innerHTML += `
+            <li class="page-item ${dashboardCurrentPage === 1 ? "disabled" : ""}">
+                <a class="page-link" href="#" onclick="changePage(${dashboardCurrentPage - 1}); return false;">«</a>
+            </li>`;
         for (let i = 1; i <= dashboardTotalPages; i++) {
-            const pageItem = document.createElement("li");
-            pageItem.className = `page-item ${i === dashboardCurrentPage ? "active" : ""}`;
-            const pageLink = document.createElement("a");
-            pageLink.className = "page-link";
-            pageLink.href = "#";
-            pageLink.textContent = i;
-            pageLink.addEventListener("click", (e) => {
-                e.preventDefault();
-                changePage(i);
-            });
-            pageItem.appendChild(pageLink);
-            paginationContainer.appendChild(pageItem);
+            paginationContainer.innerHTML += `
+                <li class="page-item ${i === dashboardCurrentPage ? "active" : ""}">
+                    <a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a>
+                </li>`;
         }
-
-        // Next button
-        const nextItem = document.createElement("li");
-        nextItem.className = `page-item ${dashboardCurrentPage === dashboardTotalPages ? "disabled" : ""}`;
-        const nextLink = document.createElement("a");
-        nextLink.className = "page-link";
-        nextLink.href = "#";
-        nextLink.innerHTML = '<span aria-hidden="true">»</span>';
-        nextLink.addEventListener("click", (e) => {
-            e.preventDefault();
-            changePage(dashboardCurrentPage + 1);
-        });
-        nextItem.appendChild(nextLink);
-        paginationContainer.appendChild(nextItem);
+        paginationContainer.innerHTML += `
+            <li class="page-item ${dashboardCurrentPage === dashboardTotalPages ? "disabled" : ""}">
+                <a class="page-link" href="#" onclick="changePage(${dashboardCurrentPage + 1}); return false;">»</a>
+            </li>`;
     }
 
-    // Change page function
-    function changePage(page) {
+    window.changePage = function (page) {
         const totalPages = Math.ceil(subscriberData.length / dashboardRecordsPerPage);
         if (page > 0 && page <= totalPages) {
             dashboardCurrentPage = page;
             updateTable();
         }
-    }
+    };
 
-    // Initial fetch and periodic update
     fetchDataAndUpdate();
     setInterval(fetchDataAndUpdate, 10000);
 });
@@ -432,7 +386,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     "Content-Type": "application/json",
                 },
             });
-            if (!response.ok) throw new Error("Failed to fetch subscribers");
+            if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to fetch subscribers`);
             const data = await response.json();
             subscribers = data.content || [];
             filteredSubscribers = [...subscribers];
@@ -446,7 +400,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     async function fetchAllSubscribers(status = null) {
         if (!checkAuth()) return [];
-
         try {
             const url = status
                 ? `${BASE_URL}/getsubscribers?size=10000&status=${status}`
@@ -458,7 +411,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     "Content-Type": "application/json",
                 },
             });
-            if (!response.ok) throw new Error("Failed to fetch all subscribers");
+            if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to fetch all subscribers`);
             const data = await response.json();
             return data.content || [];
         } catch (error) {
@@ -470,128 +423,91 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function displaySubscribers() {
         const tbody = document.getElementById("subscriber-list");
+        if (!tbody) return;
         tbody.innerHTML = "";
 
-        filteredSubscribers.forEach((subscriber) => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td>${subscriber.name || "N/A"}</td>
-                <td>${subscriber.email || "N/A"}</td>
-                <td>${subscriber.phoneNumber || "N/A"}</td>
-                <td><a href="${subscriber.aadhar_card || "#"}" target="_blank">View Aadhar</a></td>
-                <td>
-                    <img src="${subscriber.photo || "../assesst/Images/profile.jpeg"}" alt="Photo" class="img-thumbnail" width="60">
-                </td>
-                <td id="status-${subscriber.id}">${subscriber.status || "Pending"}</td>
-                <td>
-                    <button class="btn btn-success btn-sm approve-btn">Approve</button>
-                    <button class="btn btn-danger btn-sm delete-btn">Deactivate</button>
-                </td>
-            `;
-
-            const approveBtn = row.querySelector(".approve-btn");
-            const deleteBtn = row.querySelector(".delete-btn");
-
-            approveBtn.addEventListener("click", () => showConfirmationModal(subscriber.id, "approve"));
-            deleteBtn.addEventListener("click", () => showConfirmationModal(subscriber.id, "delete"));
-
-            tbody.appendChild(row);
+        filteredSubscribers.forEach(subscriber => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${subscriber.name || "N/A"}</td>
+                    <td>${subscriber.email || "N/A"}</td>
+                    <td>${subscriber.phoneNumber || "N/A"}</td>
+                    <td><a href="${subscriber.aadhar_card || "#"}" target="_blank">View Aadhar</a></td>
+                    <td><img src="${subscriber.photo || "../assesst/Images/profile.jpeg"}" alt="Photo" class="img-thumbnail" width="60"></td>
+                    <td id="status-${subscriber.id}">${subscriber.status || "Pending"}</td>
+                    <td>
+                        <button class="btn btn-success btn-sm approve-btn">Approve</button>
+                        <button class="btn btn-danger btn-sm delete-btn">Deactivate</button>
+                    </td>
+                </tr>`;
+            const row = tbody.lastElementChild;
+            row.querySelector(".approve-btn").addEventListener("click", () => showConfirmationModal(subscriber.id, "approve"));
+            row.querySelector(".delete-btn").addEventListener("click", () => showConfirmationModal(subscriber.id, "delete"));
         });
 
-        const searchInput = document.getElementById("searchSubscribers").value;
-        if (!searchInput) {
-            generatePagination();
-        } else {
-            const pagination = document.getElementById("pagination0");
-            pagination.innerHTML = "";
-        }
+        const searchInput = document.getElementById("searchSubscribers")?.value;
+        if (!searchInput) generatePagination();
+        else document.getElementById("pagination0").innerHTML = "";
     }
 
     function generatePagination() {
         const pagination = document.getElementById("pagination0");
+        if (!pagination || subscriberTotalPages <= 1) return;
         pagination.innerHTML = "";
 
-        if (subscriberTotalPages <= 1) return;
-
-        const prevItem = document.createElement("li");
-        prevItem.className = `page-item ${subscriberCurrentPage === 1 ? "disabled" : ""}`;
-        const prevButton = document.createElement("button");
-        prevButton.className = "page-link";
-        prevButton.textContent = "«";
-        if (subscriberCurrentPage > 1) {
-            prevButton.addEventListener("click", () => changeSubscriberPage(subscriberCurrentPage - 1));
-        }
-        prevItem.appendChild(prevButton);
-        pagination.appendChild(prevItem);
-
+        pagination.innerHTML += `
+            <li class="page-item ${subscriberCurrentPage === 1 ? "disabled" : ""}">
+                <button class="page-link" onclick="changeSubscriberPage(${subscriberCurrentPage - 1})">«</button>
+            </li>`;
         for (let i = 1; i <= subscriberTotalPages; i++) {
-            const pageItem = document.createElement("li");
-            pageItem.className = `page-item ${i === subscriberCurrentPage ? "active" : ""}`;
-            const pageButton = document.createElement("button");
-            pageButton.className = "page-link";
-            pageButton.textContent = i;
-            pageButton.addEventListener("click", () => changeSubscriberPage(i));
-            pageItem.appendChild(pageButton);
-            pagination.appendChild(pageItem);
+            pagination.innerHTML += `
+                <li class="page-item ${i === subscriberCurrentPage ? "active" : ""}">
+                    <button class="page-link" onclick="changeSubscriberPage(${i})">${i}</button>
+                </li>`;
         }
-
-        const nextItem = document.createElement("li");
-        nextItem.className = `page-item ${subscriberCurrentPage === subscriberTotalPages ? "disabled" : ""}`;
-        const nextButton = document.createElement("button");
-        nextButton.className = "page-link";
-        nextButton.textContent = "»";
-        if (subscriberCurrentPage < subscriberTotalPages) {
-            nextButton.addEventListener("click", () => changeSubscriberPage(subscriberCurrentPage + 1));
-        }
-        nextItem.appendChild(nextButton);
-        pagination.appendChild(nextItem);
+        pagination.innerHTML += `
+            <li class="page-item ${subscriberCurrentPage === subscriberTotalPages ? "disabled" : ""}">
+                <button class="page-link" onclick="changeSubscriberPage(${subscriberCurrentPage + 1})">»</button>
+            </li>`;
     }
 
-    function changeSubscriberPage(page) {
+    window.changeSubscriberPage = function (page) {
         if (page < 1 || page > subscriberTotalPages) return;
         subscriberCurrentPage = page;
-        const status = document.getElementById("statusFilter").value || null;
+        const status = document.getElementById("statusFilter")?.value || null;
         document.getElementById("searchSubscribers").value = "";
         fetchSubscribers(page - 1, status);
-    }
+    };
 
     function showConfirmationModal(id, action) {
-        const subscriber = subscribers.find((sub) => sub.id === id);
+        const subscriber = subscribers.find(sub => sub.id === id);
         if (!subscriber) return;
 
+        const modalBody = document.getElementById("confirmModalBody");
         const confirmText = document.getElementById("confirmText");
         const confirmActionBtn = document.getElementById("confirmActionBtn");
-        const modalBody = document.getElementById("confirmModalBody");
-        const deleteOptions = document.getElementById("deleteOptions");
 
         modalBody.innerHTML = `
             <p><strong>Name:</strong> ${subscriber.name}</p>
             <p><strong>Email:</strong> ${subscriber.email}</p>
             <p><strong>Mobile:</strong> ${subscriber.phoneNumber}</p>
             <p><strong>Aadhar Card:</strong> <a href="${subscriber.aadhar_card || "#"}" target="_blank">View Aadhar</a></p>
-            <p><strong>Photo:</strong><br>
-                <img src="${subscriber.photo || "../assesst/Images/default-avatar.jpg"}" class="img-thumbnail" width="100">
-            </p>
+            <p><strong>Photo:</strong><br><img src="${subscriber.photo || "../assesst/Images/default-avatar.jpg"}" class="img-thumbnail" width="100"></p>
         `;
 
         if (action === "approve") {
             confirmText.textContent = "Approve this subscriber?";
             confirmActionBtn.className = "btn btn-success";
             confirmActionBtn.textContent = "Approve";
-            confirmActionBtn.style.display = "block";
             confirmActionBtn.onclick = () => updateSubscriberStatus(id, "ACTIVE");
-            deleteOptions.innerHTML = "";
         } else if (action === "delete") {
             confirmText.textContent = "Deactivate this subscriber?";
             confirmActionBtn.className = "btn btn-danger";
             confirmActionBtn.textContent = "Deactivate";
-            confirmActionBtn.style.display = "block";
             confirmActionBtn.onclick = () => deleteSubscriber(id);
-            deleteOptions.innerHTML = "";
         }
 
-        const modal = new bootstrap.Modal(document.getElementById("confirmationModal"));
-        modal.show();
+        new bootstrap.Modal(document.getElementById("confirmationModal")).show();
     }
 
     async function updateSubscriberStatus(id, newStatus) {
@@ -605,21 +521,16 @@ document.addEventListener("DOMContentLoaded", function () {
                     "Content-Type": "application/json",
                 },
             });
-            if (!response.ok) throw new Error("Failed to update status");
+            if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to update status`);
             const result = await response.json();
-            console.log("Update status response:", result);
             showToast(result.message, newStatus === "ACTIVE" ? "success" : "warning");
-            const statusElement = document.getElementById(`status-${id}`);
-            if (statusElement) {
-                statusElement.textContent = newStatus;
-            }
-            const status = document.getElementById("statusFilter").value || null;
-            fetchSubscribers(subscriberCurrentPage - 1, status);
+            document.getElementById(`status-${id}`).textContent = newStatus;
+            fetchSubscribers(subscriberCurrentPage - 1, document.getElementById("statusFilter")?.value || null);
         } catch (error) {
+            console.error("Error updating status:", error);
             showToast("Error updating status", "danger");
         }
-        const modal = bootstrap.Modal.getInstance(document.getElementById("confirmationModal"));
-        modal.hide();
+        bootstrap.Modal.getInstance(document.getElementById("confirmationModal")).hide();
     }
 
     async function deleteSubscriber(id) {
@@ -633,79 +544,66 @@ document.addEventListener("DOMContentLoaded", function () {
                     "Content-Type": "application/json",
                 },
             });
-            if (!response.ok) throw new Error("Failed to deactivate subscriber");
+            if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to deactivate subscriber`);
             const result = await response.json();
-            console.log("Deactivate response:", result);
             showToast(result.message, "warning");
-            const statusElement = document.getElementById(`status-${id}`);
-            if (statusElement) {
-                statusElement.textContent = "INACTIVE";
-            }
-            const status = document.getElementById("statusFilter").value || null;
-            fetchSubscribers(subscriberCurrentPage - 1, status);
+            document.getElementById(`status-${id}`).textContent = "INACTIVE";
+            fetchSubscribers(subscriberCurrentPage - 1, document.getElementById("statusFilter")?.value || null);
         } catch (error) {
+            console.error("Error deactivating subscriber:", error);
             showToast("Error deactivating subscriber", "danger");
         }
-        const modal = bootstrap.Modal.getInstance(document.getElementById("confirmationModal"));
-        modal.hide();
+        bootstrap.Modal.getInstance(document.getElementById("confirmationModal")).hide();
     }
 
     async function filterSubscribers() {
         const searchInput = document.getElementById("searchSubscribers").value.toLowerCase();
-        const status = document.getElementById("statusFilter").value || null;
+        const status = document.getElementById("statusFilter")?.value || null;
 
         if (searchInput) {
             const allSubscribers = await fetchAllSubscribers(status);
-            filteredSubscribers = allSubscribers.filter((subscriber) => {
-                return (
-                    (subscriber.name && subscriber.name.toLowerCase().includes(searchInput)) ||
-                    (subscriber.phoneNumber && subscriber.phoneNumber.includes(searchInput)) ||
-                    (subscriber.status && subscriber.status.toLowerCase().includes(searchInput))
-                );
-            });
+            filteredSubscribers = allSubscribers.filter(subscriber => (
+                (subscriber.name && subscriber.name.toLowerCase().includes(searchInput)) ||
+                (subscriber.phoneNumber && subscriber.phoneNumber.includes(searchInput)) ||
+                (subscriber.status && subscriber.status.toLowerCase().includes(searchInput))
+            ));
         } else {
             filteredSubscribers = [...subscribers];
         }
-
         displaySubscribers();
     }
 
     function filterByStatus() {
-        const status = document.getElementById("statusFilter").value;
         subscriberCurrentPage = 1;
         document.getElementById("searchSubscribers").value = "";
-        fetchSubscribers(0, status || null);
+        fetchSubscribers(0, document.getElementById("statusFilter")?.value || null);
     }
 
-    document.getElementById("statusFilter").addEventListener("change", filterByStatus);
-    document.getElementById("searchSubscribers").addEventListener("keyup", filterSubscribers);
-    document.getElementById("exportCSV").addEventListener("click", async () => {
+    document.getElementById("statusFilter")?.addEventListener("change", filterByStatus);
+    document.getElementById("searchSubscribers")?.addEventListener("keyup", filterSubscribers);
+    document.getElementById("exportCSV")?.addEventListener("click", async () => {
         const searchInput = document.getElementById("searchSubscribers").value;
-        const status = document.getElementById("statusFilter").value || null;
+        const status = document.getElementById("statusFilter")?.value || null;
         const data = searchInput ? filteredSubscribers : await fetchAllSubscribers(status);
         exportSubscribersToCSV(data, "subscribers.csv");
     });
-    document.getElementById("exportPDF").addEventListener("click", async () => {
+    document.getElementById("exportPDF")?.addEventListener("click", async () => {
         const searchInput = document.getElementById("searchSubscribers").value;
-        const status = document.getElementById("statusFilter").value || null;
+        const status = document.getElementById("statusFilter")?.value || null;
         const data = searchInput ? filteredSubscribers : await fetchAllSubscribers(status);
         exportSubscribersToPDF(data, "subscribers.pdf");
     });
 
     function exportSubscribersToCSV(data, filename) {
-        let csvContent = "data:text/csv;charset=utf-8,";
-        csvContent += "Name,Email,Mobile,Status\n";
-
-        data.forEach((subscriber) => {
-            const row = [
+        let csvContent = "data:text/csv;charset=utf-8,Name,Email,Mobile,Status\n";
+        data.forEach(subscriber => {
+            csvContent += [
                 subscriber.name || "N/A",
                 subscriber.email || "N/A",
                 subscriber.phoneNumber || "N/A",
-                subscriber.status || "Pending",
-            ].join(",");
-            csvContent += row + "\n";
+                subscriber.status || "Pending"
+            ].join(",") + "\n";
         });
-
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
@@ -718,40 +616,16 @@ document.addEventListener("DOMContentLoaded", function () {
     function exportSubscribersToPDF(data, filename) {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-
         const headers = ["Name", "Email", "Mobile", "Status"];
-        const rows = data.map((subscriber) => [
+        const rows = data.map(subscriber => [
             subscriber.name || "N/A",
             subscriber.email || "N/A",
             subscriber.phoneNumber || "N/A",
-            subscriber.status || "Pending",
+            subscriber.status || "Pending"
         ]);
-
         doc.text("Subscriber List", 14, 10);
-        doc.autoTable({
-            head: [headers],
-            body: rows,
-            startY: 20,
-        });
-
+        doc.autoTable({ head: [headers], body: rows, startY: 20 });
         doc.save(filename);
-    }
-
-    function getToken() {
-        return sessionStorage.getItem('jwtToken');
-    }
-
-    function checkAuth() {
-        const token = getToken();
-        if (!token) {
-            console.error("No JWT token found. Please log in.");
-            return false;
-        }
-        return true;
-    }
-
-    function showToast(message, type) {
-        console.log(`${type}: ${message}`);
     }
 
     fetchSubscribers(0, null);
@@ -767,24 +641,33 @@ document.addEventListener('DOMContentLoaded', () => {
     let totalPages = 1;
 
     async function fetchWithAuth(url) {
-        const token = sessionStorage.getItem('jwtToken');
-        const headers = { 'Content-Type': 'application/json', ...(token && { 'Authorization': `Bearer ${token}` }) };
-        const response = await fetch(url, { headers });
-        if (!response.ok) throw new Error('Failed to fetch');
+        if (!checkAuth()) throw new Error('No token');
+        const response = await fetch(url, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getToken()}`
+            }
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to fetch`);
         return response.json();
     }
 
     async function loadAllTransactions() {
-        allTransactions = await fetchWithAuth(`${apiBaseUrl}/transactions/all`);
-        applyFiltersAndRender();
+        try {
+            allTransactions = await fetchWithAuth(`${apiBaseUrl}/transactions/all`);
+            applyFiltersAndRender();
+        } catch (error) {
+            console.error("Error loading transactions:", error);
+            showToast("Failed to load transactions", "danger");
+        }
     }
 
     function applyFiltersAndRender() {
-        const status = document.getElementById('filterStatus').value;
-        const payment = document.getElementById('filterPayment').value;
-        const dateFrom = document.getElementById('filterDateFrom').value;
-        const dateTo = document.getElementById('filterDateTo').value;
-        const searchTerm = document.getElementById('searchTransactions').value.trim().toLowerCase();
+        const status = document.getElementById('filterStatus')?.value;
+        const payment = document.getElementById('filterPayment')?.value;
+        const dateFrom = document.getElementById('filterDateFrom')?.value;
+        const dateTo = document.getElementById('filterDateTo')?.value;
+        const searchTerm = document.getElementById('searchTransactions')?.value.trim().toLowerCase();
 
         filteredTransactions = allTransactions.filter(tx => {
             let match = true;
@@ -803,16 +686,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderTransactions() {
         const tbody = document.getElementById('adminTransactionTable');
-        tbody.innerHTML = '';
-
-        if (filteredTransactions.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="10" class="text-center">No transactions found</td></tr>`;
-            return;
-        }
+        if (!tbody) return;
+        tbody.innerHTML = filteredTransactions.length === 0
+            ? `<tr><td colspan="10" class="text-center">No transactions found</td></tr>`
+            : '';
 
         const start = (currentPage - 1) * recordsPerPage;
         const paginatedData = filteredTransactions.slice(start, start + recordsPerPage);
-
         paginatedData.forEach(tx => {
             tbody.innerHTML += `
                 <tr>
@@ -832,19 +712,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function generatePagination() {
         const pagination = document.getElementById('pagination5');
-        pagination.innerHTML = '';
-        if (totalPages <= 1) return;
-
-        pagination.innerHTML += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-            <button class="page-link" onclick="changePage(${currentPage - 1})">&laquo;</button></li>`;
-
+        if (!pagination || totalPages <= 1) return;
+        pagination.innerHTML = `
+            <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                <button class="page-link" onclick="changePage(${currentPage - 1})">«</button>
+            </li>`;
         for (let i = 1; i <= totalPages; i++) {
-            pagination.innerHTML += `<li class="page-item ${i === currentPage ? 'active' : ''}">
-                <button class="page-link" onclick="changePage(${i})">${i}</button></li>`;
+            pagination.innerHTML += `
+                <li class="page-item ${i === currentPage ? 'active' : ''}">
+                    <button class="page-link" onclick="changePage(${i})">${i}</button>
+                </li>`;
         }
-
-        pagination.innerHTML += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-            <button class="page-link" onclick="changePage(${currentPage + 1})">&raquo;</button></li>`;
+        pagination.innerHTML += `
+            <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                <button class="page-link" onclick="changePage(${currentPage + 1})">»</button>
+            </li>`;
     }
 
     window.changePage = function (page) {
@@ -878,15 +760,13 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.save(`transaction_${transactionId}.pdf`);
     };
 
-    document.getElementById('exportTransactionsToCSVBtn').addEventListener('click', () => {
+    document.getElementById('exportTransactionsToCSVBtn')?.addEventListener('click', () => {
         let csvContent = "data:text/csv;charset=utf-8,Transaction ID,Recharge Date,Subscriber Name,Subscriber Number,Plan Name,Plan Price,Plan Validity,Payment Method,Status\n";
         filteredTransactions.forEach(tx => {
-            const row = [
+            csvContent += [
                 tx.transactionId, tx.rechargeDate, tx.subscriberName, tx.subscriberNumber,
-                tx.planName, `₹${tx.planPrice.toFixed(2)}`, tx.planValidity,
-                tx.paymentMethod, tx.status
-            ].join(",");
-            csvContent += row + "\n";
+                tx.planName, `₹${tx.planPrice.toFixed(2)}`, tx.planValidity, tx.paymentMethod, tx.status
+            ].join(",") + "\n";
         });
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
@@ -897,7 +777,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeChild(link);
     });
 
-    document.getElementById('exportTransactionsToPDFBtn').addEventListener('click', () => {
+    document.getElementById('exportTransactionsToPDFBtn')?.addEventListener('click', () => {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         doc.setFontSize(16);
@@ -905,36 +785,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const headers = ["Transaction ID", "Recharge Date", "Subscriber Name", "Subscriber Number", "Plan Name", "Plan Price", "Plan Validity", "Payment Method", "Status"];
         const rows = filteredTransactions.map(tx => [
             tx.transactionId, tx.rechargeDate, tx.subscriberName, tx.subscriberNumber,
-            tx.planName, `₹${tx.planPrice.toFixed(2)}`, tx.planValidity,
-            tx.paymentMethod, tx.status
+            tx.planName, `₹${tx.planPrice.toFixed(2)}`, tx.planValidity, tx.paymentMethod, tx.status
         ]);
         doc.autoTable({ head: [headers], body: rows, startY: 20 });
         doc.save("transactions.pdf");
     });
 
-    // Filter Events
     ['filterStatus', 'filterPayment', 'filterDateFrom', 'filterDateTo', 'searchTransactions'].forEach(id => {
-        document.getElementById(id).addEventListener('input', () => {
+        document.getElementById(id)?.addEventListener('input', () => {
             currentPage = 1;
             applyFiltersAndRender();
         });
     });
 
-    document.getElementById('clearFiltersBtn').addEventListener('click', () => {
-        document.getElementById('filterStatus').value = '';
-        document.getElementById('filterPayment').value = '';
-        document.getElementById('filterDateFrom').value = '';
-        document.getElementById('filterDateTo').value = '';
-        document.getElementById('searchTransactions').value = '';
+    document.getElementById('clearFiltersBtn')?.addEventListener('click', () => {
+        ['filterStatus', 'filterPayment', 'filterDateFrom', 'filterDateTo', 'searchTransactions'].forEach(id => {
+            document.getElementById(id).value = '';
+        });
         currentPage = 1;
         applyFiltersAndRender();
     });
 
     loadAllTransactions();
 });
-
-
-
 
 // Plan Management
 document.addEventListener("DOMContentLoaded", function () {
@@ -958,7 +831,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     "Content-Type": "application/json",
                 },
             });
-            if (!response.ok) throw new Error("Failed to fetch categories");
+            if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to fetch categories`);
             categories = await response.json();
             filteredCategories = [...categories];
             populateCategoryDropdowns();
@@ -972,18 +845,14 @@ document.addEventListener("DOMContentLoaded", function () {
     async function fetchPlans() {
         if (!checkAuth()) return;
 
-        const nameFilter = document.getElementById("search-plan-name").value;
-        const priceFilter = document.getElementById("filter-price").value;
-        const statusFilter = document.getElementById("filter-status").value;
-        const categoryFilter = document.getElementById("filter-category").value;
+        const nameFilter = document.getElementById("search-plan-name")?.value;
+        const priceFilter = document.getElementById("filter-price")?.value;
+        const statusFilter = document.getElementById("filter-status")?.value;
+        const categoryFilter = document.getElementById("filter-category")?.value;
 
-        let sortDir = "asc";
-        let sortBy = "price";
-        if (priceFilter === "low-to-high") {
-            sortDir = "asc";
-        } else if (priceFilter === "high-to-low") {
-            sortDir = "desc";
-        }
+        let sortDir = "asc", sortBy = "price";
+        if (priceFilter === "low-to-high") sortDir = "asc";
+        else if (priceFilter === "high-to-low") sortDir = "desc";
 
         let url = `${BASE_URL}/plans?page=${planPage}&size=${itemsPerPage}&sortBy=${sortBy}&sortDir=${sortDir}`;
         if (nameFilter) url += `&name=${encodeURIComponent(nameFilter)}`;
@@ -1000,7 +869,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     "Content-Type": "application/json",
                 },
             });
-            if (!response.ok) throw new Error("Failed to fetch plans");
+            if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to fetch plans`);
             const data = await response.json();
             plans = data.content;
             filteredPlans = plans.filter(plan => !statusFilter || plan.status === statusFilter);
@@ -1015,19 +884,20 @@ document.addEventListener("DOMContentLoaded", function () {
     function populateCategoryDropdowns() {
         const filterDropdown = document.getElementById("filter-category");
         const planModalDropdown = document.getElementById("plan-category");
-        filterDropdown.innerHTML = '<option value="" selected>-- Select Category --</option>';
-        planModalDropdown.innerHTML = '<option value="" selected>-- Select Category --</option>';
+        if (filterDropdown) filterDropdown.innerHTML = '<option value="" selected>-- Select Category --</option>';
+        if (planModalDropdown) planModalDropdown.innerHTML = '<option value="" selected>-- Select Category --</option>';
         categories.forEach(category => {
-            filterDropdown.innerHTML += `<option value="${category.id}">${category.name}</option>`;
-            planModalDropdown.innerHTML += `<option value="${category.id}">${category.name}</option>`;
+            if (filterDropdown) filterDropdown.innerHTML += `<option value="${category.id}">${category.name}</option>`;
+            if (planModalDropdown) planModalDropdown.innerHTML += `<option value="${category.id}">${category.name}</option>`;
         });
     }
 
     function displayPlans() {
         const tbody = document.querySelector("#plans-table tbody");
+        if (!tbody) return;
         tbody.innerHTML = "";
         filteredPlans.forEach(plan => {
-            const row = `
+            tbody.innerHTML += `
                 <tr>
                     <td>${plan.name || "N/A"}</td>
                     <td>${plan.categoryName || "N/A"}</td>
@@ -1041,18 +911,17 @@ document.addEventListener("DOMContentLoaded", function () {
                         <button class="btn btn-sm btn-primary" onclick="openEditPlanModal(${plan.id})">Edit</button>
                         <button class="btn btn-sm btn-danger" onclick="openDeletePlanModal(${plan.id})">Delete</button>
                     </td>
-                </tr>
-            `;
-            tbody.innerHTML += row;
+                </tr>`;
         });
         generatePlanPagination();
     }
 
     function displayCategories() {
         const tbody = document.querySelector("#categories-table tbody");
+        if (!tbody) return;
         tbody.innerHTML = "";
         filteredCategories.forEach(category => {
-            const row = `
+            tbody.innerHTML += `
                 <tr>
                     <td>${category.name || "N/A"}</td>
                     <td>${category.plans ? category.plans.length : 0}</td>
@@ -1060,19 +929,15 @@ document.addEventListener("DOMContentLoaded", function () {
                         <button class="btn btn-sm btn-primary" onclick="openEditCategoryModal(${category.id})">Edit</button>
                         <button class="btn btn-sm btn-danger" onclick="openDeleteCategoryModal(${category.id})">Delete</button>
                     </td>
-                </tr>
-            `;
-            tbody.innerHTML += row;
+                </tr>`;
         });
         generateCategoryPagination();
     }
 
     function generatePlanPagination() {
         const pagination = document.getElementById("pagination-plans");
-        pagination.innerHTML = "";
-        if (planTotalPages <= 1) return;
-
-        pagination.innerHTML += `
+        if (!pagination || planTotalPages <= 1) return;
+        pagination.innerHTML = `
             <li class="page-item ${planPage === 0 ? "disabled" : ""}">
                 <button class="page-link" onclick="changePlanPage(${planPage - 1})">«</button>
             </li>`;
@@ -1089,7 +954,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function generateCategoryPagination() {
-        document.getElementById("pagination-categories").innerHTML = "";
+        const pagination = document.getElementById("pagination-categories");
+        if (pagination) pagination.innerHTML = "";
     }
 
     window.changePlanPage = function (page) {
@@ -1104,23 +970,22 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     window.applyCategoryFilters = function () {
-        const nameFilter = document.getElementById("search-category-name").value.toLowerCase();
-        filteredCategories = categories.filter(category =>
-            !nameFilter || category.name.toLowerCase().includes(nameFilter)
-        );
+        const nameFilter = document.getElementById("search-category-name")?.value.toLowerCase();
+        filteredCategories = categories.filter(category => !nameFilter || category.name.toLowerCase().includes(nameFilter));
         displayCategories();
     };
 
     window.clearFilters = function () {
-        document.getElementById("search-plan-name").value = "";
-        document.getElementById("filter-price").value = "";
-        document.getElementById("filter-status").value = "";
-        document.getElementById("filter-category").value = "";
+        ['search-plan-name', 'filter-price', 'filter-status', 'filter-category'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = "";
+        });
         applyFilters();
     };
 
     window.clearCategoryFilters = function () {
-        document.getElementById("search-category-name").value = "";
+        const el = document.getElementById("search-category-name");
+        if (el) el.value = "";
         applyCategoryFilters();
     };
 
@@ -1131,7 +996,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     window.openAddPlanModal = function () {
         document.getElementById("addPlanModalLabel").textContent = "Add Plan";
-        document.getElementById("plan-form").reset();
+        document.getElementById("plan-form")?.reset();
         document.getElementById("plan-id").value = "";
     };
 
@@ -1140,7 +1005,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const response = await fetch(`${BASE_URL}/plans/${id}`, {
                 headers: { "Authorization": `Bearer ${getToken()}` },
             });
-            if (!response.ok) throw new Error("Failed to fetch plan");
+            if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to fetch plan`);
             const plan = await response.json();
             document.getElementById("addPlanModalLabel").textContent = "Edit Plan";
             document.getElementById("plan-id").value = plan.id;
@@ -1154,6 +1019,7 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("plan-status").value = plan.status;
             new bootstrap.Modal(document.getElementById("addPlanModal")).show();
         } catch (error) {
+            console.error("Error fetching plan:", error);
             showToast("Error fetching plan details", "danger");
         }
     };
@@ -1184,18 +1050,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
                 body: JSON.stringify(plan),
             });
-            if (!response.ok) throw new Error("Failed to save plan");
+            if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to save plan`);
             showToast(id ? "Plan updated successfully" : "Plan added successfully", "success");
             bootstrap.Modal.getInstance(document.getElementById("addPlanModal")).hide();
             fetchPlans();
         } catch (error) {
+            console.error("Error saving plan:", error);
             showToast("Error saving plan", "danger");
         }
     };
 
     window.openAddCategoryModal = function () {
         document.getElementById("addCategoryModalLabel").textContent = "Add Category";
-        document.getElementById("category-form").reset();
+        document.getElementById("category-form")?.reset();
         document.getElementById("category-id").value = "";
     };
 
@@ -1204,13 +1071,14 @@ document.addEventListener("DOMContentLoaded", function () {
             const response = await fetch(`${BASE_URL}/categories/${id}`, {
                 headers: { "Authorization": `Bearer ${getToken()}` },
             });
-            if (!response.ok) throw new Error("Failed to fetch category");
+            if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to fetch category`);
             const category = await response.json();
             document.getElementById("addCategoryModalLabel").textContent = "Edit Category";
             document.getElementById("category-id").value = category.id;
             document.getElementById("category-name").value = category.name;
             new bootstrap.Modal(document.getElementById("addCategoryModal")).show();
         } catch (error) {
+            console.error("Error fetching category:", error);
             showToast("Error fetching category details", "danger");
         }
     };
@@ -1234,11 +1102,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
                 body: JSON.stringify(category),
             });
-            if (!response.ok) throw new Error("Failed to save category");
+            if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to save category`);
             showToast(id ? "Category updated successfully" : "Category added successfully", "success");
             bootstrap.Modal.getInstance(document.getElementById("addCategoryModal")).hide();
             fetchCategories();
         } catch (error) {
+            console.error("Error saving category:", error);
             showToast("Error saving category", "danger");
         }
     };
@@ -1262,11 +1131,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 method: "DELETE",
                 headers: { "Authorization": `Bearer ${getToken()}` },
             });
-            if (!response.ok) throw new Error("Failed to delete plan");
+            if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to delete plan`);
             showToast("Plan deleted successfully", "success");
             bootstrap.Modal.getInstance(document.getElementById("deletePlanModal")).hide();
             fetchPlans();
         } catch (error) {
+            console.error("Error deleting plan:", error);
             showToast("Error deleting plan", "danger");
         }
     };
@@ -1288,11 +1158,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 method: "DELETE",
                 headers: { "Authorization": `Bearer ${getToken()}` },
             });
-            if (!response.ok) throw new Error("Failed to delete category");
+            if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to delete category`);
             showToast("Category deleted successfully", "success");
             bootstrap.Modal.getInstance(document.getElementById("deleteCategoryModal")).hide();
             fetchCategories();
         } catch (error) {
+            console.error("Error deleting category:", error);
             showToast("Error deleting category", "danger");
         }
     };
@@ -1300,17 +1171,10 @@ document.addEventListener("DOMContentLoaded", function () {
     window.exportPlans = function () {
         let csvContent = "data:text/csv;charset=utf-8,Name,Category,Price,Validity,Data Limit,SMS Limit,Call Limit,Status\n";
         filteredPlans.forEach(plan => {
-            const row = [
-                plan.name,
-                plan.categoryName || "N/A",
-                plan.price,
-                plan.validity,
-                plan.dataLimit,
-                plan.smsLimit,
-                plan.callLimit,
-                plan.status,
-            ].join(",");
-            csvContent += row + "\n";
+            csvContent += [
+                plan.name, plan.categoryName || "N/A", plan.price, plan.validity,
+                plan.dataLimit, plan.smsLimit, plan.callLimit, plan.status
+            ].join(",") + "\n";
         });
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
@@ -1326,14 +1190,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const doc = new jsPDF();
         const headers = ["Name", "Category", "Price", "Validity", "Data Limit", "SMS Limit", "Call Limit", "Status"];
         const rows = filteredPlans.map(plan => [
-            plan.name,
-            plan.categoryName || "N/A",
-            plan.price,
-            plan.validity,
-            plan.dataLimit,
-            plan.smsLimit,
-            plan.callLimit,
-            plan.status,
+            plan.name, plan.categoryName || "N/A", plan.price, plan.validity,
+            plan.dataLimit, plan.smsLimit, plan.callLimit, plan.status
         ]);
         doc.text("Plans List", 14, 10);
         doc.autoTable({ head: [headers], body: rows, startY: 20 });
@@ -1343,8 +1201,7 @@ document.addEventListener("DOMContentLoaded", function () {
     window.exportCategories = function () {
         let csvContent = "data:text/csv;charset=utf-8,Name,Number of Plans\n";
         filteredCategories.forEach(category => {
-            const row = [category.name, category.plans ? category.plans.length : 0].join(",");
-            csvContent += row + "\n";
+            csvContent += [category.name, category.plans ? category.plans.length : 0].join(",") + "\n";
         });
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
@@ -1359,10 +1216,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         const headers = ["Name", "Number of Plans"];
-        const rows = filteredCategories.map(category => [
-            category.name,
-            category.plans ? category.plans.length : 0,
-        ]);
+        const rows = filteredCategories.map(category => [category.name, category.plans ? category.plans.length : 0]);
         doc.text("Categories List", 14, 10);
         doc.autoTable({ head: [headers], body: rows, startY: 20 });
         doc.save("categories.pdf");
@@ -1372,357 +1226,89 @@ document.addEventListener("DOMContentLoaded", function () {
     fetchPlans();
 });
 
-// Notification Management
-document.addEventListener("DOMContentLoaded", function () {
-    let subscribers = [];
-    let notifications = JSON.parse(sessionStorage.getItem("notifications")) || [];
-    let currentNotificationPage = 1;
-    const notificationsPerPage = 5;
-    let selectedAction, selectedNotificationId;
-
-    // Fetch subscribers from data.json
-    fetch("data.json")
-        .then(response => response.json())
-        .then(data => {
-            subscribers = data.subscribers;
-            populateSubscriberList();
-            populateGroupDropdown();
-        })
-        .catch(error => console.error("Error fetching subscribers:", error));
-
-    // Populate subscriber list
-    function populateSubscriberList() {
-        let subscriberList = document.getElementById("subscriberList");
-        subscriberList.innerHTML = "";
-        subscribers.forEach(subscriber => {
-            let option = document.createElement("option");
-            option.value = subscriber.name;
-            subscriberList.appendChild(option);
-        });
-    }
-
-    // Populate group dropdown
-    function populateGroupDropdown() {
-        let groupSelect = document.getElementById("groupSelect");
-        let uniquePlans = [...new Set(subscribers.map(sub => sub.plan))];
-        groupSelect.innerHTML = `<option value="">Select Group</option>`;
-        uniquePlans.forEach(plan => {
-            let option = document.createElement("option");
-            option.value = plan;
-            option.textContent = plan;
-            groupSelect.appendChild(option);
-        });
-    }
-
-    // Send Notification
-    document.getElementById("notificationForm").addEventListener("submit", function (event) {
-        event.preventDefault();
-        let subscriberName = document.getElementById("subscriberSelect").value.trim();
-        let messageContent = document.getElementById("messageContent").value.trim();
-        let notificationType = document.getElementById("notificationType").value;
-        let selectedGroup = document.getElementById("groupSelect").value;
-        let errorMessage = document.getElementById("errorMessage");
-
-        if (messageContent.length < 10) {
-            errorMessage.textContent = "Message must be at least 10 characters.";
-            return;
-        }
-        errorMessage.textContent = "";
-
-        let recipients = [];
-
-        if (notificationType === "all") {
-            recipients = subscribers;
-        } else if (notificationType === "group") {
-            recipients = subscribers.filter(subscriber => subscriber.plan === selectedGroup);
-            if (recipients.length === 0) {
-                errorMessage.textContent = "No subscribers found in the selected group.";
-                return;
-            }
-        } else {
-            let subscriber = subscribers.find(s => s.name === subscriberName);
-            if (!subscriber) {
-                errorMessage.textContent = "Please select a valid subscriber.";
-                return;
-            }
-            recipients.push(subscriber);
-        }
-
-        recipients.forEach(subscriber => {
-            let newNotification = {
-                id: notifications.length ? Math.max(...notifications.map(n => n.id)) + 1 : 1,
-                subscriber: subscriber.name,
-                mobile: subscriber.mobile,
-                message: messageContent,
-                date: new Date().toLocaleString(),
-                status: "Pending"
-            };
-            notifications.push(newNotification);
-        });
-
-        sessionStorage.setItem("notifications", JSON.stringify(notifications));
-        renderNotifications();
-
-        setTimeout(() => {
-            notifications.forEach(notification => {
-                if (notification.status === "Pending") notification.status = "Sent";
-            });
-            sessionStorage.setItem("notifications", JSON.stringify(notifications));
-            renderNotifications();
-        }, 1000);
-
-        document.getElementById("messageContent").value = "";
-    });
-
-    // Render notifications
-    function renderNotifications() {
-        let tableBody = document.getElementById("notificationHistoryList");
-        tableBody.innerHTML = "";
-        let filteredData = filterNotifications();
-        let start = (currentNotificationPage - 1) * notificationsPerPage;
-        let paginatedData = filteredData.slice(start, start + notificationsPerPage);
-
-        paginatedData.forEach(notification => {
-            let statusBadge = getStatusBadge(notification.status);
-            let row = `<tr>
-                <td>${notification.id}</td>
-                <td>${notification.subscriber}</td>
-                <td>${notification.mobile}</td>
-                <td>${notification.date}</td>
-                <td>${notification.message}</td>
-                <td>${statusBadge}</td>
-                <td>
-                    <button class="btn btn-success btn-sm" onclick="confirmNotificationAction('resend', ${notification.id})">Resend</button>
-                    <button class="btn btn-danger btn-sm" onclick="confirmNotificationAction('delete', ${notification.id})">Delete</button>
-                </td>
-            </tr>`;
-            tableBody.innerHTML += row;
-        });
-
-        updateNotificationPagination();
-    }
-
-    function getStatusBadge(status) {
-        let badgeClass = status === "Sent" ? "success" : status === "Pending" ? "warning" : status === "Resending" ? "info" : "primary";
-        return `<span class="badge bg-${badgeClass}">${status}</span>`;
-    }
-
-    document.getElementById("searchInput").addEventListener("input", function () {
-        currentNotificationPage = 1;
-        renderNotifications();
-    });
-
-    function filterNotifications() {
-        let searchValue = document.getElementById("searchInput").value.toLowerCase();
-        return notifications.filter(n => n.status.toLowerCase().includes(searchValue));
-    }
-
-    function updateNotificationPagination() {
-        let pagination = document.getElementById("pagination3");
-        pagination.innerHTML = "";
-        let totalPages = Math.ceil(filterNotifications().length / notificationsPerPage);
-        if (totalPages <= 1) return;
-
-        pagination.innerHTML += `<li class="page-item ${currentNotificationPage === 1 ? "disabled" : ""}">
-            <a class="page-link" href="#" onclick="changeNotificationPage(${currentNotificationPage - 1})">&laquo;</a>
-        </li>`;
-
-        for (let i = 1; i <= totalPages; i++) {
-            pagination.innerHTML += `<li class="page-item ${i === currentNotificationPage ? "active" : ""}">
-                <a class="page-link" href="#" onclick="changeNotificationPage(${i})">${i}</a>
-            </li>`;
-        }
-
-        pagination.innerHTML += `<li class="page-item ${currentNotificationPage === totalPages ? "disabled" : ""}">
-            <a class="page-link" href="#" onclick="changeNotificationPage(${currentNotificationPage + 1})">&raquo;</a>
-        </li>`;
-    }
-
-    window.changeNotificationPage = function (page) {
-        currentNotificationPage = page;
-        renderNotifications();
-    };
-
-    document.getElementById("clearHistory").addEventListener("click", function () {
-        let clearHistoryModal = new bootstrap.Modal(document.getElementById("clearHistoryModal"));
-        clearHistoryModal.show();
-    });
-
-    document.getElementById("confirmClearHistory").addEventListener("click", function () {
-        notifications = [];
-        localStorage.setItem("notifications", JSON.stringify(notifications));
-        renderNotifications();
-
-        let clearHistoryModal = bootstrap.Modal.getInstance(document.getElementById("clearHistoryModal"));
-        clearHistoryModal.hide();
-    });
-
-    window.confirmNotificationAction = function (action, id) {
-        selectedAction = action;
-        selectedNotificationId = id;
-        document.getElementById("notificationModalBody").textContent = `Are you sure you want to ${action} this notification?`;
-        new bootstrap.Modal(document.getElementById("notificationConfirmationModal")).show();
-    };
-
-    document.getElementById("notificationConfirmAction").addEventListener("click", function () {
-        if (selectedAction === "delete") {
-            notifications = notifications.filter(n => n.id !== selectedNotificationId);
-        } else if (selectedAction === "resend") {
-            let originalNotification = notifications.find(n => n.id === selectedNotificationId);
-            if (originalNotification) {
-                notifications.push({ ...originalNotification, id: notifications.length + 1, status: "Pending" });
-            }
-        }
-
-        localStorage.setItem("notifications", JSON.stringify(notifications));
-        renderNotifications();
-        bootstrap.Modal.getInstance(document.getElementById("notificationConfirmationModal")).hide();
-    });
-
-    document.getElementById("downloadedHistory").addEventListener("click", function () {
-       
-        let notificationData = localStorage.getItem("notifications");
-        if (!notificationData) {
-            showModal("notificationNoDataModal");
-            return;
-        }
-    
-        let notifications = JSON.parse(notificationData);
-        if (notifications.length === 0) {
-            showModal("notificationNoDataModal");
-            return;
-        }
-
-        if (typeof window.jspdf === "undefined" || typeof window.jspdf.jsPDF === "undefined") {
-            return;
-        }
-        const { jsPDF } = window.jspdf;
-        let doc = new jsPDF("p", "mm", "a4");
-
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(16);
-        doc.text("Notification History", 14, 15);
-
-        let rows = notifications.map((n, index) => [
-            index + 1,                 
-            n.subscriber || "N/A",    
-            n.mobile || "N/A",      
-            n.date || "N/A",           
-            n.message || "N/A",       
-            
-            n.status || "N/A"          
-        ]);
-        doc.autoTable({
-            startY: 20,
-            head: [["ID", "Subscriber", "Mobile", "Date & Time", "Message", "Status"]],
-            body: rows,
-            theme: "grid",
-            styles: { fontSize: 10, cellPadding: 3 },
-            headStyles: { fillColor: [40, 40, 40], textColor: 255, fontStyle: "bold" }
-        });
-
-        doc.save("Notification_History.pdf");
-    });
-    
-    renderNotifications();
-});
-
 // Profile Management
 document.addEventListener("DOMContentLoaded", function () {
     const BASE_URL = "http://localhost:8083/admin";
     let adminUsername;
 
     function logError(message, error) {
-        console.error(`${message}:`, {
-            message: error.message,
-            stack: error.stack,
-            status: error.status || 'N/A'
-        });
+        console.error(`${message}:`, { message: error.message, stack: error.stack, status: error.status || 'N/A' });
     }
 
     async function loadAdminProfile() {
         if (!checkAuth()) return;
-    
-        const jwtToken = getToken();
-        const decodedToken = parseJwt(jwtToken);
-    
+
+        const decodedToken = parseJwt(getToken());
         if (!decodedToken || !decodedToken.sub) {
             showToast("Invalid or missing token. Please log in again.", "danger");
             setTimeout(() => window.location.href = "login.html", 2000);
             return;
         }
-    
+
         adminUsername = decodedToken.sub;
-    
+
         try {
-            const url = `${BASE_URL}/profile/${encodeURIComponent(adminUsername)}`;
-            const response = await fetch(url, {
+            const response = await fetch(`${BASE_URL}/profile/${encodeURIComponent(adminUsername)}`, {
                 method: "GET",
                 headers: {
-                    "Authorization": `Bearer ${jwtToken}`,
+                    "Authorization": `Bearer ${getToken()}`,
                     "Content-Type": "application/json",
                 },
             });
-    
+
             if (!response.ok) {
                 const errorText = await response.text();
                 throw Object.assign(new Error(`HTTP ${response.status}: ${errorText || "Failed to fetch profile"}`), { status: response.status });
             }
-    
+
             const profile = await response.json();
-    
             document.getElementById("username").value = profile.username || "";
             document.getElementById("email").value = profile.email || adminUsername;
             document.getElementById("contact").value = profile.contact || "";
             document.getElementById("address").value = profile.address || "";
-    
             const profileImageElement = document.getElementById("profileImage");
             const navbarAvatarElement = document.getElementById("navbarAvatar");
             const defaultImage = "../assesst/Images/profile.jpeg";
-    
-            if (profile.profileImage && profile.profileImage.startsWith("data:image")) {
-                profileImageElement.src = profile.profileImage;
-                navbarAvatarElement.src = profile.profileImage;
-            } else if (profile.profileImage && /^https?:\/\//.test(profile.profileImage)) {
-                profileImageElement.src = profile.profileImage;
-                navbarAvatarElement.src = profile.profileImage;
-            } else {
-                profileImageElement.src = defaultImage;
-                navbarAvatarElement.src = defaultImage;
-                console.warn("Profile image not set or invalid, using default:", defaultImage);
-            }
-    
+            profileImageElement.src = profile.profileImage && (profile.profileImage.startsWith("data:image") || /^https?:\/\//.test(profile.profileImage))
+                ? profile.profileImage
+                : defaultImage;
+            navbarAvatarElement.src = profileImageElement.src;
             document.getElementById("email").setAttribute("readonly", true);
             document.getElementById("username").setAttribute("readonly", true);
-    
         } catch (error) {
             logError("Error loading profile", error);
-            if (error.status === 401 || error.status === 403) {
-                showToast("Unauthorized access. Please log in again.", "danger");
-                setTimeout(() => window.location.href = "/login.html", 2000);
-            } else if (error.status === 404) {
-                showToast("Profile not found.", "warning");
-            } else {
-                showToast(`Failed to load profile: ${error.message}`, "danger");
-            }
-            document.getElementById("username").value = "";
-            document.getElementById("email").value = adminUsername || "";
-            document.getElementById("contact").value = "";
-            document.getElementById("address").value = "";
-            document.getElementById("profileImage").src = "../assesst/Images/profile.jpeg";
-            document.getElementById("navbarAvatar").src = "../assesst/Images/profile.jpeg";
+            handleAuthError(error);
+            resetProfileFields();
         }
     }
 
-    document.getElementById("editProfileImage").addEventListener("click", function () {
-        document.getElementById("imageUpload").click();
-    });
+    function handleAuthError(error) {
+        if (error.status === 401 || error.status === 403) {
+            showToast("Unauthorized access. Please log in again.", "danger");
+            setTimeout(() => window.location.href = "/login.html", 2000);
+        } else if (error.status === 404) {
+            showToast("Profile not found.", "warning");
+        } else {
+            showToast(`Failed to load profile: ${error.message}`, "danger");
+        }
+    }
 
-    document.getElementById("imageUpload").addEventListener("change", function (event) {
+    function resetProfileFields() {
+        document.getElementById("username").value = "";
+        document.getElementById("email").value = adminUsername || "";
+        document.getElementById("contact").value = "";
+        document.getElementById("address").value = "";
+        document.getElementById("profileImage").src = "../assesst/Images/profile.jpeg";
+        document.getElementById("navbarAvatar").src = "../assesst/Images/profile.jpeg";
+    }
+
+    document.getElementById("editProfileImage")?.addEventListener("click", () => document.getElementById("imageUpload")?.click());
+
+    document.getElementById("imageUpload")?.addEventListener("change", function (event) {
         const file = event.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = function (e) {
+            reader.onload = e => {
                 document.getElementById("profileImage").src = e.target.result;
                 document.getElementById("navbarAvatar").src = e.target.result;
             };
@@ -1730,7 +1316,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    document.getElementById("togglePasswordFields").addEventListener("click", function () {
+    document.getElementById("togglePasswordFields")?.addEventListener("click", function () {
         const passwordFields = document.getElementById("passwordFields");
         passwordFields.style.display = passwordFields.style.display === "none" ? "block" : "none";
     });
@@ -1747,63 +1333,50 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    document.getElementById("profileForm").addEventListener("input", function (event) {
+    document.getElementById("profileForm")?.addEventListener("input", function (event) {
         document.getElementById(event.target.id + "Error")?.classList.add("d-none");
     });
 
-    document.getElementById("updateProfile").addEventListener("click", async function (event) {
+    document.getElementById("updateProfile")?.addEventListener("click", async function (event) {
         event.preventDefault();
-    
         if (!checkAuth()) return;
-    
+
         const username = document.getElementById("username").value.trim();
         const contact = document.getElementById("contact").value.trim();
         const address = document.getElementById("address").value.trim();
         const newPassword = document.getElementById("newPassword").value.trim();
         const confirmPassword = document.getElementById("confirmPassword").value.trim();
         const profileImage = document.getElementById("profileImage").src;
-        const passwordFields = document.getElementById("passwordFields");
-    
+
         const isContactValid = validateInput(contact, "contactError", /^\d{10}$/.test(contact), "Invalid contact number (10 digits required)");
         const isAddressValid = validateInput(address, "addressError", address !== "", "Address cannot be empty");
-    
-        let isPasswordValid = true;
-        let isPasswordMatch = true;
-    
-        if (passwordFields.style.display === "block" && newPassword) {
+        let isPasswordValid = true, isPasswordMatch = true;
+
+        if (document.getElementById("passwordFields").style.display === "block" && newPassword) {
             isPasswordValid = validateInput(newPassword, "passwordError", newPassword.length >= 6, "Password must be at least 6 characters");
             isPasswordMatch = validateInput(confirmPassword, "confirmPasswordError", newPassword === confirmPassword, "Passwords do not match");
         }
-    
-        // Check image size (no format restriction)
-        const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024; // 2MB limit
+
+        const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024; // 2MB
         let isImageSizeValid = true;
-    
         if (profileImage.startsWith("data:image")) {
-            // Extract MIME type for logging (optional)
-            const mimeType = profileImage.split(",")[0].match(/data:([^;]+)/)[1];
-            console.log("Image MIME Type:", mimeType); // Debug log
-    
-            // Validate image size
-            const imageSizeBytes = profileImage.length; // Rough size in bytes
-            const approxFileSizeBytes = Math.round(imageSizeBytes * 0.75); // Approximate decoded size
-            console.log(`Profile Image Size: ${approxFileSizeBytes} bytes`); // Debug log
+            const approxFileSizeBytes = Math.round(profileImage.length * 0.75);
             if (approxFileSizeBytes > MAX_IMAGE_SIZE_BYTES) {
-                showToast(`Image size (${(approxFileSizeBytes / (1024 * 1024)).toFixed(2)} MB) exceeds the 2MB limit. Please select a smaller image.`, "warning");
+                showToast(`Image size exceeds 2MB limit`, "warning");
                 isImageSizeValid = false;
             }
         }
-    
+
         if (isContactValid && isAddressValid && isPasswordValid && isPasswordMatch && isImageSizeValid) {
             const profileData = {
-                username: username,
+                username,
                 email: document.getElementById("email").value,
-                contact: contact,
-                address: address,
+                contact,
+                address,
                 password: newPassword || undefined,
                 profileImage: profileImage.startsWith("data:image") ? profileImage : undefined
             };
-    
+
             try {
                 const response = await fetch(`${BASE_URL}/profile/${encodeURIComponent(adminUsername)}`, {
                     method: "PUT",
@@ -1813,43 +1386,28 @@ document.addEventListener("DOMContentLoaded", function () {
                     },
                     body: JSON.stringify(profileData),
                 });
-    
+
                 if (!response.ok) {
                     const errorText = await response.text();
                     throw Object.assign(new Error(`HTTP ${response.status}: ${errorText || "Failed to update profile"}`), { status: response.status });
                 }
-    
+
                 const updatedProfile = await response.json();
-    
                 document.getElementById("contact").value = updatedProfile.contact || "";
                 document.getElementById("address").value = updatedProfile.address || "";
                 document.getElementById("profileImage").src = updatedProfile.profileImage || "../assesst/Images/profile.jpeg";
                 document.getElementById("navbarAvatar").src = updatedProfile.profileImage || "../assesst/Images/profile.jpeg";
-    
                 document.getElementById("newPassword").value = "";
                 document.getElementById("confirmPassword").value = "";
                 document.getElementById("passwordFields").style.display = "none";
-    
                 showToast("Profile updated successfully!", "success");
-                const toastElement = document.getElementById("updateToast");
-                if (toastElement) {
-                    var toast = new bootstrap.Toast(toastElement);
-                    toast.show();
-                } else {
-                    console.warn("Toast element 'updateToast' not found in HTML.");
-                }
-    
             } catch (error) {
                 logError("Error updating profile", error);
-                if (error.status === 401 || error.status === 403) {
-                    showToast("Unauthorized. Please log in again.", "danger");
-                    setTimeout(() => window.location.href = "/login.html", 2000);
-                } else {
-                    showToast(`Failed to update profile: ${error.message}`, "danger");
-                }
+                handleAuthError(error);
             }
         }
     });
+
     loadAdminProfile();
 });
 
@@ -1858,28 +1416,20 @@ document.addEventListener("DOMContentLoaded", function () {
     let revenueChart, dailyRechargeChart, rechargePlanChart, paymentModeChart;
     const BASE_URL = "http://localhost:8083/admin";
 
-    // Fetch Data from Backend API
     fetchReportData();
 
     function fetchReportData() {
-        const jwtToken = getToken(); // Assuming getToken() is defined as in your previous code
-        if (!jwtToken) {
-            showToast("Please log in to view reports.", "danger");
-            setTimeout(() => window.location.href = "login.html", 2000);
-            return;
-        }
+        if (!checkAuth()) return;
 
         fetch(`${BASE_URL}/reports/analytics`, {
             method: "GET",
             headers: {
-                "Authorization": `Bearer ${jwtToken}`,
+                "Authorization": `Bearer ${getToken()}`,
                 "Content-Type": "application/json",
             },
         })
         .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: Failed to fetch report data`);
-            }
+            if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to fetch report data`);
             return response.json();
         })
         .then(data => {
@@ -1890,103 +1440,102 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("Error fetching report data:", error);
             showToast(`Failed to load reports: ${error.message}`, "danger");
             if (error.message.includes("401") || error.message.includes("403")) {
-                showToast("Unauthorized access. Please log in again.", "danger");
                 setTimeout(() => window.location.href = "/login.html", 2000);
             }
         });
     }
 
-    // Update Summary Cards
     function updateSummaryCards(data) {
         document.getElementById("totalRevenues").innerHTML = `<b>${data.summary.totalRevenue} (This Month)</b>`;
         document.getElementById("totalRecharge").innerHTML = `<b>${data.summary.totalRecharge} (This Month)</b>`;
         document.getElementById("newSubscribers").innerHTML = `<b>${data.summary.newSubscribers} (This Month)</b>`;
     }
 
-    // Generate Charts using Chart.js
     function generateCharts(data) {
-        let revenueCtx = document.getElementById("revenueChart").getContext("2d");
-        revenueChart = new Chart(revenueCtx, {
-            type: "line",
-            data: {
-                labels: data.revenueOverview.labels,
-                datasets: [{
-                    label: "Revenue (₹)",
-                    data: data.revenueOverview.values,
-                    backgroundColor: "rgba(54, 162, 235, 0.2)",
-                    borderColor: "rgb(20, 145, 122)",
-                    borderWidth: 2
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
+        let revenueCtx = document.getElementById("revenueChart")?.getContext("2d");
+        if (revenueCtx) {
+            revenueChart = new Chart(revenueCtx, {
+                type: "line",
+                data: {
+                    labels: data.revenueOverview.labels,
+                    datasets: [{
+                        label: "Revenue (₹)",
+                        data: data.revenueOverview.values,
+                        backgroundColor: "rgba(54, 162, 235, 0.2)",
+                        borderColor: "rgb(20, 145, 122)",
+                        borderWidth: 2
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
 
-        let dailyRechargeCtx = document.getElementById("dailyRechargeChart").getContext("2d");
-        dailyRechargeChart = new Chart(dailyRechargeCtx, {
-            type: "bar",
-            data: {
-                labels: data.dailyRecharge.labels,
-                datasets: [{
-                    label: "Daily Recharge (₹)",
-                    data: data.dailyRecharge.values,
-                    backgroundColor: "rgba(255, 99, 132, 0.2)",
-                    borderColor: "rgb(237, 13, 61)",
-                    borderWidth: 2
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
+        let dailyRechargeCtx = document.getElementById("dailyRechargeChart")?.getContext("2d");
+        if (dailyRechargeCtx) {
+            dailyRechargeChart = new Chart(dailyRechargeCtx, {
+                type: "bar",
+                data: {
+                    labels: data.dailyRecharge.labels,
+                    datasets: [{
+                        label: "Daily Recharge (₹)",
+                        data: data.dailyRecharge.values,
+                        backgroundColor: "rgba(255, 99, 132, 0.2)",
+                        borderColor: "rgb(237, 13, 61)",
+                        borderWidth: 2
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
 
-        let rechargePlanCtx = document.getElementById("rechargePlanChart").getContext("2d");
-        rechargePlanChart = new Chart(rechargePlanCtx, {
-            type: "pie",
-            data: {
-                labels: data.rechargePlanPopularity.labels,
-                datasets: [{
-                    data: data.rechargePlanPopularity.values,
-                    backgroundColor: ['#4CAF50', '#2196F3', '#FF9800', '#E91E63', '#9C27B0']
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
+        let rechargePlanCtx = document.getElementById("rechargePlanChart")?.getContext("2d");
+        if (rechargePlanCtx) {
+            rechargePlanChart = new Chart(rechargePlanCtx, {
+                type: "pie",
+                data: {
+                    labels: data.rechargePlanPopularity.labels,
+                    datasets: [{
+                        data: data.rechargePlanPopularity.values,
+                        backgroundColor: ['#4CAF50', '#2196F3', '#FF9800', '#E91E63', '#9C27B0']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
 
-        let paymentModeCtx = document.getElementById("paymentModeChart").getContext("2d");
-        paymentModeChart = new Chart(paymentModeCtx, {
-            type: "doughnut",
-            data: {
-                labels: data.paymentModeUsage.labels,
-                datasets: [{
-                    data: data.paymentModeUsage.values,
-                    backgroundColor: ['#673AB7', '#03A9F4', '#FF9800']
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
+        let paymentModeCtx = document.getElementById("paymentModeChart")?.getContext("2d");
+        if (paymentModeCtx) {
+            paymentModeChart = new Chart(paymentModeCtx, {
+                type: "doughnut",
+                data: {
+                    labels: data.paymentModeUsage.labels,
+                    datasets: [{
+                        data: data.paymentModeUsage.values,
+                        backgroundColor: ['#673AB7', '#03A9F4', '#FF9800']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
     }
 });
 
-// PDF Generation Functions (unchanged)
 function generatePDF(sectionId, fileName) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('p', 'mm', 'a4');
-
-    const headerTitle = "Mobi.Comm Service";
-    const reportTitle = fileName.replace('.pdf', '');
-
     doc.setFont("helvetica", "bold");
     doc.setFontSize(16);
-    doc.text(headerTitle, 105, 15, { align: "center" });
+    doc.text("Mobi.Comm Service", 105, 15, { align: "center" });
     doc.setFontSize(14);
-    doc.text(reportTitle, 105, 25, { align: "center" });
-    document.querySelectorAll(".downloadBtn").forEach(btn => btn.style.display = "none");
+    doc.text(fileName.replace('.pdf', ''), 105, 25, { align: "center" });
 
+    document.querySelectorAll(".downloadBtn")?.forEach(btn => btn.style.display = "none");
     html2canvas(document.getElementById(sectionId)).then(canvas => {
         const imgData = canvas.toDataURL("image/png");
         const imgWidth = 150;
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
         doc.addImage(imgData, "PNG", 10, 45, imgWidth, imgHeight);
-
-        document.querySelectorAll(".downloadBtn").forEach(btn => btn.style.display = "block");
+        document.querySelectorAll(".downloadBtn")?.forEach(btn => btn.style.display = "block");
         doc.save(fileName);
     });
 }
@@ -1994,114 +1543,19 @@ function generatePDF(sectionId, fileName) {
 function generateFullReport() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('p', 'mm', 'a4');
-
-    const headerTitle = "Mobi.Comm Service";
-    const reportTitle = "Full Reports & Analytics";
-
     doc.setFont("helvetica", "bold");
     doc.setFontSize(16);
-    doc.text(headerTitle, 105, 15, { align: "center" });
+    doc.text("Mobi.Comm Service", 105, 15, { align: "center" });
     doc.setFontSize(14);
-    doc.text(reportTitle, 105, 25, { align: "center" });
-    document.querySelectorAll(".downloadBtn").forEach(btn => btn.style.display = "none");
+    doc.text("Full Reports & Analytics", 105, 25, { align: "center" });
 
+    document.querySelectorAll(".downloadBtn")?.forEach(btn => btn.style.display = "none");
     html2canvas(document.getElementById("reportAndAnalysis")).then(canvas => {
         const imgData = canvas.toDataURL("image/png");
         const imgWidth = 190;
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
         doc.addImage(imgData, "PNG", 10, 35, imgWidth, imgHeight);
-        document.querySelectorAll(".downloadBtn").forEach(btn => btn.style.display = "block");
+        document.querySelectorAll(".downloadBtn")?.forEach(btn => btn.style.display = "block");
         doc.save("Full_Report.pdf");
     });
 }
-document.addEventListener("DOMContentLoaded", function () {
-    let notifications = [
-        {
-            id: 1,
-            user: "Yuvasree",
-            date: "26 Feb 2025, 10:15 AM",
-            message: "I recharged with ₹599, but the plan hasn't been activated yet. Please check.",
-            status: "Pending"
-        },
-        {
-            id: 2,
-            user: "Subscriber 1",
-            date: "26 Feb 2025, 11:30 AM",
-            message: "I want to upgrade from the Basic Plan to the Ultimate Plan. Kindly assist.",
-            status: "In Progress"
-        },
-        {
-            id: 3,
-            user: "Subscriber 2",
-            date: "26 Feb 2025, 12:05 PM",
-            message: "I tried to pay via UPI, but the transaction failed. The amount was deducted. Help me!",
-            status: "Resolved"
-        }
-    ];
-
-    const notificationList = document.getElementById("notificationList");
-    const filterStatus = document.getElementById("filterStatus");
-
-    // Function to Render Notifications
-    function renderNotifications() {
-        notificationList.innerHTML = "";
-
-        let filteredNotifications = notifications.filter(notif => 
-            filterStatus.value === "all" || notif.status === filterStatus.value
-        );
-
-        if (filteredNotifications.length === 0) {
-            notificationList.innerHTML = `<p class="text-muted">No notifications available.</p>`;
-            return;
-        }
-
-        filteredNotifications.forEach(notification => {
-            const notifCard = document.createElement("div");
-            notifCard.classList.add("card", "mb-3");
-            notifCard.innerHTML = `
-                <div class="card-body">
-                    <h5 class="card-title">${notification.user} - <span class="badge bg-${getStatusColor(notification.status)}">${notification.status}</span></h5>
-                    <p class="text-muted">${notification.date}</p>
-                    <p>${notification.message}</p>
-                    <select class="form-select status-select" data-id="${notification.id}">
-                        <option value="Pending" ${notification.status === "Pending" ? "selected" : ""}>Pending</option>
-                        <option value="In Progress" ${notification.status === "In Progress" ? "selected" : ""}>In Progress</option>
-                        <option value="Resolved" ${notification.status === "Resolved" ? "selected" : ""}>Resolved</option>
-                    </select>
-                    <button class="btn btn-danger btn-sm mt-2 delete-btn" data-id="${notification.id}">Delete</button>
-                </div>
-            `;
-            notificationList.appendChild(notifCard);
-        });
-
-        // Event Listeners for Status Change & Delete
-        document.querySelectorAll(".status-select").forEach(select => {
-            select.addEventListener("change", updateStatus);
-        });
-
-        document.querySelectorAll(".delete-btn").forEach(button => {
-            button.addEventListener("click", deleteNotification);
-        });
-    }
-
-    function updateStatus(event) {
-        const notificationId = parseInt(event.target.getAttribute("data-id"));
-        const newStatus = event.target.value;
-        notifications = notifications.map(notif => notif.id === notificationId ? { ...notif, status: newStatus } : notif);
-        renderNotifications();
-    }
-
-    function deleteNotification(event) {
-        const notificationId = parseInt(event.target.getAttribute("data-id"));
-        notifications = notifications.filter(notif => notif.id !== notificationId);
-        renderNotifications();
-    }
-
-    function getStatusColor(status) {
-        return status === "Pending" ? "danger" : status === "In Progress" ? "warning" : "success";
-    }
-
-    filterStatus.addEventListener("change", renderNotifications);
-
-    renderNotifications();
-});

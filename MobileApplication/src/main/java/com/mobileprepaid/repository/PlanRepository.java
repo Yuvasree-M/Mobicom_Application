@@ -3,6 +3,7 @@ package com.mobileprepaid.repository;
 import com.mobileprepaid.entities.Plan;
 import com.mobileprepaid.enums.PlanStatus;
 
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PlanRepository extends JpaRepository<Plan, Long>, JpaSpecificationExecutor<Plan> {
-
+//	Optional<Plan> findByPlanName(String Name);
 
 	Page<Plan> findAll(Pageable pageable);
 
@@ -30,8 +31,10 @@ public interface PlanRepository extends JpaRepository<Plan, Long>, JpaSpecificat
     Page<Plan> findByValidityAndStatus(Integer validity, PlanStatus status, Pageable pageable);
 
     Page<Plan> findByStatusOrderByPriceAsc(PlanStatus status, Pageable pageable);
-    long countByStatus(PlanStatus status);
+    
     Page<Plan> findByStatusOrderByPriceDesc(PlanStatus status, Pageable pageable);
+    
+    long countByStatus(PlanStatus status);
     
     
 }
