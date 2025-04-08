@@ -25,12 +25,50 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function confirmLogout() {
-    $('#logoutModal').modal('show');
-}
+    const logoutModal = new bootstrap.Modal(document.getElementById('logoutModal'));
+    logoutModal.show();
 
-document.getElementById('confirmLogoutBtn').addEventListener('click', function() {
-    window.location.href = '../index.html';
-});
+    const apiBaseUrl = "http://localhost:8083/auth";
+    const confirmBtn = document.getElementById('confirmLogoutBtn');
+
+    confirmBtn.onclick = async () => {
+        const token = sessionStorage.getItem('jwtToken');
+
+        if (!token) {
+            showToast("errorToast", "No session token found. You are already logged out.");
+            sessionStorage.removeItem('jwtToken');
+            logoutModal.hide();
+            window.location.href = '/index.html';
+            return;
+        }
+
+        try {
+            const response = await fetch(`${apiBaseUrl}/logout/subscriber`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || "Logout failed!");
+            }
+
+            sessionStorage.removeItem('jwtToken');
+            showToast("successToast", result.message || "Logged out successfully!");
+            logoutModal.hide();
+
+            setTimeout(() => {
+                window.location.href = '/index.html';
+            }, 1000);
+        } catch (error) {
+            console.error("Error during logout:", error);
+            showToast("errorToast", error.message || "Failed to logout. Please try again.");
+        }
+    };
+}
 
 function goToNotifications() {
     showSection('notifications');

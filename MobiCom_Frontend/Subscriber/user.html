@@ -160,7 +160,7 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><button class="dropdown-item" onclick="confirmLogout()">Logout</button></li>
+                        <li><button class="dropdown-item"  onclick="confirmLogout()">Logout</button></li>
                     </ul>
                 </div>
             </div>
@@ -484,24 +484,24 @@
         <div id="toastContainer" class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050;"></div>
         <button id="homeButton"><i class="fas fa-arrow-up"></i></button>
 
-        <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        Are you sure you want to log out?
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" id="confirmLogoutBtn">Logout</button>
-                    </div>
+        <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+                <div class="modal-body">
+                  Are you sure you want to logout?
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                  <button type="button" id="confirmLogoutBtn" class="btn btn-danger">Logout</button>
+                </div>
+              </div>
             </div>
-        </div>
+          </div>
+          
     </div>
     <footer class="footer">
         <div class="container py-5">
@@ -1332,74 +1332,6 @@ document.getElementById('clear-filters')?.addEventListener('click', () => {
     fetchPlans();
 });
 
-function confirmLogout() {
-    const logoutModal = new bootstrap.Modal(document.getElementById('logoutModal'));
-    logoutModal.show();
-
-    const apiBaseUrl = "http://localhost:8083/auth"; 
-    const confirmBtn = document.getElementById('confirmLogoutBtn');
-
-    confirmBtn.onclick = async () => {
-        const token = sessionStorage.getItem('jwtToken');
-
-        if (!token) {
-            showToast("errorToast", "No session token found. You are already logged out.");
-            sessionStorage.removeItem('jwtToken');
-            logoutModal.hide();
-            window.location.href = '../index.html';
-            return;
-        }
-
-        try {
-            const response = await fetch(`${apiBaseUrl}/logout/subscriber`, {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            });
-
-            const result = await response.json();
-
-            if (!response.ok) {
-                throw new Error(result.error || "Logout failed!");
-            }
-
-            sessionStorage.removeItem('jwtToken');
-            showToast("successToast", result.message || "Logged out successfully!");
-            logoutModal.hide();
-
-            setTimeout(() => {
-                window.location.href = '/index.html';
-            }, 1000);
-        } catch (error) {
-            console.error("Error during logout:", error);
-            showToast("errorToast", error.message || "Failed to logout. Please try again.");
-        }
-    };
-}
-
-function showToast(toastId, message) {
-    const toastContainer = document.getElementById("toastContainer");
-    if (!toastContainer) {
-        console.error("Toast container not found in DOM");
-        return;
-    }
-    const toastHTML = `
-        <div class="toast bg-${toastId === 'successToast' ? 'success' : 'danger'} text-white" role="alert">
-            <div class="d-flex">
-                <div class="toast-body">${message}</div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        </div>
-    `;
-    toastContainer.innerHTML = toastHTML;
-    const toastElement = toastContainer.querySelector(".toast");
-    const toast = new bootstrap.Toast(toastElement);
-    toast.show();
-    setTimeout(() => toastElement.remove(), 3000);
-}
-
-window.confirmLogout = confirmLogout;
 
 
 // Fetch and Display Current Plan
