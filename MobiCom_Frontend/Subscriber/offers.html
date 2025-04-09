@@ -172,31 +172,25 @@
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-       // Handle smooth scrolling for nav links with fixed navbar
-       const navLinks = document.querySelectorAll('.nav-link');
-            navLinks.forEach(link => {
-                link.addEventListener('click', function (e) {
-                    e.preventDefault();
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                navLinks.forEach(navLink => navLink.classList.remove('active'));
 
-                    // Remove active class from all links
-                    navLinks.forEach(navLink => navLink.classList.remove('active'));
+                this.classList.add('active');
 
-                    // Add active class to clicked link
-                    this.classList.add('active');
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
 
-                    const targetId = this.getAttribute('href').substring(1);
-                    const targetElement = document.getElementById(targetId);
-
-                    if (targetElement) {
-                        // Let the browser handle the scrolling with scroll-padding-top
-                        targetElement.scrollIntoView({
-                            behavior: 'smooth'
-                        });
-                    }
-                });
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
             });
+        });
 
-        // Show/hide home button based on scroll position
         window.addEventListener("scroll", function () {
             let homeButton = document.getElementById("homeButton");
             if (window.scrollY > 200) {
@@ -214,7 +208,6 @@
             });
         });
 
-        // Function to update active nav item based on scroll position
         function updateActiveNavItem() {
             const navbarHeight = document.querySelector('.navbar').offsetHeight;
             const sections = ['home', 'offers', 'quick-recharge', 'plans', 'faq', 'contact'];

@@ -43,37 +43,32 @@
         </div>
     </nav>
 
-    <!-- Login Section -->
     <div class="container d-flex justify-content-center mt-5">
         <div class="row login-container w-100">
-            <!-- Left Side -->
             <div class="col-md-6 left-panel text-center">
                 <h2>Mobi.Comm</h2>
                 <p>Welcome back! Please login to continue.</p>
             </div>
-
-            <!-- Right Side (Login Form) -->
             <div class="col-md-6 right-panel">
                 <h4 class="mb-4 text-center"><b>Subscriber Login</b></h4>
                 <form id="loginForm">
-                    <!-- Mobile Number Input -->
                     <div class="mb-3">
                         <label for="mobileNumber" class="form-label">Mobile Number</label>
                         <div class="input-group phone-input-group">
                             <span class="input-group-text">+91</span>
-                            <input type="tel" class="form-control" id="mobileNumber" placeholder="Enter 10-digit number" maxlength="10" required ="Mobile Number">
+                            <input type="tel" class="form-control" id="mobileNumber" placeholder="Enter 10-digit number"
+                                maxlength="10" required="Mobile Number">
                         </div>
                         <span id="mobileError" class="error-message"></span>
                     </div>
 
-                    <!-- OTP Input -->
                     <div class="mb-3">
                         <label for="otp" class="form-label">OTP</label>
-                        <input type="text" class="form-control" id="otp" placeholder="Enter OTP" disabled aria-label="OTP">
+                        <input type="text" class="form-control" id="otp" placeholder="Enter OTP" disabled
+                            aria-label="OTP">
                         <span id="otpError" class="error-message"></span>
                     </div>
 
-                    <!-- Buttons -->
                     <div class="d-flex justify-content-between">
                         <button type="button" class="btn btn-success" id="generateOTPBtn">Send OTP</button>
                         <button type="submit" class="btn btn-primary" id="loginBtn" disabled>Login</button>
@@ -84,7 +79,6 @@
         </div>
     </div>
 
-    <!-- OTP Sent Modal -->
     <div class="modal fade" id="otpModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -102,7 +96,6 @@
         </div>
     </div>
 
-    <!-- Sign Up Prompt Modal -->
     <div class="modal fade" id="signupPromptModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -121,7 +114,6 @@
         </div>
     </div>
 
-    <!-- Success Toast -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
         <div id="loginToast" class="toast align-items-center text-white bg-success border-0" role="alert">
             <div class="d-flex">
@@ -131,7 +123,6 @@
         </div>
     </div>
 
-    <!-- Error Toast -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
         <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert">
             <div class="d-flex">
@@ -194,7 +185,7 @@
                     new bootstrap.Modal(document.getElementById("otpModal")).show();
                     return;
                 }
-                if(response.status === 403){
+                if (response.status === 403) {
                     showErrorMessage("mobileError", data.message || "Your account is pending or Inactive. Please wait for admin approval.");
                 }
 

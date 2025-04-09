@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.mobileprepaid.dto.AdminRegisterRequest;
 import com.mobileprepaid.dto.LoginRequest;
 import com.mobileprepaid.dto.OtpRequest;
 import com.mobileprepaid.dto.SubscriberRegisterRequest;
@@ -58,23 +57,6 @@ public class AuthService {
         this.tokenBlocklist = tokenBlocklist;
     }
 
-    @Transactional
-    public String registerAdmin(AdminRegisterRequest request) {
-        if (adminLoginRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin already registered with this email!");
-        }
-
-        Role adminRole = roleRepository.findByName(RoleType.ADMIN)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin role not found!"));
-
-        AdminLogin admin = new AdminLogin();
-        admin.setEmail(request.getEmail());
-        admin.setPassword(passwordEncoder.encode(request.getPassword()));
-        admin.setRole(adminRole);
-
-        adminLoginRepository.save(admin);
-        return "Admin registered successfully!";
-    }
 
     public String loginAdmin(LoginRequest request) {
         AdminLogin admin = adminLoginRepository.findByEmail(request.getEmail())

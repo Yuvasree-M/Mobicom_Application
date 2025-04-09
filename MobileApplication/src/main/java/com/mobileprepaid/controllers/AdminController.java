@@ -285,7 +285,7 @@ public class AdminController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/dashboard")
     public ResponseEntity<DashboardDTO> getDashboardData() {
-        DashboardDTO dashboard = dashboardService.getDashboardData();
+        DashboardDTO dashboard = dashboardService.getDashboardData(); // Updated service call
         return ResponseEntity.ok(dashboard);
     }
     

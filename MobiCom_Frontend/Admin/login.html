@@ -111,11 +111,9 @@
 
 <body>
 
-    <!--  Navbar with Menu and Avatar Dropdown -->
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="../index.html">Mobi.Comm</a>
-            <!-- Avatar dropdown -->
             <div class="avatar-icon" data-bs-toggle="dropdown">
                 <i class="fas fa-user"></i>
             </div>
@@ -123,13 +121,10 @@
     </nav>
     <div class="container d-flex justify-content-center align-items-center h-100">
         <div class="row login-container w-100">
-            <!-- Left Side -->
             <div class="col-md-6 left-panel text-center">
                 <h2>Mobi.Comm</h2>
                 <p>Welcome back! Please login to continue.</p>
             </div>
-
-            <!-- Right Side (Login Form) -->
             <div class="col-md-6 right-panel">
                 <h4 class="mb-4">Admin Login</h4>
                 <form id="loginForm">
@@ -148,7 +143,6 @@
                 <p class="footer-text">&copy; 2025 Mobi.Comm | Contact: support@mobi.comm</p>
             </div>
 
-            <!-- Toast Container (Fixed at Top Right) -->
             <div id="toastContainer" class="position-fixed top-0 end-0 p-3"
                 style="top: 20px; right: 20px; z-index: 1050;"></div>
 
@@ -157,97 +151,95 @@
     </div>
 
     <script>
-      document.getElementById("loginForm").addEventListener("submit", async function (event) {
-    event.preventDefault();
+        document.getElementById("loginForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
 
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const emailError = document.getElementById("emailError");
-    const passwordError = document.getElementById("passwordError");
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const emailError = document.getElementById("emailError");
+            const passwordError = document.getElementById("passwordError");
 
-    let isValid = true;
+            let isValid = true;
 
-    // Email Validation
-    if (email === "") {
-        emailError.textContent = "Email is required.";
-        emailError.style.display = "block";
-        isValid = false;
-    } else if (!/^\S+@\S+\.\S+$/.test(email)) {
-        emailError.textContent = "Please enter a valid email address.";
-        emailError.style.display = "block";
-        isValid = false;
-    } else {
-        emailError.style.display = "none";
-    }
+            if (email === "") {
+                emailError.textContent = "Email is required.";
+                emailError.style.display = "block";
+                isValid = false;
+            } else if (!/^\S+@\S+\.\S+$/.test(email)) {
+                emailError.textContent = "Please enter a valid email address.";
+                emailError.style.display = "block";
+                isValid = false;
+            } else {
+                emailError.style.display = "none";
+            }
 
-    // Password Validation
-    if (password === "") {
-        passwordError.textContent = "Password is required.";
-        passwordError.style.display = "block";
-        isValid = false;
-    } else {
-        passwordError.style.display = "none";
-    }
+            if (password === "") {
+                passwordError.textContent = "Password is required.";
+                passwordError.style.display = "block";
+                isValid = false;
+            } else {
+                passwordError.style.display = "none";
+            }
 
-    // Function to Show Toast Notifications
-    function showToast(message, type) {
-        let toastContainer = document.getElementById("toastContainer");
-        let toast = document.createElement("div");
 
-        toast.className = `toast align-items-center text-white bg-${type} border-0 show`;
-        toast.role = "alert";
-        toast.innerHTML = `
+            function showToast(message, type) {
+                let toastContainer = document.getElementById("toastContainer");
+                let toast = document.createElement("div");
+
+                toast.className = `toast align-items-center text-white bg-${type} border-0 show`;
+                toast.role = "alert";
+                toast.innerHTML = `
             <div class="d-flex">
                 <div class="toast-body">${message}</div>
                 <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
             </div>
         `;
 
-        toastContainer.appendChild(toast);
-        setTimeout(() => {
-            toast.remove();
-        }, 3000);
-    }
+                toastContainer.appendChild(toast);
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            }
 
-    if (!isValid) {
-        showToast("Please fill in all fields!", "warning");
-        return;
-    }
+            if (!isValid) {
+                showToast("Please fill in all fields!", "warning");
+                return;
+            }
 
-    // Send Login Request to Backend
-    try {
-        const response = await fetch("http://localhost:8083/auth/login/admin", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ email, password })
+
+            try {
+                const response = await fetch("http://localhost:8083/auth/login/admin", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.token) {
+                    showToast("Login Successful!", "success");
+                    sessionStorage.setItem("jwtToken", data.token);
+
+                    setTimeout(() => {
+                        window.location.href = "dashboard.html";
+                    }, 1500);
+                } else {
+                    showToast(data.message || "Invalid Credentials! Please try again.", "danger");
+                }
+            } catch (error) {
+                console.error("Error during login:", error);
+                showToast("Server Error! Please try again later.", "danger");
+            }
+        });
+        document.getElementById("email").addEventListener("input", () => {
+            document.getElementById("emailError").style.display = "none";
         });
 
-        const data = await response.json();
-
-        if (response.ok && data.token) {
-            showToast("Login Successful!", "success");
-            sessionStorage.setItem("jwtToken", data.token);
-
-            setTimeout(() => {
-                window.location.href = "dashboard.html";
-            }, 1500);
-        } else {
-            showToast(data.message || "Invalid Credentials! Please try again.", "danger");
-        }
-    } catch (error) {
-        console.error("Error during login:", error);
-        showToast("Server Error! Please try again later.", "danger");
-    }
-});
-document.getElementById("email").addEventListener("input", () => {
-    document.getElementById("emailError").style.display = "none";
-});
-
-document.getElementById("password").addEventListener("input", () => {
-    document.getElementById("passwordError").style.display = "none";
-});
+        document.getElementById("password").addEventListener("input", () => {
+            document.getElementById("passwordError").style.display = "none";
+        });
 
     </script>
 

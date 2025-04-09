@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.mobileprepaid.dto.AdminRegisterRequest;
 import com.mobileprepaid.dto.SubscriberRegisterRequest;
 import com.mobileprepaid.dto.LoginRequest;
 import com.mobileprepaid.dto.OtpRequest;
@@ -20,14 +19,6 @@ import com.mobileprepaid.services.AuthService;
 public class AuthController {
 
     private final AuthService authService;
-
-    // Register Admin
-    @PostMapping("/register/admin")
-    public ResponseEntity<Map<String, String>> registerAdmin(@RequestBody AdminRegisterRequest request) {
-        String message = authService.registerAdmin(request);
-        
-        return ResponseEntity.ok(Map.of("message", message)); 
-    }
 
     // Register Subscriber
     @PostMapping("/register/subscriber")

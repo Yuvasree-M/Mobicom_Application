@@ -411,14 +411,15 @@ canvas {
     padding-top: 10px;
     font-size: 14px;
 }
- 
+
 #filterStatus {
     font-size: 14px;
     padding: 5px 10px;
 }
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  
+
 
     .plan-card {
         width: 100%;
@@ -462,4 +463,3 @@ canvas {
         border-radius: 0 0 10px 10px;
     }
 }
-

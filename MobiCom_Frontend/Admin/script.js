@@ -1,4 +1,3 @@
-// Utility Functions
 function parseJwt(token) {
     try {
         const base64Url = token.split('.')[1];
@@ -6,7 +5,6 @@ function parseJwt(token) {
         const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
         return JSON.parse(jsonPayload);
     } catch (e) {
-        console.error("Error decoding JWT:", e);
         return null;
     }
 }
@@ -44,7 +42,7 @@ function showToast(message, type) {
     setTimeout(() => toastContainer.innerHTML = "", 3000);
 }
 
-// Navigation and Page Management
+
 document.addEventListener("DOMContentLoaded", function () {
     showPage("dashboard");
     const navLinks = document.querySelectorAll(".nav-link");
@@ -55,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
             showPage(pageId);
         });
     });
-    setAdminTooltip(); // Ensure this runs only once here
+    setAdminTooltip();
 });
 
 function showPage(pageId) {
@@ -84,7 +82,6 @@ function scrollToTop() {
 async function setAdminTooltip() {
     const tooltipElement = document.getElementById('adminTooltip');
     if (!tooltipElement) {
-        console.warn("Admin tooltip element not found in DOM");
         return;
     }
 
@@ -111,7 +108,6 @@ async function setAdminTooltip() {
         const profileData = await response.json();
         tooltipElement.setAttribute('data-bs-title', profileData.name || 'Admin');
     } catch (error) {
-        console.error("Error fetching admin profile:", error);
         tooltipElement.setAttribute('data-bs-title', 'Error loading profile');
         showToast(`Failed to load admin profile: ${error.message}`, "danger");
     }
@@ -123,83 +119,21 @@ async function notifyUser(name, phone, email, expiryDate) {
         if (!checkAuth()) throw new Error("No JWT token found. Please log in.");
         if (!expiryDate || typeof expiryDate !== 'string') throw new Error("Expiry date is missing or invalid");
 
-        let expiry = expiryDate.includes('-') && expiryDate.split('-').length === 3
-            ? (expiryDate.split('-')[0].length === 4 ? new Date(expiryDate) : new Date(`${expiryDate.split('-')[2]}-${expiryDate.split('-')[1]}-${expiryDate.split('-')[0]}`))
-            : new Date(expiryDate);
+        const payload = {
+            name,
+            phone,
+            email: email || 'Not provided',
+            expiryDate,
+        };
 
-        if (isNaN(expiry.getTime())) throw new Error("Invalid expiry date provided");
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        expiry.setHours(0, 0, 0, 0);
-        const daysRemaining = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
-
-        let plainMessage, subject;
-        if (daysRemaining > 3) {
-            subject = "Mobi.Comm Subscription Update";
-            plainMessage = `Dear ${name}, your subscription is still active and will expire in ${daysRemaining} days.`;
-        } else if (daysRemaining === 3) {
-            subject = "Mobi.Comm Subscription Reminder: 3 Days Remaining";
-            plainMessage = `Dear ${name}, your subscription is nearing its expiry date. Only 3 days remaining! Please recharge soon.`;
-        } else if (daysRemaining === 2) {
-            subject = "Mobi.Comm Subscription Reminder: 2 Days Remaining";
-            plainMessage = `Dear ${name}, your subscription expires in 2 days. Please recharge soon!`;
-        } else if (daysRemaining === 1) {
-            subject = "Mobi.Comm Subscription Reminder: Expiring Tomorrow";
-            plainMessage = `Dear ${name}, your subscription expires tomorrow! Please recharge today to avoid interruption.`;
-        } else if (daysRemaining === 0) {
-            subject = "Mobi.Comm Subscription Reminder: Expiring Today";
-            plainMessage = `Dear ${name}, your subscription expires today! Please recharge now to continue services.`;
-        } else {
-            subject = "Mobi.Comm Subscription Expired";
-            plainMessage = `Dear ${name}, your subscription has expired. Please recharge to reactivate your plan.`;
-        }
-
-        const htmlMessage = `
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>${subject}</title>
-                <style>
-                    body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
-                    .container { max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
-                    .header { background-color: #26A69A; padding: 20px; text-align: center; border-top-left-radius: 8px; border-top-right-radius: 8px; }
-                    .header h1 { color: #ffffff; margin: 0; font-size: 24px; }
-                    .content { padding: 20px; color: #333333; line-height: 1.6; }
-                    .content p { margin: 0 0 10px; }
-                    .footer { background-color: #f4f4f4; padding: 10px; text-align: center; font-size: 12px; color: #777777; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <div class="header">
-                        <h1>Mobi.Comm Prepaid Service</h1>
-                    </div>
-                    <div class="content">
-                        <p>${plainMessage}</p>
-                        <p>Phone: ${phone}</p>
-                        <p>Email: ${email || 'Not provided'}</p>
-                        <p>Expiry Date: ${expiryDate}</p>
-                    </div>
-                    <div class="footer">
-                        <p>© ${new Date().getFullYear()} Mobi.Comm. All rights reserved.</p>
-                        <p>Contact us at support@mobicomm.com</p>
-                    </div>
-                </div>
-            </body>
-            </html>
-        `;
-
-        const payload = { name, phone, email: email || 'Not provided', subject, message: plainMessage, htmlMessage };
-        const response = await fetch('http://localhost:8083/admin/notify', {
+        // Send POST request to backend API
+        const response = await fetch('http://localhost:8083/admin/notify-expiry', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${getToken()}`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(payload),
         });
 
         if (!response.ok) {
@@ -212,7 +146,7 @@ async function notifyUser(name, phone, email, expiryDate) {
             userName: document.getElementById('notifyUserName'),
             userPhone: document.getElementById('notifyUserPhone'),
             message: document.getElementById('notifyMessage'),
-            modalLabel: document.getElementById('notifyModalLabel')
+            modalLabel: document.getElementById('notifyModalLabel'),
         };
 
         if (!Object.values(modalElements).every(el => el)) {
@@ -227,12 +161,12 @@ async function notifyUser(name, phone, email, expiryDate) {
         const notifyModal = new bootstrap.Modal(document.getElementById('notifyModal'), { keyboard: true });
         notifyModal.show();
     } catch (error) {
-        console.error("Error sending notification:", error);
+    
         const modalElements = {
             userName: document.getElementById('notifyUserName'),
             userPhone: document.getElementById('notifyUserPhone'),
             message: document.getElementById('notifyMessage'),
-            modalLabel: document.getElementById('notifyModalLabel')
+            modalLabel: document.getElementById('notifyModalLabel'),
         };
 
         if (Object.values(modalElements).every(el => el)) {
@@ -275,7 +209,6 @@ document.addEventListener("DOMContentLoaded", function () {
             updateDashboard(data);
             updateTable();
         } catch (error) {
-            console.error("Error fetching dashboard data:", error);
             displayError(`Failed to load dashboard data: ${error.message}`);
         }
     }
@@ -324,6 +257,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     </tr>`;
             });
         }
+
         updatePaginationControls();
     }
 
@@ -332,36 +266,48 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!paginationContainer) return;
         paginationContainer.innerHTML = "";
 
-        const dashboardTotalPages = Math.ceil(subscriberData.length / dashboardRecordsPerPage);
-        if (dashboardTotalPages === 0) return;
+        const totalPages = Math.ceil(subscriberData.length / dashboardRecordsPerPage);
+        if (totalPages <= 1) return;
 
-        paginationContainer.innerHTML += `
-            <li class="page-item ${dashboardCurrentPage === 1 ? "disabled" : ""}">
-                <a class="page-link" href="#" onclick="changePage(${dashboardCurrentPage - 1}); return false;">«</a>
-            </li>`;
-        for (let i = 1; i <= dashboardTotalPages; i++) {
-            paginationContainer.innerHTML += `
-                <li class="page-item ${i === dashboardCurrentPage ? "active" : ""}">
-                    <a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a>
+        const createPageItem = (page, label = page, disabled = false, active = false) => {
+            return `
+                <li class="page-item ${disabled ? 'disabled' : ''} ${active ? 'active' : ''}">
+                    <a class="page-link" href="#" data-page="${page}">${label}</a>
                 </li>`;
+        };
+
+        paginationContainer.innerHTML += createPageItem(dashboardCurrentPage - 1, "«", dashboardCurrentPage === 1);
+
+        for (let i = 1; i <= totalPages; i++) {
+            paginationContainer.innerHTML += createPageItem(i, i, false, i === dashboardCurrentPage);
         }
-        paginationContainer.innerHTML += `
-            <li class="page-item ${dashboardCurrentPage === dashboardTotalPages ? "disabled" : ""}">
-                <a class="page-link" href="#" onclick="changePage(${dashboardCurrentPage + 1}); return false;">»</a>
-            </li>`;
+
+        paginationContainer.innerHTML += createPageItem(dashboardCurrentPage + 1, "»", dashboardCurrentPage === totalPages);
+
+        // Attach event listeners to pagination links
+        Array.from(paginationContainer.querySelectorAll("a.page-link")).forEach(link => {
+            link.addEventListener("click", (e) => {
+                e.preventDefault();
+                const page = parseInt(e.target.getAttribute("data-page"));
+                if (!isNaN(page)) {
+                    changePage(page);
+                }
+            });
+        });
     }
 
-    window.changePage = function (page) {
+    function changePage(page) {
         const totalPages = Math.ceil(subscriberData.length / dashboardRecordsPerPage);
-        if (page > 0 && page <= totalPages) {
+        if (page >= 1 && page <= totalPages) {
             dashboardCurrentPage = page;
             updateTable();
         }
-    };
+    }
 
     fetchDataAndUpdate();
     setInterval(fetchDataAndUpdate, 10000);
 });
+
 
 // Subscriber Management
 document.addEventListener("DOMContentLoaded", function () {
@@ -393,7 +339,6 @@ document.addEventListener("DOMContentLoaded", function () {
             subscriberTotalPages = data.totalPages || 1;
             displaySubscribers();
         } catch (error) {
-            console.error("Error fetching subscribers:", error);
             showToast("Error fetching subscribers", "danger");
         }
     }
@@ -415,7 +360,6 @@ document.addEventListener("DOMContentLoaded", function () {
             const data = await response.json();
             return data.content || [];
         } catch (error) {
-            console.error("Error fetching all subscribers:", error);
             showToast("Error fetching all subscribers", "danger");
             return [];
         }
@@ -527,7 +471,6 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById(`status-${id}`).textContent = newStatus;
             fetchSubscribers(subscriberCurrentPage - 1, document.getElementById("statusFilter")?.value || null);
         } catch (error) {
-            console.error("Error updating status:", error);
             showToast("Error updating status", "danger");
         }
         bootstrap.Modal.getInstance(document.getElementById("confirmationModal")).hide();
@@ -550,7 +493,6 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById(`status-${id}`).textContent = "INACTIVE";
             fetchSubscribers(subscriberCurrentPage - 1, document.getElementById("statusFilter")?.value || null);
         } catch (error) {
-            console.error("Error deactivating subscriber:", error);
             showToast("Error deactivating subscriber", "danger");
         }
         bootstrap.Modal.getInstance(document.getElementById("confirmationModal")).hide();
@@ -657,7 +599,6 @@ document.addEventListener('DOMContentLoaded', () => {
             allTransactions = await fetchWithAuth(`${apiBaseUrl}/transactions/all`);
             applyFiltersAndRender();
         } catch (error) {
-            console.error("Error loading transactions:", error);
             showToast("Failed to load transactions", "danger");
         }
     }
@@ -837,7 +778,6 @@ document.addEventListener("DOMContentLoaded", function () {
             populateCategoryDropdowns();
             displayCategories();
         } catch (error) {
-            console.error("Error fetching categories:", error);
             showToast("Error fetching categories", "danger");
         }
     }
@@ -876,7 +816,6 @@ document.addEventListener("DOMContentLoaded", function () {
             planTotalPages = data.totalPages;
             displayPlans();
         } catch (error) {
-            console.error("Error fetching plans:", error);
             showToast("Error fetching plans", "danger");
         }
     }
@@ -1019,7 +958,6 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("plan-status").value = plan.status;
             new bootstrap.Modal(document.getElementById("addPlanModal")).show();
         } catch (error) {
-            console.error("Error fetching plan:", error);
             showToast("Error fetching plan details", "danger");
         }
     };
@@ -1055,7 +993,6 @@ document.addEventListener("DOMContentLoaded", function () {
             bootstrap.Modal.getInstance(document.getElementById("addPlanModal")).hide();
             fetchPlans();
         } catch (error) {
-            console.error("Error saving plan:", error);
             showToast("Error saving plan", "danger");
         }
     };
@@ -1078,7 +1015,6 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("category-name").value = category.name;
             new bootstrap.Modal(document.getElementById("addCategoryModal")).show();
         } catch (error) {
-            console.error("Error fetching category:", error);
             showToast("Error fetching category details", "danger");
         }
     };
@@ -1107,7 +1043,6 @@ document.addEventListener("DOMContentLoaded", function () {
             bootstrap.Modal.getInstance(document.getElementById("addCategoryModal")).hide();
             fetchCategories();
         } catch (error) {
-            console.error("Error saving category:", error);
             showToast("Error saving category", "danger");
         }
     };
@@ -1136,7 +1071,6 @@ document.addEventListener("DOMContentLoaded", function () {
             bootstrap.Modal.getInstance(document.getElementById("deletePlanModal")).hide();
             fetchPlans();
         } catch (error) {
-            console.error("Error deleting plan:", error);
             showToast("Error deleting plan", "danger");
         }
     };
@@ -1163,7 +1097,6 @@ document.addEventListener("DOMContentLoaded", function () {
             bootstrap.Modal.getInstance(document.getElementById("deleteCategoryModal")).hide();
             fetchCategories();
         } catch (error) {
-            console.error("Error deleting category:", error);
             showToast("Error deleting category", "danger");
         }
     };
@@ -1230,10 +1163,6 @@ document.addEventListener("DOMContentLoaded", function () {
 document.addEventListener("DOMContentLoaded", function () {
     const BASE_URL = "http://localhost:8083/admin";
     let adminUsername;
-
-    function logError(message, error) {
-        console.error(`${message}:`, { message: error.message, stack: error.stack, status: error.status || 'N/A' });
-    }
 
     async function loadAdminProfile() {
         if (!checkAuth()) return;
@@ -1428,21 +1357,21 @@ document.addEventListener("DOMContentLoaded", function () {
                 "Content-Type": "application/json",
             },
         })
-        .then(response => {
-            if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to fetch report data`);
-            return response.json();
-        })
-        .then(data => {
-            updateSummaryCards(data);
-            generateCharts(data);
-        })
-        .catch(error => {
-            console.error("Error fetching report data:", error);
-            showToast(`Failed to load reports: ${error.message}`, "danger");
-            if (error.message.includes("401") || error.message.includes("403")) {
-                setTimeout(() => window.location.href = "/login.html", 2000);
-            }
-        });
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to fetch report data`);
+                return response.json();
+            })
+            .then(data => {
+                updateSummaryCards(data);
+                generateCharts(data);
+            })
+            .catch(error => {
+
+                showToast(`Failed to load reports: ${error.message}`, "danger");
+                if (error.message.includes("401") || error.message.includes("403")) {
+                    setTimeout(() => window.location.href = "/login.html", 2000);
+                }
+            });
     }
 
     function updateSummaryCards(data) {
@@ -1558,4 +1487,49 @@ function generateFullReport() {
         document.querySelectorAll(".downloadBtn")?.forEach(btn => btn.style.display = "block");
         doc.save("Full_Report.pdf");
     });
+}
+
+function confirmLogout() {
+    const logoutModal = new bootstrap.Modal(document.getElementById('logoutModal'));
+    logoutModal.show();
+
+    const apiBaseUrl = "http://localhost:8083/auth";
+    const confirmBtn = document.getElementById('confirmLogoutBtn');
+
+    confirmBtn.onclick = async () => {
+        const token = sessionStorage.getItem('jwtToken');
+
+        if (!token) {
+            showToast("errorToast", "No session token found. You are already logged out.");
+            sessionStorage.removeItem('jwtToken');
+            logoutModal.hide();
+            window.location.href = '/index.html';
+            return;
+        }
+
+        try {
+            const response = await fetch(`${apiBaseUrl}/logout/admin`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || "Logout failed!");
+            }
+
+            sessionStorage.removeItem('jwtToken');
+            showToast("successToast", result.message || "Logged out successfully!");
+            logoutModal.hide();
+
+            setTimeout(() => {
+                window.location.href = '/index.html';
+            }, 1000);
+        } catch (error) {
+            showToast("errorToast", error.message || "Failed to logout. Please try again.");
+        }
+    };
 }
