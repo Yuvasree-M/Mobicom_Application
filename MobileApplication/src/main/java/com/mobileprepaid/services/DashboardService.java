@@ -10,11 +10,12 @@ import com.mobileprepaid.enums.SubscriberStatus;
 import com.mobileprepaid.repository.PlanRepository;
 import com.mobileprepaid.repository.SubscriberRepository;
 import com.mobileprepaid.repository.TransactionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -23,16 +24,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class DashboardService {
 
-    @Autowired
-    private SubscriberRepository subscriberRepository;
-
-    @Autowired
-    private PlanRepository planRepository;
-
-    @Autowired
-    private TransactionRepository transactionRepository;
+    private final SubscriberRepository subscriberRepository;
+    private final PlanRepository planRepository;
+    private final TransactionRepository transactionRepository;
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 

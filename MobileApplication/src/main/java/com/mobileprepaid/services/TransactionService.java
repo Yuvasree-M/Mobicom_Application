@@ -9,28 +9,30 @@ import com.mobileprepaid.repository.TransactionRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class TransactionService {
 
-    @Autowired
-    private TransactionRepository transactionRepository;
-    @Autowired
-    private PlanRepository planRepository;
+    private final TransactionRepository transactionRepository;
+    private final PlanRepository planRepository;
 
     public Page<Transaction> getAllTransactions(Pageable pageable) {
         return transactionRepository.findAll(pageable);
     }
-    public List<Transaction> getAllTransaction(){
-    	return transactionRepository.findAll();
+
+    public List<Transaction> getAllTransaction() {
+        return transactionRepository.findAll();
     }
+
     public Page<Transaction> getFilteredTransactions(String status, String paymentMethod, String fromDate, String toDate, Pageable pageable) {
         return transactionRepository.findWithFilters(status, paymentMethod, fromDate, toDate, pageable);
     }
+
     public CurrentPlanDTO getLatestTransaction(String subscriberNumber) {
         Transaction latestTransaction = transactionRepository.findLatestBySubscriberPhoneNumber(subscriberNumber);
         if (latestTransaction == null) {
@@ -40,14 +42,8 @@ public class TransactionService {
         Plan plan = null;
         if (latestTransaction.getPlanId() != null) {
             plan = planRepository.findById(latestTransaction.getPlanId()).orElse(null);
-            System.out.println("Plan ID: " + latestTransaction.getPlanId());
-            System.out.println("Fetched Plan: " + (plan != null ? plan.toString() : "null"));
-            if (plan != null) {
-                System.out.println("Call Limit: " + plan.getCallLimit());
-                System.out.println("SMS Limit: " + plan.getSmsLimit());
-                System.out.println("Data Limit: " + plan.getDataLimit());
-            }
         }
+
         if (plan == null) {
             int validityDays = Integer.parseInt(latestTransaction.getPlanValidity().replaceAll("[^0-9]", ""));
             return new CurrentPlanDTO(
@@ -74,11 +70,10 @@ public class TransactionService {
             daysLeft
         );
     }
-    
+
     private int calculateDaysLeft(LocalDateTime rechargeDate, int validity) {
         LocalDateTime expiryDate = rechargeDate.plusDays(validity);
         long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(LocalDateTime.now(), expiryDate);
         return Math.max(0, (int) daysBetween);
     }
-
 }

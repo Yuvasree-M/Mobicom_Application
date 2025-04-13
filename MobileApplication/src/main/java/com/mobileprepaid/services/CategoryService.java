@@ -2,17 +2,18 @@ package com.mobileprepaid.services;
 
 import com.mobileprepaid.entities.Category;
 import com.mobileprepaid.repository.CategoryRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class CategoryService {
-
-    @Autowired
-    private CategoryRepository categoryRepository;
-
+    private final CategoryRepository categoryRepository;
+    
     public Category saveCategory(Category category) {
         return categoryRepository.save(category);
     }

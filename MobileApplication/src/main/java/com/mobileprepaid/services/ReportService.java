@@ -5,7 +5,9 @@ import com.mobileprepaid.dto.ReportAnalyticsDTO;
 import com.mobileprepaid.dto.ReportSummaryDTO;
 import com.mobileprepaid.repository.SubscriberRepository;
 import com.mobileprepaid.repository.TransactionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
@@ -15,21 +17,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ReportService {
 
-    @Autowired
-    private TransactionRepository transactionRepository;
-
-    @Autowired
-    private SubscriberRepository subscriberRepository;
+    private final TransactionRepository transactionRepository;
+    private final SubscriberRepository subscriberRepository;
 
     public ReportAnalyticsDTO getReportAnalytics() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startOfMonth = now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
         LocalDateTime endOfMonth = now.withDayOfMonth(now.getMonth().length(now.toLocalDate().isLeapYear()))
-                                    .withHour(23).withMinute(59).withSecond(59).withNano(999999999);
+                                      .withHour(23).withMinute(59).withSecond(59).withNano(999999999);
 
-        
         Double totalRevenue = transactionRepository.getTotalRevenueThisMonth(startOfMonth, endOfMonth);
         if (totalRevenue == null) totalRevenue = 0.0;
         DecimalFormat df = new DecimalFormat("#,###.##");
@@ -43,7 +42,6 @@ public class ReportService {
 
         ReportSummaryDTO summary = new ReportSummaryDTO(formattedRevenue, totalRecharge.intValue(), newSubscribers.intValue());
 
-   
         List<Object[]> dailyRevenueData = transactionRepository.getDailyRevenueThisMonth(startOfMonth, endOfMonth);
         List<String> revenueDates = new ArrayList<>();
         List<Double> revenueValues = new ArrayList<>();
@@ -54,7 +52,6 @@ public class ReportService {
         }
         ChartDataDTO revenueOverview = new ChartDataDTO(revenueDates, revenueValues);
 
-       
         List<Object[]> dailyRechargeData = transactionRepository.getDailyRechargeCountsThisMonth(startOfMonth, endOfMonth);
         List<String> rechargeDates = new ArrayList<>();
         List<Double> rechargeValues = new ArrayList<>();
@@ -64,7 +61,6 @@ public class ReportService {
         }
         ChartDataDTO dailyRecharge = new ChartDataDTO(rechargeDates, rechargeValues);
 
-      
         List<Object[]> planPopularityData = transactionRepository.getRechargePlanPopularityThisMonth(startOfMonth, endOfMonth);
         List<String> plans = new ArrayList<>();
         List<Double> planValues = new ArrayList<>();
@@ -74,7 +70,6 @@ public class ReportService {
         }
         ChartDataDTO rechargePlanPopularity = new ChartDataDTO(plans, planValues);
 
-    
         List<Object[]> paymentModeData = transactionRepository.getPaymentModeUsageThisMonth(startOfMonth, endOfMonth);
         List<String> modes = new ArrayList<>();
         List<Double> modeValues = new ArrayList<>();

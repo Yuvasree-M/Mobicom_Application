@@ -24,7 +24,10 @@ import com.mobileprepaid.security.TokenBlocklist;
 import com.mobileprepaid.utils.OtpGenerator;
 import com.mobileprepaid.utils.SmsService;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
     private final SubscriberRepository subscriberRepository;
@@ -36,26 +39,6 @@ public class AuthService {
     private final SmsService smsService;
     private final JwtService jwtService;
     private final TokenBlocklist tokenBlocklist;
-
-    public AuthService(SubscriberRepository subscriberRepository,
-                       SubscriberLoginRepository subscriberLoginRepository,
-                       AdminLoginRepository adminLoginRepository,
-                       RoleRepository roleRepository,
-                       PasswordEncoder passwordEncoder,
-                       OtpGenerator otpGenerator,
-                       SmsService smsService,
-                       JwtService jwtService,
-                       TokenBlocklist tokenBlocklist) {
-        this.subscriberRepository = subscriberRepository;
-        this.subscriberLoginRepository = subscriberLoginRepository;
-        this.adminLoginRepository = adminLoginRepository;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.otpGenerator = otpGenerator;
-        this.smsService = smsService;
-        this.jwtService = jwtService;
-        this.tokenBlocklist = tokenBlocklist;
-    }
 
 
     public String loginAdmin(LoginRequest request) {

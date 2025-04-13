@@ -5,7 +5,8 @@ import com.mobileprepaid.enums.PlanStatus;
 import com.mobileprepaid.repository.PlanRepository;
 import com.mobileprepaid.utils.PlanSpecification;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -14,10 +15,10 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
 @Service
+@RequiredArgsConstructor
 public class PlanService {
 
-    @Autowired
-    private PlanRepository planRepository;
+    private final PlanRepository planRepository;
 
     public Page<Plan> getFilteredActivePlans(String name, String category, String dataLimit, Integer validity, Pageable pageable) {
         Specification<Plan> spec = PlanSpecification.filterPlans(name, category, dataLimit, validity);
@@ -79,9 +80,4 @@ public class PlanService {
 
         return planRepository.save(plan);
     }
-    
-//    public Plan findPlanByName(String planName) {
-//        return planRepository.findByPlanName(planName)
-//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Plan not found with name: " + planName));
-//    }
 }

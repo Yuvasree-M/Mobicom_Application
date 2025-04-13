@@ -9,6 +9,12 @@ import org.springframework.web.server.ResponseStatusException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+	
+	 @ExceptionHandler(SubscriberNotFoundException.class)
+	    public ResponseEntity<ErrorResponse> handleSubscriberNotFoundException(SubscriberNotFoundException ex) {
+	        ErrorResponse errorResponse = new ErrorResponse(ex.getMessage());
+	        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+	    }
 
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ErrorResponse> handleResponseStatusException(ResponseStatusException ex) {

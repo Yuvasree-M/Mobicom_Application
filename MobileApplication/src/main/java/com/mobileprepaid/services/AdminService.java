@@ -1,7 +1,5 @@
 package com.mobileprepaid.services;
 import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -11,33 +9,26 @@ import com.mobileprepaid.entities.Subscriber;
 import com.mobileprepaid.enums.SubscriberStatus;
 import com.mobileprepaid.repository.AdminLoginRepository;
 import com.mobileprepaid.repository.SubscriberRepository;
+import lombok.RequiredArgsConstructor;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.List;
 
+
 @Service
+@RequiredArgsConstructor
 public class AdminService {
     private final SubscriberRepository subscriberRepository;
-
-    public AdminService(SubscriberRepository subscriberRepository,AdminLoginRepository adminLoginRepository, PasswordEncoder passwordEncoder) {
-        this.subscriberRepository = subscriberRepository;
-        this.adminLoginRepository = adminLoginRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
-    
     private final AdminLoginRepository adminLoginRepository;
     private final PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private AdminLoginRepository adminRepository;
   
     public Page<Subscriber> getSubscribersByStatus(SubscriberStatus status, Pageable pageable) {
         return subscriberRepository.findByStatus(status, pageable);
     }
 
     public AdminLogin getAdminProfile(String email) {
-        Optional<AdminLogin> admin = adminRepository.findByEmail(email);
+    	Optional<AdminLogin> admin = adminLoginRepository.findByEmail(email);
         AdminLogin adminLogin = admin.orElseThrow(() -> new RuntimeException("Admin profile not found for email: " + email));
         
         if (adminLogin.getProfileImage() != null && !adminLogin.getProfileImage().startsWith("data:image")) {
@@ -54,7 +45,7 @@ public class AdminService {
     }
 
     public AdminLogin updateAdminProfile(String email, AdminLogin adminLogin) {
-        Optional<AdminLogin> existingAdminOpt = adminRepository.findByEmail(email);
+        Optional<AdminLogin> existingAdminOpt = adminLoginRepository.findByEmail(email);
         if (existingAdminOpt.isEmpty()) {
             throw new RuntimeException("Admin profile not found for email: " + email);
         }
@@ -71,7 +62,7 @@ public class AdminService {
             existingAdmin.setProfileImage(adminLogin.getProfileImage());
         }
 
-        return adminRepository.save(existingAdmin);
+        return adminLoginRepository.save(existingAdmin);
     }
     
     public List<Subscriber> getAllSubscribers() {

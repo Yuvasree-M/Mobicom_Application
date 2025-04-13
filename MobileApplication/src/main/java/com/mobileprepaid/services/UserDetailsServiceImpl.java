@@ -5,6 +5,8 @@ import com.mobileprepaid.entities.SubscriberLogin;
 import com.mobileprepaid.repository.AdminLoginRepository;
 import com.mobileprepaid.repository.SubscriberLoginRepository;
 
+import lombok.RequiredArgsConstructor;
+
 import java.util.Collections;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,14 +17,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
     private final AdminLoginRepository adminLoginRepository;
     private final SubscriberLoginRepository subscriberLoginRepository;
-
-    public UserDetailsServiceImpl(AdminLoginRepository adminLoginRepository, SubscriberLoginRepository subscriberLoginRepository) {
-        this.adminLoginRepository = adminLoginRepository;
-        this.subscriberLoginRepository = subscriberLoginRepository;
-    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

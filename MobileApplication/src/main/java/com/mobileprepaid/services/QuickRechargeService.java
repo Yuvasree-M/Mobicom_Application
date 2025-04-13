@@ -7,7 +7,9 @@ import com.mobileprepaid.enums.SubscriberStatus;
 import com.mobileprepaid.repository.SubscriberRepository;
 import com.mobileprepaid.repository.TransactionRepository;
 import com.mobileprepaid.utils.MailService;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,17 +17,12 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class QuickRechargeService {
 
-
-    @Autowired
-    private SubscriberRepository subscriberRepository;
-
-    @Autowired
-    private TransactionRepository transactionRepository;
-
-    @Autowired
-    private MailService mailService;
+    private final SubscriberRepository subscriberRepository;
+    private final TransactionRepository transactionRepository;
+    private final MailService mailService;
 
     public String validateAndRecharge(String phoneNumber) {
         String normalizedNumber = phoneNumber.trim();
